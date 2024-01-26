@@ -11,6 +11,7 @@ public class Overseer {
 
 	private Map<Arc, Node> arcToOutputNode = new HashMap<>();
 	private int tick = 0;
+	private boolean started = false;
 
 	public void start() {
 		// check population of startingNodes
@@ -19,6 +20,9 @@ public class Overseer {
 				throw new IllegalStateException("Starting nodes not fully populated; unable to start!");
 			}
 		}
+
+		started = true;
+		ticktock();
 	}
 
 	private void end() {
@@ -46,7 +50,14 @@ public class Overseer {
 		return true;
 	}
 
+	private boolean hasStarted() {
+		return started;
+	}
+
 	public void ticktock() {
+		if (!hasStarted()) { // todo i think this could be gotten rid of since ticktock is in arc now
+			return;
+		}
 		if (hasEnded()) {
 			end();
 			return;
@@ -59,24 +70,33 @@ public class Overseer {
 			}
 		}
 
-//		Set<Todo> todoNow = new HashSet<>();
-//		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
-//			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
-//				todoNow.addAll(todoEntry.getValue());
-//			}
-//		}
-		/* This may not be necessary as only one dependency state is changed per tick.
-		 *  A direct comparison may therefore suffice and can be evaluated in O(1).
-		 *  I'll keep this here for now. */
-
-		Set<Todo> todoNow = todos.get(sitrep);
-		if (todoNow != null) {
-			for (Todo todo : todoNow) {
-				todo.getArc().run();
+		Set<Todo> todoNow = new HashSet<>();
+		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
+			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
+				for (Todo todo : todoEntry.getValue()) {
+					if (todo.getArc().status != ArcStatus.FINISHED) {
+						todoNow.add(todo);
+					}
+				}
 			}
 		}
+		/* This may not be necessary as only one dependency state is changed per tick.
+		 * A direct comparison may therefore suffice and can be evaluated in O(1).
+		 * I'll keep this here for now.
+		 *
+		 * The only reason why this is here is because you can change multiple node's progress
+		 * during initialization which violates the one tick - at most one extra node done principle*/
 
+		System.out.println("tick = " + tick);
 		tick++;
+
+		if (todoNow.isEmpty()) {
+			System.out.println("Warning: no more Todos left.");
+		}
+		for (Todo todo : todoNow) {
+			System.out.println("todo = " + todo);
+			todo.getArc().runWrapper();
+		}
 	}
 
 	public void addTodos(Set<Todo> todoSet) {

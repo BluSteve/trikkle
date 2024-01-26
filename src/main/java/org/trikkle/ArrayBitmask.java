@@ -34,6 +34,15 @@ public class ArrayBitmask implements IBitmask {
 	}
 
 	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (boolean b : array) {
+			sb.append(b?1:0);
+		}
+		return sb.toString();
+	}
+
+	@Override
 	public int compareTo(IBitmask o) {
 		if (this == o) return 0;
 

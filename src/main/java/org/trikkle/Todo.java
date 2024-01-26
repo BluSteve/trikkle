@@ -25,4 +25,13 @@ public class Todo implements IGraph {
 	public Node getOutputNode() {
 		return outputNode;
 	}
+
+	@Override
+	public String toString() {
+		return "Todo{" +
+				"dependencies=" + dependencies +
+				", arc=" + arc +
+				", outputNode=" + outputNode +
+				'}';
+	}
 }

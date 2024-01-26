@@ -31,7 +31,7 @@ public class ExampleFunctions {
 	}
 
 	static void simpleTest() {
-		Node inputNode = new DiscreteNode(new String[]{"toSquare"});
+		Node inputNode = new DiscreteNode(Set.of("toSquare"));
 		Arc arc = new Arc() {
 			@Override
 			public void run() {
@@ -40,7 +40,7 @@ public class ExampleFunctions {
 				returnDatum("squared", squared);
 			}
 		};
-		Node outputNode = new DiscreteNode(new String[]{"squared"});
+		Node outputNode = new DiscreteNode(Set.of("squared"));
 		Todo todo = new Todo(Set.of(inputNode), arc, outputNode);
 
 
@@ -58,7 +58,8 @@ public class ExampleFunctions {
 	}
 
 	static void complexTest() {
-		Node inputNode = new DiscreteNode(new String[]{"toSquare"});
+		Node inputNode2 = new DiscreteNode(Set.of("finalMultiplier", "finalExponent"));
+		Node inputNode = new DiscreteNode(Set.of("toSquare"));
 		Arc arc = new Arc() {
 			@Override
 			public void run() {
@@ -67,7 +68,7 @@ public class ExampleFunctions {
 				returnDatum("squared", squared);
 			}
 		};
-		Node node2 = new DiscreteNode(new String[]{"squared"});
+		Node node2 = new DiscreteNode(Set.of("squared"));
 		Todo todo = new Todo(Set.of(inputNode), arc, node2);
 
 
@@ -78,20 +79,33 @@ public class ExampleFunctions {
 				double toSquare = (double) getDatum("toSquare");
 				double result = squared + 1.5 * toSquare;
 
-				returnDatum("result", result);
+				returnDatum("result1", result);
 			}
 		};
-		Node node3 = new DiscreteNode(new String[]{"result"});
-
+		Node node3 = new DiscreteNode(Set.of("result1"));
 		Todo todo2 = new Todo(Set.of(inputNode, node2), arc2, node3);
+
+		Arc arc3 = new Arc() {
+			@Override
+			public void run() {
+				double result1 = (double) getDatum("result1");
+				double finalMultiplier = (double) getDatum("finalMultiplier");
+				double finalExponent = (double) getDatum("finalExponent");
+				returnDatum("result2", Math.pow(result1 * finalMultiplier, finalExponent));
+			}
+		};
+		Node node4 = new DiscreteNode(Set.of("result2"));
+		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
 
 
 		Overseer overseer = new Overseer();
-		overseer.addTodos(Set.of(todo, todo2));
-		overseer.setAsStarting(Set.of(inputNode));
-		overseer.setAsEnding(Set.of(node3));
+		overseer.addTodos(Set.of(todo, todo2, todo3));
+		overseer.setAsStarting(Set.of(inputNode, inputNode2));
+		overseer.setAsEnding(Set.of(node4));
 
 		inputNode.addDatum("toSquare", 2.0);
+		inputNode2.addDatum("finalMultiplier", 3.0);
+		inputNode2.addDatum("finalExponent", 1.2);
 		overseer.start();
 
 

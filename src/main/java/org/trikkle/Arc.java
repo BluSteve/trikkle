@@ -2,9 +2,16 @@ package org.trikkle;
 
 public abstract class Arc implements Primable {
 	private Overseer overseer;
-	protected ArcStatus status;
+	protected ArcStatus status = ArcStatus.WAITING;
 
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
+
+	void runWrapper() {
+		status = ArcStatus.IN_PROGRESS;
+		run();
+		status = ArcStatus.FINISHED;
+		overseer.ticktock();
+	}
 
 	protected Object getDatum(String datumName) {
 		return overseer.getCache().get(datumName);

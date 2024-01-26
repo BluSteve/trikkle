@@ -1,11 +1,13 @@
 package org.trikkle;
 
+import java.util.Set;
+
 public abstract class Node implements Primable {
 	protected Overseer overseer;
 	protected double progress;
-	protected String[] datumNames;
+	protected Set<String> datumNames;
 
-	public Node(String[] datumNames) {
+	public Node(Set<String> datumNames) {
 		this.datumNames = datumNames;
 	}
 
@@ -30,5 +32,13 @@ public abstract class Node implements Primable {
 	@Override
 	public Overseer getOverseer() {
 		return overseer;
+	}
+
+	@Override
+	public String toString() {
+		return "Node{" +
+				"progress=" + progress +
+				", datumNames=" + datumNames +
+				'}';
 	}
 }
