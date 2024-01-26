@@ -95,6 +95,7 @@ public class Overseer {
 			if (todo.getArc().status != ArcStatus.FINISHED) {
 				System.out.println("todo = " + todo);
 				todo.getArc().runWrapper();
+				break;
 			}
 		}
 	}
