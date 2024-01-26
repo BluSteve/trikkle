@@ -1,7 +1,8 @@
 package org.trikkle;
 
 public enum ArcStatus {
-	WAITING,
+	IDLE,
+	STAND_BY,
 	IN_PROGRESS,
 	FINISHED
 }

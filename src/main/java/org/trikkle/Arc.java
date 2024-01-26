@@ -2,7 +2,7 @@ package org.trikkle;
 
 public abstract class Arc implements Primable {
 	private Overseer overseer;
-	protected ArcStatus status = ArcStatus.WAITING;
+	protected ArcStatus status = ArcStatus.IDLE;
 
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 

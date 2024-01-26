@@ -111,7 +111,7 @@ public class ExampleFunctions {
 	}
 
 	public static void main(String[] args) {
-		complexTest();
+		simpleTest();
 
 	}
 }

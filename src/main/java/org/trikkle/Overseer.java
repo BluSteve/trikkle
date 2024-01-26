@@ -63,6 +63,8 @@ public class Overseer {
 			return;
 		}
 
+		tick++;
+
 		IBitmask sitrep = new ArrayBitmask(nodes.size());
 		for (Node node : nodes) {
 			if (node.getProgress() == 1) {
@@ -71,17 +73,17 @@ public class Overseer {
 		}
 
 
-		Todo todoNow = null;
+		Set<Todo> todosNow = new HashSet<>();
 		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
 			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
 				for (Todo todo : todoEntry.getValue()) {
-					if (todo.getArc().status != ArcStatus.FINISHED) { // until it finds one that's not finished
-						todoNow = todo;
+					if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
+						todo.getArc().status = ArcStatus.STAND_BY;
+						todosNow.add(todo);
 					}
 				}
 			}
 		}
-		if (todoNow == null) return;
 		/* This may not be necessary as only one dependency state is changed per tick.
 		 * A direct comparison may therefore suffice and can be evaluated in O(1).
 		 * I'll keep this here for now.
@@ -89,11 +91,11 @@ public class Overseer {
 		 * The only reason why this is here is because you can change multiple node's progress
 		 * during initialization which violates the one tick - at most one extra node done principle*/
 
-		System.out.println("tick = " + tick);
-		tick++;
-
-		System.out.println("todo = " + todoNow);
-		todoNow.getArc().runWrapper();
+		for (Todo todo : todosNow) {
+			System.out.println("tick = " + tick);
+			System.out.println("todo = " + todo);
+			todo.getArc().runWrapper();
+		}
 	}
 
 	public void addTodos(Set<Todo> todoSet) {
