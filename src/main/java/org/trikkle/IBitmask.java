@@ -1,6 +1,6 @@
 package org.trikkle;
 
-public interface IBitmask {
+public interface IBitmask extends Comparable<IBitmask> {
 	void set(int index);
 
 	void unset(int index);

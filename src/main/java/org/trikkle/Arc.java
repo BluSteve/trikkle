@@ -1,16 +1,17 @@
 package org.trikkle;
 
-public class Arc implements Primable {
-	private int index;
+public abstract class Arc implements Primable {
 	private Overseer overseer;
-	private ArcStatus status;
+	protected ArcStatus status;
 
-	public int getIndex() {
-		return index;
+	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
+
+	protected Object getDatum(String datumName) {
+		return overseer.getCache().get(datumName);
 	}
 
-	public void setIndex(int index) {
-		this.index = index;
+	protected void returnDatum(String datumName, Object datum) {
+		overseer.getOutputNode(this).addDatum(datumName, datum);
 	}
 
 	@Override

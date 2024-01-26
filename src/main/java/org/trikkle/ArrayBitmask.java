@@ -25,4 +25,27 @@ public class ArrayBitmask implements IBitmask {
 	public int hashCode() {
 		return Arrays.hashCode(array);
 	}
+
+	@Override
+	public int compareTo(IBitmask o) {
+		if (this == o) return 0;
+
+		ArrayBitmask ab = (ArrayBitmask) o;
+		if (array.length != ab.array.length) {
+			throw new IllegalArgumentException("ArrayBitmasks not of the same length!");
+		}
+		else {
+			boolean allSame = true;
+			for (int i = 0; i < array.length; i++) {
+				if (ab.array[i] != array[i]) {
+					allSame = false;
+				}
+				if (ab.array[i] && !array[i]) {
+					return -1;
+				}
+			}
+			if (allSame) return 0;
+			return 1;
+		}
+	}
 }
