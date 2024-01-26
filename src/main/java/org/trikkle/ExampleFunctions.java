@@ -41,8 +41,7 @@ public class ExampleFunctions {
 		Todo todo = new Todo(Set.of(inputNode), arc, outputNode);
 
 
-		Overseer overseer = new Overseer();
-		overseer.addTodos(Set.of(todo));
+		Overseer overseer = new Overseer(Set.of(todo));
 		overseer.setAsStarting(Set.of(inputNode));
 		overseer.setAsEnding(Set.of(outputNode));
 
@@ -107,7 +106,7 @@ public class ExampleFunctions {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(000);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
@@ -117,8 +116,7 @@ public class ExampleFunctions {
 		};
 		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
 
-		Overseer overseer = new Overseer();
-		overseer.addTodos(Set.of(todo, todo2, todo3, phantomTodo1, phantomTodo2));
+		Overseer overseer = new Overseer(Set.of(todo, todo2, todo3, phantomTodo1, phantomTodo2));
 		overseer.setAsStarting(Set.of());
 		overseer.setAsEnding(Set.of(node4));
 		overseer.start();

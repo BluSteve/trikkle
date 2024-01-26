@@ -13,13 +13,6 @@ public abstract class Node implements Primable {
 
 	public abstract void addDatum(String datumName, Object datum);
 
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (obj == this) return true;
-//		if (!(obj instanceof Node)) return false;
-//		return this.index == ((Node) obj).index;
-//	}
-
 	public double getProgress() { // 1 = usable, !1 = unusable. Might convert to boolean in the future.
 		return progress;
 	}

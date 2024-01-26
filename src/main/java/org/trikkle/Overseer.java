@@ -6,14 +6,52 @@ import java.util.concurrent.*;
 public class Overseer {
 	private final Map<IBitmask, Set<Todo>> todos = new HashMap<>();
 	private final Map<String, Object> cache = new ConcurrentHashMap<>();
-	private final Set<Node> nodes = new HashSet<>(), startingNodes = new HashSet<>(), endingNodes = new HashSet<>();
+	private final Set<Node> nodes = new HashSet<>();
+	private final Set<Node> startingNodes = new HashSet<>();
+	private final Set<Node> endingNodes = new HashSet<>();
 	private final List<Node> nodeOfIndex = new ArrayList<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
-
 	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
 	private int tick = 0;
 	private boolean started = false;
-	private static final ForkJoinPool POOL = ForkJoinPool.commonPool();
+
+	public Overseer(Set<Todo> todoSet) {
+		for (Todo todo : todoSet) {
+			nodes.addAll(todo.getDependencies());
+			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
+			nodes.add(todo.getOutputNode());
+		}
+
+		for (Primable primable : nodes) {
+			primable.primeWith(this);
+		}
+		for (Primable primable : arcToOutputNode.keySet()) {
+			primable.primeWith(this);
+		}
+
+		int i = 0;
+		for (Node node : nodes) {
+			nodeOfIndex.add(node);
+			indexOfNode.put(node, i);
+			i++;
+		}
+
+		for (Todo todo : todoSet) {
+			IBitmask bitmask = new ArrayBitmask(nodes.size()); // hardcode ArrayBitmask for now.
+			for (Node dependency : todo.getDependencies()) {
+				bitmask.set(indexOfNode.get(dependency));
+			}
+
+			if (todos.containsKey(bitmask)) {
+				todos.get(bitmask).add(todo);
+			}
+			else {
+				Set<Todo> set = new HashSet<>();
+				set.add(todo);
+				todos.put(bitmask, set);
+			}
+		}
+	}
 
 	public void start() {
 		// check population of startingNodes
@@ -96,7 +134,7 @@ public class Overseer {
 
 		System.out.println("todosNow.size() = " + todosNow.size());
 		Todo[] todoArray = todosNow.toArray(new Todo[0]);
-		List<RecursiveAction> tasks = new ArrayList<>();
+		List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
 
 		for (int i = 0; i < todoArray.length; i++) {
 			int finalI = i;
@@ -105,50 +143,12 @@ public class Overseer {
 				protected void compute() {
 					Todo todo = todoArray[finalI];
 					todo.getArc().runWrapper();
-					System.out.println("tick = " + Thread.currentThread() + ", todo = " + todo);
+					System.out.println("tick = " + tick + ", todo = " + todo);
 				}
 			});
 		}
 
 		ForkJoinTask.invokeAll(tasks);
-	}
-
-	public void addTodos(Set<Todo> todoSet) {
-		for (Todo todo : todoSet) {
-			nodes.addAll(todo.getDependencies());
-			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
-			nodes.add(todo.getOutputNode());
-		}
-
-		for (Primable primable : nodes) {
-			primable.primeWith(this);
-		}
-		for (Primable primable : arcToOutputNode.keySet()) {
-			primable.primeWith(this);
-		}
-
-		int i = 0;
-		for (Node node : nodes) {
-			nodeOfIndex.add(node);
-			indexOfNode.put(node, i);
-			i++;
-		}
-
-		for (Todo todo : todoSet) {
-			IBitmask bitmask = new ArrayBitmask(nodes.size()); // hardcode ArrayBitmask for now.
-			for (Node dependency : todo.getDependencies()) {
-				bitmask.set(indexOfNode.get(dependency));
-			}
-
-			if (todos.containsKey(bitmask)) {
-				todos.get(bitmask).add(todo);
-			}
-			else {
-				Set<Todo> set = new HashSet<>();
-				set.add(todo);
-				todos.put(bitmask, set);
-			}
-		}
 	}
 
 	public void setAsStarting(Set<Node> nodeSet) {
