@@ -1,17 +1,19 @@
 package org.trikkle;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 public class Overseer {
 	private final Map<IBitmask, Set<Todo>> todos = new HashMap<>();
-	private final Map<String, Object> cache = new HashMap<>();
-	private Set<Node> nodes = new HashSet<>(), startingNodes = new HashSet<>(), endingNodes = new HashSet<>();
-	private List<Node> nodeOfIndex = new ArrayList<>();
-	private Map<Node, Integer> indexOfNode = new HashMap<>();
+	private final Map<String, Object> cache = new ConcurrentHashMap<>();
+	private final Set<Node> nodes = new HashSet<>(), startingNodes = new HashSet<>(), endingNodes = new HashSet<>();
+	private final List<Node> nodeOfIndex = new ArrayList<>();
+	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 
-	private Map<Arc, Node> arcToOutputNode = new HashMap<>();
+	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
 	private int tick = 0;
 	private boolean started = false;
+	private static final ForkJoinPool POOL = ForkJoinPool.commonPool();
 
 	public void start() {
 		// check population of startingNodes
@@ -91,11 +93,24 @@ public class Overseer {
 		 * The only reason why this is here is because you can change multiple node's progress
 		 * during initialization which violates the one tick - at most one extra node done principle*/
 
-		for (Todo todo : todosNow) {
-			System.out.println("tick = " + tick);
-			System.out.println("todo = " + todo);
-			todo.getArc().runWrapper();
+
+		System.out.println("todosNow.size() = " + todosNow.size());
+		Todo[] todoArray = todosNow.toArray(new Todo[0]);
+		List<RecursiveAction> tasks = new ArrayList<>();
+
+		for (int i = 0; i < todoArray.length; i++) {
+			int finalI = i;
+			tasks.add(new RecursiveAction() {
+				@Override
+				protected void compute() {
+					Todo todo = todoArray[finalI];
+					todo.getArc().runWrapper();
+					System.out.println("tick = " + Thread.currentThread() + ", todo = " + todo);
+				}
+			});
 		}
+
+		ForkJoinTask.invokeAll(tasks);
 	}
 
 	public void addTodos(Set<Todo> todoSet) {
