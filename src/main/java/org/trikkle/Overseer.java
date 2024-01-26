@@ -74,9 +74,7 @@ public class Overseer {
 		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
 			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
 				for (Todo todo : todoEntry.getValue()) {
-					if (todo.getArc().status != ArcStatus.FINISHED) {
-						todoNow.add(todo);
-					}
+					todoNow.add(todo);
 				}
 			}
 		}
@@ -94,8 +92,10 @@ public class Overseer {
 			System.out.println("Warning: no more Todos left.");
 		}
 		for (Todo todo : todoNow) {
-			System.out.println("todo = " + todo);
-			todo.getArc().runWrapper();
+			if (todo.getArc().status != ArcStatus.FINISHED) {
+				System.out.println("todo = " + todo);
+				todo.getArc().runWrapper();
+			}
 		}
 	}
 

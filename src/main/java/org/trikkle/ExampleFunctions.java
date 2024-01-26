@@ -1,9 +1,6 @@
 package org.trikkle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ExampleFunctions {
 	static double fn1() {
@@ -98,14 +95,28 @@ public class ExampleFunctions {
 		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
 
 
+		Arc phantomArc1 = new Arc() {
+			@Override
+			public void run() {
+				returnDatum("toSquare", 2.0);
+			}
+		};
+		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
+
+		Arc phantomArc2 = new Arc() {
+			@Override
+			public void run() {
+				returnDatum("finalMultiplier", 3.0);
+				returnDatum("finalExponent", 1.2);
+			}
+		};
+		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
+
 		Overseer overseer = new Overseer();
-		overseer.addTodos(Set.of(todo, todo2, todo3));
-		overseer.setAsStarting(Set.of(inputNode, inputNode2));
+		overseer.addTodos(Set.of(todo, todo2, todo3, phantomTodo1, phantomTodo2));
+		overseer.setAsStarting(Set.of());
 		overseer.setAsEnding(Set.of(node4));
 
-		inputNode.addDatum("toSquare", 2.0);
-		inputNode2.addDatum("finalMultiplier", 3.0);
-		inputNode2.addDatum("finalExponent", 1.2);
 		overseer.start();
 
 
