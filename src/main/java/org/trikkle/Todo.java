@@ -1,19 +1,20 @@
 package org.trikkle;
 
 import java.util.List;
+import java.util.Set;
 
 public class Todo implements IGraph {
-	private List<Node> dependencies;
+	private Set<Node> dependencies;
 	private Arc arc;
 	private Node outputNode;
 
-	public Todo(List<Node> dependencies, Arc arc, Node outputNode) {
+	public Todo(Set<Node> dependencies, Arc arc, Node outputNode) {
 		this.dependencies = dependencies;
 		this.arc = arc;
 		this.outputNode = outputNode;
 	}
 
-	public List<Node> getDependencies() {
+	public Set<Node> getDependencies() {
 		return dependencies;
 	}
 

@@ -10,6 +10,7 @@ public class Overseer {
 	private Map<Node, Integer> indexOfNode = new HashMap<>();
 
 	private Map<Arc, Node> arcToOutputNode = new HashMap<>();
+	private int tick = 0;
 
 	public void start() {
 		// check population of startingNodes
@@ -58,23 +59,28 @@ public class Overseer {
 			}
 		}
 
-		Set<Todo> todoNow = new HashSet<>();
-		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
-			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
-				todoNow.addAll(todoEntry.getValue());
-			}
-		}
+//		Set<Todo> todoNow = new HashSet<>();
+//		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
+//			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
+//				todoNow.addAll(todoEntry.getValue());
+//			}
+//		}
 		/* This may not be necessary as only one dependency state is changed per tick.
 		 *  A direct comparison may therefore suffice and can be evaluated in O(1).
 		 *  I'll keep this here for now. */
 
-		for (Todo todo : todoNow) {
-			todo.getArc().run();
+		Set<Todo> todoNow = todos.get(sitrep);
+		if (todoNow != null) {
+			for (Todo todo : todoNow) {
+				todo.getArc().run();
+			}
 		}
+
+		tick++;
 	}
 
-	public void addTodos(Todo... todoCollection) {
-		for (Todo todo : todoCollection) {
+	public void addTodos(Set<Todo> todoSet) {
+		for (Todo todo : todoSet) {
 			nodes.addAll(todo.getDependencies());
 			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
 			nodes.add(todo.getOutputNode());
@@ -91,9 +97,10 @@ public class Overseer {
 		for (Node node : nodes) {
 			nodeOfIndex.add(node);
 			indexOfNode.put(node, i);
+			i++;
 		}
 
-		for (Todo todo : todoCollection) {
+		for (Todo todo : todoSet) {
 			IBitmask bitmask = new ArrayBitmask(nodes.size()); // hardcode ArrayBitmask for now.
 			for (Node dependency : todo.getDependencies()) {
 				bitmask.set(indexOfNode.get(dependency));
@@ -110,8 +117,8 @@ public class Overseer {
 		}
 	}
 
-	public void setAsStarting(Node... nodeCollection) {
-		for (Node node : nodeCollection) {
+	public void setAsStarting(Set<Node> nodeSet) {
+		for (Node node : nodeSet) {
 			if (!nodes.contains(node)) {
 				throw new IllegalArgumentException("Node not part of graph!");
 			}
@@ -121,8 +128,8 @@ public class Overseer {
 		}
 	}
 
-	public void setAsEnding(Node... nodeCollection) {
-		for (Node node : nodeCollection) {
+	public void setAsEnding(Set<Node> nodeSet) {
+		for (Node node : nodeSet) {
 			if (!nodes.contains(node)) {
 				throw new IllegalArgumentException("Node not part of graph!");
 			}

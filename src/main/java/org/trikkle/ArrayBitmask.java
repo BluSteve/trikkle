@@ -27,6 +27,13 @@ public class ArrayBitmask implements IBitmask {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) return true;
+		if (!(obj instanceof ArrayBitmask)) return false;
+		return this.hashCode() == obj.hashCode();
+	}
+
+	@Override
 	public int compareTo(IBitmask o) {
 		if (this == o) return 0;
 

@@ -7,4 +7,7 @@ public interface IBitmask extends Comparable<IBitmask> {
 
 	@Override
 	int hashCode();
+
+	@Override
+	boolean equals(Object o);
 }
