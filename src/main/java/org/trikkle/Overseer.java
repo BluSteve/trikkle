@@ -70,14 +70,18 @@ public class Overseer {
 			}
 		}
 
-		Set<Todo> todoNow = new HashSet<>();
+
+		Todo todoNow = null;
 		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
 			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
 				for (Todo todo : todoEntry.getValue()) {
-					todoNow.add(todo);
+					if (todo.getArc().status != ArcStatus.FINISHED) { // until it finds one that's not finished
+						todoNow = todo;
+					}
 				}
 			}
 		}
+		if (todoNow == null) return;
 		/* This may not be necessary as only one dependency state is changed per tick.
 		 * A direct comparison may therefore suffice and can be evaluated in O(1).
 		 * I'll keep this here for now.
@@ -88,16 +92,8 @@ public class Overseer {
 		System.out.println("tick = " + tick);
 		tick++;
 
-		if (todoNow.isEmpty()) {
-			System.out.println("Warning: no more Todos left.");
-		}
-		for (Todo todo : todoNow) {
-			if (todo.getArc().status != ArcStatus.FINISHED) {
-				System.out.println("todo = " + todo);
-				todo.getArc().runWrapper();
-				break;
-			}
-		}
+		System.out.println("todo = " + todoNow);
+		todoNow.getArc().runWrapper();
 	}
 
 	public void addTodos(Set<Todo> todoSet) {
