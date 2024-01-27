@@ -25,6 +25,7 @@ public class DiscreteNode extends Node {
 
 			if (!isDatumDone.containsValue(false)) { // all datums filled
 				progress = 1;
+				overseer.ticktock(this);
 			}
 		}
 	}

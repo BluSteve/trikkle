@@ -10,7 +10,6 @@ public abstract class Arc implements Primable {
 		status = ArcStatus.IN_PROGRESS;
 		run();
 		status = ArcStatus.FINISHED;
-		overseer.ticktock(this);
 	}
 
 	protected Object getDatum(String datumName) {

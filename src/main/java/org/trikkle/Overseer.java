@@ -88,7 +88,7 @@ public class Overseer {
 		return true;
 	}
 
-	public void ticktock(Arc callingArc) { // passing callingArc is only for debugging purposes
+	public void ticktock(Node outputNode) { // passing callingArc is only for debugging purposes
 		if (hasEnded()) {
 			end();
 			return;
@@ -96,8 +96,8 @@ public class Overseer {
 
 		tick++;
 
-		if (callingArc != null) {
-			System.out.printf("tick = %d, just filled = %s%n", tick, arcToOutputNode.get(callingArc).datumNames);
+		if (outputNode != null) {
+			System.out.printf("tick = %d, just filled %s%n", tick, outputNode.datumNames);
 		}
 		else {
 			System.out.printf("tick = %d, callingArc not passed%n", tick);
