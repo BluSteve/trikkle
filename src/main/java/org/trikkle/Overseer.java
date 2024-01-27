@@ -62,7 +62,7 @@ public class Overseer {
 		}
 
 		started = true;
-		ticktock();
+		ticktock(null); // todo replace with placeholder empty arc, or maybe make it nullable
 	}
 
 	private void end() {
@@ -94,7 +94,7 @@ public class Overseer {
 		return started;
 	}
 
-	public void ticktock() {
+	public void ticktock(Arc callingArc) {
 		if (!hasStarted()) { // todo i think this could be gotten rid of since ticktock is in arc now
 			return;
 		}
@@ -114,16 +114,16 @@ public class Overseer {
 
 
 		Set<Todo> todosNow = new HashSet<>();
-		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
-			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
-				for (Todo todo : todoEntry.getValue()) {
-					if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
-						todo.getArc().status = ArcStatus.STAND_BY;
-						todosNow.add(todo);
-					}
-				}
-			}
-		}
+//		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
+//			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
+//				for (Todo todo : todoEntry.getValue()) {
+//					if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
+//						todo.getArc().status = ArcStatus.STAND_BY;
+//						todosNow.add(todo);
+//					}
+//				}
+//			}
+//		}
 		/* This may not be necessary as only one dependency state is changed per tick.
 		 * A direct comparison may therefore suffice and can be evaluated in O(1).
 		 * I'll keep this here for now.
@@ -132,23 +132,40 @@ public class Overseer {
 		 * during initialization which violates the one tick - at most one extra node done principle*/
 
 
-		System.out.println("todosNow.size() = " + todosNow.size());
-		Todo[] todoArray = todosNow.toArray(new Todo[0]);
-		List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
-
-		for (int i = 0; i < todoArray.length; i++) {
-			int finalI = i;
-			tasks.add(new RecursiveAction() {
-				@Override
-				protected void compute() {
-					Todo todo = todoArray[finalI];
-					todo.getArc().runWrapper();
-					System.out.println("tick = " + tick + ", todo = " + todo);
-				}
-			});
+		if (callingArc != null) {
+			System.out.printf("tick = %d, just filled = %s%n", tick, arcToOutputNode.get(callingArc).datumNames);
 		}
 
-		ForkJoinTask.invokeAll(tasks);
+		if (todos.containsKey(sitrep)) {
+			for (Todo todo : todos.get(sitrep)) {
+				if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
+					todo.getArc().status = ArcStatus.STAND_BY;
+					todosNow.add(todo);
+				}
+			}
+
+			System.out.printf("tick = %d, todosNow.size() = %d%n", tick, todosNow.size());
+			Todo[] todoArray = todosNow.toArray(new Todo[0]);
+			List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
+
+			for (int i = 0; i < todoArray.length; i++) {
+				int finalI = i;
+				tasks.add(new RecursiveAction() {
+					@Override
+					protected void compute() {
+						Todo todo = todoArray[finalI];
+						System.out.printf("Started: tick = %d, todo = %s%n", tick, todo);
+						todo.getArc().runWrapper();
+//						System.out.printf("Ended: tick = %d, todo = %s%n", tick, todo);
+					}
+				});
+			}
+
+			ForkJoinTask.invokeAll(tasks);
+		}
+		else {
+			System.out.printf("tick = %d, todosNow.size() = %d%n", tick, 0);
+		}
 	}
 
 	public void setAsStarting(Set<Node> nodeSet) {
