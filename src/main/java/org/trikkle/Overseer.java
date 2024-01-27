@@ -13,7 +13,6 @@ public class Overseer {
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
 	private int tick = 0;
-	private boolean started = false;
 
 	public Overseer(Set<Todo> todoSet) {
 		for (Todo todo : todoSet) {
@@ -61,7 +60,6 @@ public class Overseer {
 			}
 		}
 
-		started = true;
 		ticktock(null); // todo replace with placeholder empty arc, or maybe make it nullable
 	}
 
@@ -90,14 +88,7 @@ public class Overseer {
 		return true;
 	}
 
-	private boolean hasStarted() {
-		return started;
-	}
-
-	public void ticktock(Arc callingArc) {
-		if (!hasStarted()) { // todo i think this could be gotten rid of since ticktock is in arc now
-			return;
-		}
+	public void ticktock(Arc callingArc) { // passing callingArc is only for debugging purposes
 		if (hasEnded()) {
 			end();
 			return;
@@ -109,7 +100,7 @@ public class Overseer {
 			System.out.printf("tick = %d, just filled = %s%n", tick, arcToOutputNode.get(callingArc).datumNames);
 		}
 		else {
-			System.out.printf("tick = %d, started!%n", tick);
+			System.out.printf("tick = %d, callingArc not passed%n", tick);
 		}
 
 
