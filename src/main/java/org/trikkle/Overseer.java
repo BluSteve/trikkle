@@ -105,67 +105,56 @@ public class Overseer {
 
 		tick++;
 
-		IBitmask sitrep = new ArrayBitmask(nodes.size());
-		for (Node node : nodes) {
-			if (node.getProgress() == 1) {
-				sitrep.set(indexOfNode.get(node));
-			}
-		}
-
-
-		Set<Todo> todosNow = new HashSet<>();
-//		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
-//			if (sitrep.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
-//				for (Todo todo : todoEntry.getValue()) {
-//					if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
-//						todo.getArc().status = ArcStatus.STAND_BY;
-//						todosNow.add(todo);
-//					}
-//				}
-//			}
-//		}
-		/* This may not be necessary as only one dependency state is changed per tick.
-		 * A direct comparison may therefore suffice and can be evaluated in O(1).
-		 * I'll keep this here for now.
-		 *
-		 * The only reason why this is here is because you can change multiple node's progress
-		 * during initialization which violates the one tick - at most one extra node done principle*/
-
-
 		if (callingArc != null) {
 			System.out.printf("tick = %d, just filled = %s%n", tick, arcToOutputNode.get(callingArc).datumNames);
 		}
+		else {
+			System.out.printf("tick = %d, started!%n", tick);
+		}
 
-		if (todos.containsKey(sitrep)) {
-			for (Todo todo : todos.get(sitrep)) {
-				if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
-					todo.getArc().status = ArcStatus.STAND_BY;
-					todosNow.add(todo);
+
+		// Get all Todos with idle Arcs that the current state allows to be executed
+		IBitmask state = getCurrentState();
+		Set<Todo> todosNow = new HashSet<>();
+		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
+			if (state.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
+				for (Todo todo : todoEntry.getValue()) {
+					if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
+						todo.getArc().status = ArcStatus.STAND_BY;
+						todosNow.add(todo);
+					}
 				}
 			}
+		}
 
-			System.out.printf("tick = %d, todosNow.size() = %d%n", tick, todosNow.size());
-			Todo[] todoArray = todosNow.toArray(new Todo[0]);
-			List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
+		System.out.printf("tick = %d, todosNow.size() = %d%n", tick, todosNow.size());
 
-			for (int i = 0; i < todoArray.length; i++) {
-				int finalI = i;
-				tasks.add(new RecursiveAction() {
-					@Override
-					protected void compute() {
-						Todo todo = todoArray[finalI];
-						System.out.printf("Started: tick = %d, todo = %s%n", tick, todo);
-						todo.getArc().runWrapper();
-//						System.out.printf("Ended: tick = %d, todo = %s%n", tick, todo);
-					}
-				});
+
+		// Run all todos that can be done now (aka todosNow) in parallel.
+		Todo[] todoArray = todosNow.toArray(new Todo[0]);
+		List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
+		for (int i = 0; i < todoArray.length; i++) {
+			int finalI = i;
+			tasks.add(new RecursiveAction() {
+				@Override
+				protected void compute() {
+					Todo todo = todoArray[finalI];
+					System.out.printf("Started: tick = %d, todo = %s%n", tick, todo);
+					todo.getArc().runWrapper();
+				}
+			});
+		}
+		ForkJoinTask.invokeAll(tasks);
+	}
+
+	private IBitmask getCurrentState() {
+		IBitmask state = new ArrayBitmask(nodes.size());
+		for (Node node : nodes) {
+			if (node.getProgress() == 1) {
+				state.set(indexOfNode.get(node));
 			}
-
-			ForkJoinTask.invokeAll(tasks);
 		}
-		else {
-			System.out.printf("tick = %d, todosNow.size() = %d%n", tick, 0);
-		}
+		return state;
 	}
 
 	public void setAsStarting(Set<Node> nodeSet) {
