@@ -104,34 +104,39 @@ public class ExampleFunctions {
 		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
 
 
-		Arc phantomArc1 = new Arc.AutoArc() {
-			@Override
-			public void run() {
-				returnDatum("toSquare", 2.0);
-			}
-		};
-		phantomArc1.name = "phantomArc1";
-		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
+//		Arc phantomArc1 = new Arc.AutoArc() {
+//			@Override
+//			public void run() {
+//				returnDatum("toSquare", 2.0);
+//			}
+//		};
+//		phantomArc1.name = "phantomArc1";
+//		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
+//
+//		Arc phantomArc2 = new Arc.AutoArc() {
+//			@Override
+//			public void run() {
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e) {
+//					throw new RuntimeException(e);
+//				}
+//				returnDatum("finalMultiplier", 3.0);
+//				returnDatum("finalExponent", 1.2);
+//			}
+//		};
+//		phantomArc2.name = "phantomArc2";
+//		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
 
-		Arc phantomArc2 = new Arc.AutoArc() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				returnDatum("finalMultiplier", 3.0);
-				returnDatum("finalExponent", 1.2);
-			}
-		};
-		phantomArc2.name = "phantomArc2";
-		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
-
-		Graph graph = new Graph(Set.of(todo, todo2, todo3, phantomTodo1, phantomTodo2), Set.of(), Set.of(node4));
+		Graph graph = new Graph(Set.of(todo, todo2, todo3), Set.of(inputNode, inputNode2), Set.of(node4));
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
+
+		inputNode.addDatum("toSquare", 2.0);
+		inputNode2.addDatum("finalMultiplier", 3.0);
+		inputNode2.addDatum("finalExponent", 1.2);
+
 		overseer.start();
 
 
