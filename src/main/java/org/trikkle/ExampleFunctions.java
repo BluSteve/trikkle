@@ -1,6 +1,8 @@
 package org.trikkle;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 public class ExampleFunctions {
 	static double fn1() {
@@ -29,7 +31,7 @@ public class ExampleFunctions {
 
 	static void simpleTest() {
 		Node inputNode = new DiscreteNode(Set.of("toSquare"));
-		Arc arc = new Arc() {
+		Arc arc = new Arc.SimpleArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");
@@ -56,7 +58,7 @@ public class ExampleFunctions {
 	static void complexTest() {
 		Node inputNode2 = new DiscreteNode(Set.of("finalMultiplier", "finalExponent"));
 		Node inputNode = new DiscreteNode(Set.of("toSquare"));
-		Arc arc = new Arc() {
+		Arc arc = new Arc.SimpleArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");
@@ -68,7 +70,7 @@ public class ExampleFunctions {
 		Todo todo = new Todo(Set.of(inputNode), arc, node2);
 
 
-		Arc arc2 = new Arc() {
+		Arc arc2 = new Arc.SimpleArc() {
 			@Override
 			public void run() {
 				double squared = (double) getDatum("squared");
@@ -81,7 +83,7 @@ public class ExampleFunctions {
 		Node node3 = new DiscreteNode(Set.of("result1"));
 		Todo todo2 = new Todo(Set.of(inputNode, node2), arc2, node3);
 
-		Arc arc3 = new Arc() {
+		Arc arc3 = new Arc.SimpleArc() {
 			@Override
 			public void run() {
 				double result1 = (double) getDatum("result1");
@@ -94,7 +96,7 @@ public class ExampleFunctions {
 		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
 
 
-		Arc phantomArc1 = new Arc() {
+		Arc phantomArc1 = new Arc.SimpleArc() {
 			@Override
 			public void run() {
 				returnDatum("toSquare", 2.0);
@@ -102,7 +104,7 @@ public class ExampleFunctions {
 		};
 		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
 
-		Arc phantomArc2 = new Arc() {
+		Arc phantomArc2 = new Arc.SimpleArc() {
 			@Override
 			public void run() {
 				try {
@@ -126,8 +128,64 @@ public class ExampleFunctions {
 		System.out.println(results);
 	}
 
+	static void streamTest() {
+		Arc inputArc = new Arc() {
+			@Override
+			public void run() {
+				for (int i = 1; i < 10; i++) {
+					returnDatum("stream1", (double) i);
+					outputNode.setProgress(i / 10.0);
+				}
+
+				outputNode.setProgress(1);
+			}
+		};
+		Node streamNode = new StreamNode(Set.of("stream1"));
+		Todo todo = new Todo(Set.of(), inputArc, streamNode);
+
+		Arc consumerArc = new Arc() {
+			double total = 0; // is this a pure function?
+			@Override
+			public void run() {
+				Queue<Double> queue = (Queue<Double>) getDatum("stream1");
+				Node stream1Node = overseer.getOutputNodeOfDatum("stream1");
+
+				double sum = 0;
+				synchronized (queue) {
+					if (queue.size() >= 3) {
+						this.status = ArcStatus.IN_PROGRESS;
+						while (!queue.isEmpty()) {
+							sum += queue.poll();
+						}
+
+						total += sum;
+						stream1Node.setUsable(false);
+					}
+				}
+
+				System.out.println("total = " + total);
+
+				if (stream1Node.getProgress() == 1) {
+					returnDatum("result1", total);
+					this.status = ArcStatus.FINISHED;
+				}
+				this.status = ArcStatus.IDLE;
+			}
+		};
+		Node outputNode = new DiscreteNode(Set.of("result1"));
+		Todo todo2 = new Todo(Set.of(streamNode), consumerArc, outputNode);
+
+		Overseer overseer = new Overseer(Set.of(todo, todo2));
+		overseer.setAsEnding(Set.of(outputNode));
+		overseer.start();
+
+		Map<String, Object> results = overseer.getResultCache();
+		System.out.println(results);
+	}
+
 	public static void main(String[] args) {
 		simpleTest();
 		complexTest();
+		streamTest();
 	}
 }

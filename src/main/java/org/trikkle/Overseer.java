@@ -6,18 +6,29 @@ import java.util.concurrent.*;
 public class Overseer {
 	private final Map<IBitmask, Set<Todo>> todos = new HashMap<>();
 	private final Map<String, Object> cache = new ConcurrentHashMap<>();
+	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
 	private final Set<Node> nodes = new HashSet<>();
 	private final Set<Node> startingNodes = new HashSet<>();
 	private final Set<Node> endingNodes = new HashSet<>();
 	private final List<Node> nodeOfIndex = new ArrayList<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
-	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
+	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
 	private int tick = 0;
 
 	public Overseer(Set<Todo> todoSet) {
 		for (Todo todo : todoSet) {
 			nodes.addAll(todo.getDependencies());
+
+			Collection<Node> existingOutputNodes = arcToOutputNode.values();
+			if (existingOutputNodes.contains(todo.getOutputNode())) {
+				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
+			}
+
+			if (arcToOutputNode.containsKey(todo.getArc())) {
+				throw new IllegalArgumentException("The same Arc cannot be used for two Todos!");
+			}
 			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
+
 			nodes.add(todo.getOutputNode());
 		}
 
@@ -32,6 +43,9 @@ public class Overseer {
 		for (Node node : nodes) {
 			nodeOfIndex.add(node);
 			indexOfNode.put(node, i);
+			for (String datumName : node.datumNames) {
+				nodeOfDatumName.put(datumName, node);
+			}
 			i++;
 		}
 
@@ -60,7 +74,7 @@ public class Overseer {
 			}
 		}
 
-		ticktock(null); // todo replace with placeholder empty arc, or maybe make it nullable
+		ticktock(null);
 	}
 
 	private void end() {
@@ -71,7 +85,12 @@ public class Overseer {
 		Map<String, Object> resultCache = new HashMap<>();
 		for (Node endingNode : endingNodes) {
 			for (String datumName : endingNode.datumNames) {
-				resultCache.put(datumName, cache.get(datumName));
+				Object datum = cache.get(datumName);
+				// todo decide whether to throw an exception here.
+//				if (datum == null) {
+//					throw new NullPointerException("Result datum \""+ datumName + "\" is null!");
+//				}
+				resultCache.put(datumName, datum);
 			}
 		}
 
@@ -141,7 +160,7 @@ public class Overseer {
 	private IBitmask getCurrentState() {
 		IBitmask state = new ArrayBitmask(nodes.size());
 		for (Node node : nodes) {
-			if (node.getProgress() == 1) {
+			if (node.isUsable()) {
 				state.set(indexOfNode.get(node));
 			}
 		}
@@ -170,8 +189,12 @@ public class Overseer {
 		}
 	}
 
-	public Node getOutputNode(Arc arc) {
+	public Node getOutputNodeOfArc(Arc arc) {
 		return arcToOutputNode.get(arc);
+	}
+
+	public Node getOutputNodeOfDatum(String datumName) {
+		return nodeOfDatumName.get(datumName);
 	}
 
 	public Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.

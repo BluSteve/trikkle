@@ -14,7 +14,7 @@ public class DiscreteNode extends Node {
 	}
 
 	@Override
-	public void addDatum(String datumName, Object datum) {
+	public void uncheckedAddDatum(String datumName, Object datum) {
 		Map<String, Object> cache = overseer.getCache();
 		if (cache.containsKey(datumName)) {
 			throw new IllegalStateException("Datum already present in cache!");
@@ -24,7 +24,8 @@ public class DiscreteNode extends Node {
 			isDatumDone.put(datumName, true);
 
 			if (!isDatumDone.containsValue(false)) { // all datums filled
-				progress = 1;
+				setProgress(1);
+				usable = true;
 				overseer.ticktock(this);
 			}
 		}
