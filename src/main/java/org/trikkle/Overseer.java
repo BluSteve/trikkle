@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Overseer {
-	private final Map<IBitmask, Set<Todo>> todos = new HashMap<>();
+	private final MultiMap<IBitmask, Todo> todos = new MultiHashMap<>();
 	private final Map<String, Object> cache = new ConcurrentHashMap<>();
 	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
 	private Set<Node> nodes;
@@ -63,14 +63,7 @@ public class Overseer {
 				bitmask.set(indexOfNode.get(dependency));
 			}
 
-			if (todos.containsKey(bitmask)) {
-				todos.get(bitmask).add(todo);
-			}
-			else {
-				Set<Todo> set = new HashSet<>();
-				set.add(todo);
-				todos.put(bitmask, set);
-			}
+			todos.putOne(bitmask, todo);
 		}
 	}
 
