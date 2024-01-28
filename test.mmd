@@ -1,0 +1,13 @@
+flowchart LR
+    node1[finalMultiplier<br>finalExponent]
+    node2[toSquare]
+    node3((squared))
+    node4((result1))
+    node5{{result2}}
+
+    node2 --arc--> node3
+    node2 & node3 --- arc2 --> node4
+    node1 & node4 --- arc3 --> node5
+
+    arc2{arc2}
+    arc3{arc3}
