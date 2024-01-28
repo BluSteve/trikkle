@@ -186,6 +186,7 @@ public class ExampleFunctions {
 
 	static void mergeTest() {
 		Node paramNode = new DiscreteNode(Set.of("param"));
+		Node magicNode = new DiscreteNode(Set.of("magic"));
 		Node hfNode = new DiscreteNode(Set.of("hf"));
 		Node matrixNode = new DiscreteNode(Set.of("matrix"));
 		Node dipoleNode = new DiscreteNode(Set.of("dipole"));
@@ -208,12 +209,19 @@ public class ExampleFunctions {
 
 			}
 		};
+		Arc arc4 = new Arc.AutoArc() {
+			@Override
+			public void run() {
 
-		Todo todo1 = new Todo(Set.of(paramNode), arc1, hfNode);
+			}
+		};
+
+		Todo todo1 = new Todo(Set.of(magicNode, paramNode), arc1, hfNode);
+		Todo todo4 = new Todo(Set.of(paramNode), arc4, dipoleNode);
 		Todo todo2 = new Todo(Set.of(matrixNode), arc2, hfNode);
 		Todo todo3 = new Todo(Set.of(matrixNode), arc3, dipoleNode);
 
-		Graph graph1 = new Graph(Set.of(todo1), Set.of(paramNode), Set.of(hfNode));
+		Graph graph1 = new Graph(Set.of(todo1, todo4), Set.of(paramNode), Set.of(hfNode));
 		Graph graph2 = new Graph(Set.of(todo2, todo3), Set.of(matrixNode), Set.of(hfNode, dipoleNode));
 		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), null, Set.of(hfNode, dipoleNode));
 
@@ -224,6 +232,8 @@ public class ExampleFunctions {
 	}
 
 	public static void main(String[] args) {
+		complexTest();
+		streamTest();
 		mergeTest();
 	}
 }

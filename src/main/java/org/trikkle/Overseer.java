@@ -6,7 +6,7 @@ import java.util.concurrent.*;
 public class Overseer {
 	private final MultiMap<IBitmask, Todo> todos = new MultiHashMap<>();
 	private final Map<String, Object> cache = new ConcurrentHashMap<>();
-	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
+	private final Map<Arc, Node> arcToOutputNode;
 	private final Set<Node> nodes;
 	private final Set<Node> startingNodes;
 	private final Set<Node> endingNodes;
@@ -19,21 +19,7 @@ public class Overseer {
 		this.nodes = graph.getNodes();
 		this.startingNodes = graph.getStartingNodes();
 		this.endingNodes = graph.getEndingNodes();
-
-
-		// Create arcToOutputNode
-		for (Todo todo : graph.getTodos()) {
-			Collection<Node> existingOutputNodes = arcToOutputNode.values();
-			if (existingOutputNodes.contains(todo.getOutputNode())) {
-				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
-			}
-
-			if (arcToOutputNode.containsKey(todo.getArc())) {
-				throw new IllegalArgumentException("The same Arc cannot be used for two Todos!");
-			}
-			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
-		}
-
+		this.arcToOutputNode = graph.getArcToOutputNode();
 
 		// Prime Nodes and Arcs with this Overseer
 		for (Primable primable : nodes) {
@@ -56,7 +42,7 @@ public class Overseer {
 		}
 
 
-		// Generate bitmasks for each Todo
+		// Generate bitmasks for each To do
 		for (Todo todo : graph.getTodos()) {
 			IBitmask bitmask = new ArrayBitmask(nodes.size()); // hardcode ArrayBitmask for now.
 			for (Node dependency : todo.getDependencies()) {

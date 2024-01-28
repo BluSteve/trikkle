@@ -5,22 +5,35 @@ import java.util.*;
 public class Graph {
 	private final Set<Todo> todos;
 
-	private final Set<Node> nodes;
-	private final Set<Arc> arcs;
+	private final Set<Node> nodes = new HashSet<>();
+	private final Set<Arc> arcs = new HashSet<>();
+	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
+
 	private final Set<Node> startingNodes;
 	private final Set<Node> endingNodes;
 
-	private final Map<Node, Set<Node>> dependenciesOfNode;
+	private final Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
+	private final Map<Node, Todo> todoOfOutputNode = new HashMap<>();
 
 	public Graph(Set<Todo> todos, Set<Node> startingNodes, Set<Node> endingNodes) {
 		this.todos = todos;
 
-		nodes = new HashSet<>();
-		arcs = new HashSet<>();
 		for (Todo todo : todos) {
+			// Create arcToOutputNode
+			Collection<Node> existingOutputNodes = arcToOutputNode.values();
+			if (existingOutputNodes.contains(todo.getOutputNode())) {
+				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
+			}
+
+			if (arcToOutputNode.containsKey(todo.getArc())) {
+				throw new IllegalArgumentException("The same Arc cannot be used for two Todos!");
+			}
+			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
+
 			nodes.addAll(todo.getDependencies());
 			arcs.add(todo.getArc());
 			nodes.add(todo.getOutputNode());
+			todoOfOutputNode.put(todo.getOutputNode(), todo);
 		}
 
 		for (Node node : startingNodes) {
@@ -37,7 +50,6 @@ public class Graph {
 		this.startingNodes = startingNodes;
 		this.endingNodes = endingNodes;
 
-		dependenciesOfNode = new HashMap<>();
 		for (Todo todo : todos) {
 			dependenciesOfNode.put(todo.getOutputNode(), todo.getDependencies());
 		}
@@ -57,6 +69,11 @@ public class Graph {
 		}
 
 		Map<Node, Integer> graphUsedOfNode = new HashMap<>();
+		// this graph generates which nodes?
+		List<Set<Node>> endingNodesOfGraph = new ArrayList<>(graphs.size());
+		for (int i = 0; i < graphs.size(); i++) {
+			endingNodesOfGraph.add(new HashSet<>());
+		}
 
 		Set<Node> hardDependencies = new HashSet<>();
 		for (Map.Entry<Node, Set<Way>> nodeSetEntry : waysToGetNode.entrySet()) {
@@ -66,6 +83,7 @@ public class Graph {
 				Way way = value.iterator().next();
 				hardDependencies.addAll(way.dependencies);
 				graphUsedOfNode.put(key, way.graphIndex);
+				endingNodesOfGraph.get(way.graphIndex).add(key);
 			}
 		}
 
@@ -79,6 +97,7 @@ public class Graph {
 				for (Way way : ways) {
 					if (hardDependencies.containsAll(way.dependencies)) {
 						graphUsedOfNode.put(endingNode, way.graphIndex);
+						endingNodesOfGraph.get(way.graphIndex).add(endingNode);
 						allHard = true;
 						break;
 					}
@@ -91,24 +110,65 @@ public class Graph {
 						lowestGraphIndex = Math.min(lowestGraphIndex, way.graphIndex);
 					}
 					graphUsedOfNode.put(endingNode, lowestGraphIndex);
+					endingNodesOfGraph.get(lowestGraphIndex).add(endingNode);
 				}
 			}
 		}
 
 
-		Set<Graph> finalGraphs = new HashSet<>();
-		for (Integer graphIndex : graphUsedOfNode.values()) {
-			finalGraphs.add(graphs.get(graphIndex));
+		Set<Todo> finalTodos = new HashSet<>();
+		Set<Node> finalStartingNodes = new HashSet<>();
+		for (int i = 0; i < graphs.size(); i++) {
+			Graph graph = graphs.get(i);
+
+			for (Node node : endingNodesOfGraph.get(i)) {
+				Graph prunedGraph = graph.findPrunedGraphFor(node);
+				finalTodos.addAll(prunedGraph.todos);
+				finalStartingNodes.addAll(prunedGraph.startingNodes);
+			}
 		}
+
+		// endingNodes is a subset of "finalEndingNodes". This allows the program to finish earlier, computing only
+		// necessary nodes.
+		return new Graph(finalTodos, finalStartingNodes, endingNodes);
+	}
+
+	private Graph findPrunedGraphFor(Node endingNode) {
+		// Note: endingNode may not be in endingNodes. It's merely the endingNode of the PRUNED graph.
+//		if (!endingNodes.contains(endingNode)) {
+//			throw new IllegalArgumentException("That's not an ending Node!");
+//		}
+
+		/*
+		 find to do which creates this endingNode
+		 record this to do
+		 get the dependencies of this to do
+		 for each dependency find to do which creates it
+		*/
 
 		Set<Todo> finalTodos = new HashSet<>();
 		Set<Node> finalStartingNodes = new HashSet<>();
-		for (Graph graph : finalGraphs) {
-			finalTodos.addAll(graph.todos);
-			finalStartingNodes.addAll(graph.startingNodes);
+		Set<Node> finalEndingNodes = new HashSet<>();
+
+		Stack<Node> nodeStack = new Stack<>();
+		nodeStack.push(endingNode);
+		while (!nodeStack.empty()) {
+			Node node = nodeStack.pop();
+			Todo generatingTodo = todoOfOutputNode.get(node);
+
+			if (generatingTodo == null) { // means it's a starting Node
+				finalStartingNodes.add(node);
+			}
+			else {
+				finalTodos.add(generatingTodo);
+				for (Node dependency : generatingTodo.getDependencies()) {
+					nodeStack.push(dependency);
+				}
+			}
 		}
 
-		return new Graph(finalTodos, finalStartingNodes, endingNodes);
+		finalEndingNodes.add(endingNode);
+		return new Graph(finalTodos, finalStartingNodes, finalEndingNodes);
 	}
 
 	public Set<Todo> getTodos() {
@@ -117,6 +177,10 @@ public class Graph {
 
 	public Set<Node> getNodes() {
 		return nodes;
+	}
+
+	public Map<Arc, Node> getArcToOutputNode() {
+		return arcToOutputNode;
 	}
 
 	public Set<Arc> getArcs() {
