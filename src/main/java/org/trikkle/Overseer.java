@@ -7,9 +7,9 @@ public class Overseer {
 	private final MultiMap<IBitmask, Todo> todos = new MultiHashMap<>();
 	private final Map<String, Object> cache = new ConcurrentHashMap<>();
 	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
-	private Set<Node> nodes;
-	private Set<Node> startingNodes;
-	private Set<Node> endingNodes;
+	private final Set<Node> nodes;
+	private final Set<Node> startingNodes;
+	private final Set<Node> endingNodes;
 	private final List<Node> nodeOfIndex = new ArrayList<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<String, Node> nodeOfDatumName = new HashMap<>();

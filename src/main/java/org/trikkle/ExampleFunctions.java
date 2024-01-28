@@ -1,5 +1,6 @@
 package org.trikkle;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -31,7 +32,7 @@ public class ExampleFunctions {
 
 	static void simpleTest() {
 		Node inputNode = new DiscreteNode(Set.of("toSquare"));
-		Arc arc = new Arc.SimpleArc() {
+		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");
@@ -57,7 +58,7 @@ public class ExampleFunctions {
 	static void complexTest() {
 		Node inputNode2 = new DiscreteNode(Set.of("finalMultiplier", "finalExponent"));
 		Node inputNode = new DiscreteNode(Set.of("toSquare"));
-		Arc arc = new Arc.SimpleArc() {
+		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");
@@ -69,7 +70,7 @@ public class ExampleFunctions {
 		Todo todo = new Todo(Set.of(inputNode), arc, node2);
 
 
-		Arc arc2 = new Arc.SimpleArc() {
+		Arc arc2 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 				double squared = (double) getDatum("squared");
@@ -82,7 +83,7 @@ public class ExampleFunctions {
 		Node node3 = new DiscreteNode(Set.of("result1"));
 		Todo todo2 = new Todo(Set.of(inputNode, node2), arc2, node3);
 
-		Arc arc3 = new Arc.SimpleArc() {
+		Arc arc3 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 				double result1 = (double) getDatum("result1");
@@ -95,7 +96,7 @@ public class ExampleFunctions {
 		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
 
 
-		Arc phantomArc1 = new Arc.SimpleArc() {
+		Arc phantomArc1 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 				returnDatum("toSquare", 2.0);
@@ -103,7 +104,7 @@ public class ExampleFunctions {
 		};
 		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
 
-		Arc phantomArc2 = new Arc.SimpleArc() {
+		Arc phantomArc2 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 				try {
@@ -127,7 +128,7 @@ public class ExampleFunctions {
 	}
 
 	static void streamTest() {
-		Arc inputArc = new Arc.SimpleArc() {
+		Arc inputArc = new Arc.AutoArc() {
 			@Override
 			public void run() {
 				for (int i = 1; i < 10; i++) {
@@ -183,9 +184,46 @@ public class ExampleFunctions {
 		System.out.println(results);
 	}
 
+	static void mergeTest() {
+		Node paramNode = new DiscreteNode(Set.of("param"));
+		Node hfNode = new DiscreteNode(Set.of("hf"));
+		Node matrixNode = new DiscreteNode(Set.of("matrix"));
+		Node dipoleNode = new DiscreteNode(Set.of("dipole"));
+
+		Arc arc1 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		Arc arc2 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		Arc arc3 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+
+		Todo todo1 = new Todo(Set.of(paramNode), arc1, hfNode);
+		Todo todo2 = new Todo(Set.of(matrixNode), arc2, hfNode);
+		Todo todo3 = new Todo(Set.of(matrixNode), arc3, dipoleNode);
+
+		Graph graph1 = new Graph(Set.of(todo1), Set.of(paramNode), Set.of(hfNode));
+		Graph graph2 = new Graph(Set.of(todo2, todo3), Set.of(matrixNode), Set.of(hfNode, dipoleNode));
+		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), null, Set.of(hfNode, dipoleNode));
+
+		for (Todo todo : graph3.getTodos()) {
+			System.out.println(todo);
+		}
+		System.out.println();
+	}
+
 	public static void main(String[] args) {
-		simpleTest();
-		complexTest();
-		streamTest();
+		mergeTest();
 	}
 }

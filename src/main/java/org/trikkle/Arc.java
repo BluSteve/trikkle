@@ -31,7 +31,7 @@ public abstract class Arc implements Primable {
 	}
 
 
-	public static abstract class SimpleArc extends Arc {
+	public static abstract class AutoArc extends Arc {
 		@Override
 		void runWrapper() {
 			outputNode = overseer.getOutputNodeOfArc(this);
