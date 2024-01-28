@@ -108,12 +108,12 @@ public class Overseer {
 	}
 
 	public void ticktock(Node outputNode) { // passing callingArc is only for debugging purposes
+		tick++;
+		System.out.println("\ntick = " + tick);
 		if (hasEnded()) {
 			end();
 			return;
 		}
-
-		tick++;
 
 		if (outputNode != null) {
 			System.out.printf("tick = %d, just filled %s%n", tick, outputNode.datumNames);

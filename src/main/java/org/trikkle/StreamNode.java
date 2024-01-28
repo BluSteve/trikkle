@@ -32,7 +32,7 @@ public class StreamNode extends Node {
 
 	@Override
 	protected void onDone() {
-		usable = true;
+		usable = true; // usable tells the receiving arc to look at this node again
 		overseer.ticktock(this);
 	}
 }

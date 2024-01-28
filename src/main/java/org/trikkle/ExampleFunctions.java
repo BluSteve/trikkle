@@ -129,7 +129,7 @@ public class ExampleFunctions {
 	}
 
 	static void streamTest() {
-		Arc inputArc = new Arc() {
+		Arc inputArc = new Arc.SimpleArc() {
 			@Override
 			public void run() {
 				for (int i = 1; i < 10; i++) {
@@ -159,6 +159,7 @@ public class ExampleFunctions {
 						}
 
 						total += sum;
+						// prevents stream1Node from calling this arc again when another node ticktock().
 						stream1Node.setUsable(false);
 					}
 				}
@@ -166,10 +167,11 @@ public class ExampleFunctions {
 				System.out.println("total = " + total);
 
 				if (stream1Node.getProgress() == 1) {
-					returnDatum("result1", total);
+					stream1Node.setUsable(false);
 					this.status = ArcStatus.FINISHED;
+					returnDatum("result1", total); // this must be the last line as it's a recursive call
 				}
-				this.status = ArcStatus.IDLE;
+				else this.status = ArcStatus.IDLE;
 			}
 		};
 		Node outputNode = new DiscreteNode(Set.of("result1"));
