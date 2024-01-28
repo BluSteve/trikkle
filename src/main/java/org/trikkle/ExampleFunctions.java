@@ -223,7 +223,7 @@ public class ExampleFunctions {
 
 		Graph graph1 = new Graph(Set.of(todo1, todo4), Set.of(paramNode), Set.of(hfNode));
 		Graph graph2 = new Graph(Set.of(todo2, todo3), Set.of(matrixNode), Set.of(hfNode, dipoleNode));
-		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), null, Set.of(hfNode, dipoleNode));
+		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
 
 		for (Todo todo : graph3.getTodos()) {
 			System.out.println(todo);

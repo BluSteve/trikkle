@@ -14,6 +14,7 @@ public class Graph {
 
 	private final Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
 	private final Map<Node, Todo> todoOfOutputNode = new HashMap<>();
+	private Map<Node, Graph> prunedGraphOfNode;
 
 	public Graph(Set<Todo> todos, Set<Node> startingNodes, Set<Node> endingNodes) {
 		this.todos = todos;
@@ -55,7 +56,7 @@ public class Graph {
 		}
 	}
 
-	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> startingNodes, Set<Node> endingNodes) {
+	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {
 		MultiMap<Node, Way> waysToGetNode = new MultiHashMap<>();
 		for (Node endingNode : endingNodes) {
 			for (int i = 0; i < graphs.size(); i++) {
@@ -135,6 +136,13 @@ public class Graph {
 
 	private Graph findPrunedGraphFor(Node endingNode) {
 		// Note: endingNode may not be in endingNodes. It's merely the endingNode of the PRUNED graph.
+
+		if (prunedGraphOfNode == null) {
+			prunedGraphOfNode = new HashMap<>();
+		}
+		else if (prunedGraphOfNode.containsKey(endingNode)) { // cache hit
+			return prunedGraphOfNode.get(endingNode);
+		}
 //		if (!endingNodes.contains(endingNode)) {
 //			throw new IllegalArgumentException("That's not an ending Node!");
 //		}
@@ -168,7 +176,10 @@ public class Graph {
 		}
 
 		finalEndingNodes.add(endingNode);
-		return new Graph(finalTodos, finalStartingNodes, finalEndingNodes);
+
+		Graph prunedGraph = new Graph(finalTodos, finalStartingNodes, finalEndingNodes);
+		prunedGraphOfNode.put(endingNode, prunedGraph);
+		return prunedGraph;
 	}
 
 	public Set<Todo> getTodos() {
