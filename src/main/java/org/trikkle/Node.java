@@ -3,10 +3,10 @@ package org.trikkle;
 import java.util.Set;
 
 public abstract class Node implements Primable { // Generics are too restricting for this class
-	protected Overseer overseer;
-	private double progress; // monotonically increasing
-	protected boolean usable; // can be true then false
 	public Set<String> datumNames;
+	protected Overseer overseer;
+	protected boolean usable; // can be true then false
+	private double progress; // monotonically increasing
 
 	public Node(Set<String> datumNames) {
 		this.datumNames = datumNames;
@@ -37,6 +37,9 @@ public abstract class Node implements Primable { // Generics are too restricting
 	}
 
 	public void setProgress(double progress) {
+		if (progress < 0 || progress > 1) {
+			throw new IllegalArgumentException("Progress not between 0 and 1!");
+		}
 		this.progress = progress;
 		if (progress == 1) onDone();
 	}
