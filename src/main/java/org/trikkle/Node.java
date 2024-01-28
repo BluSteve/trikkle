@@ -6,7 +6,7 @@ public abstract class Node implements Primable { // Generics are too restricting
 	protected Overseer overseer;
 	private double progress; // monotonically increasing
 	protected boolean usable; // can be true then false
-	protected Set<String> datumNames;
+	public Set<String> datumNames;
 
 	public Node(Set<String> datumNames) {
 		this.datumNames = datumNames;

@@ -1,5 +1,8 @@
 package org.trikkle;
 
+import org.trikkle.viz.IGraphViz;
+import org.trikkle.viz.MermaidGraphViz;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -66,6 +69,7 @@ public class ExampleFunctions {
 				returnDatum("squared", squared);
 			}
 		};
+		arc.name = "squarer";
 		Node node2 = new DiscreteNode(Set.of("squared"));
 		Todo todo = new Todo(Set.of(inputNode), arc, node2);
 
@@ -80,6 +84,7 @@ public class ExampleFunctions {
 				returnDatum("result1", result);
 			}
 		};
+		arc2.name = "process 1";
 		Node node3 = new DiscreteNode(Set.of("result1"));
 		Todo todo2 = new Todo(Set.of(inputNode, node2), arc2, node3);
 
@@ -92,6 +97,7 @@ public class ExampleFunctions {
 				returnDatum("result2", Math.pow(result1 * finalMultiplier, finalExponent));
 			}
 		};
+		arc3.name = "aggregator";
 		Node node4 = new DiscreteNode(Set.of("result2"));
 		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
 
@@ -102,6 +108,7 @@ public class ExampleFunctions {
 				returnDatum("toSquare", 2.0);
 			}
 		};
+		phantomArc1.name = "phantomArc1";
 		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
 
 		Arc phantomArc2 = new Arc.AutoArc() {
@@ -116,9 +123,12 @@ public class ExampleFunctions {
 				returnDatum("finalExponent", 1.2);
 			}
 		};
+		phantomArc2.name = "phantomArc2";
 		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
 
 		Graph graph = new Graph(Set.of(todo, todo2, todo3, phantomTodo1, phantomTodo2), Set.of(), Set.of(node4));
+		IGraphViz visualizer = new MermaidGraphViz();
+		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
 		overseer.start();
 
@@ -233,7 +243,7 @@ public class ExampleFunctions {
 
 	public static void main(String[] args) {
 		complexTest();
-		streamTest();
-		mergeTest();
+//		streamTest();
+//		mergeTest();
 	}
 }

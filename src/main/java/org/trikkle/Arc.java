@@ -4,7 +4,7 @@ public abstract class Arc implements Primable {
 	protected Overseer overseer;
 	protected ArcStatus status = ArcStatus.IDLE;
 	protected Node outputNode;
-	public String name = "";
+	public String name;
 
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
