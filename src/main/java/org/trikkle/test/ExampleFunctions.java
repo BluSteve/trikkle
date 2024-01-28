@@ -1,5 +1,6 @@
-package org.trikkle;
+package org.trikkle.test;
 
+import org.trikkle.*;
 import org.trikkle.viz.IGraphViz;
 import org.trikkle.viz.MermaidGraphViz;
 

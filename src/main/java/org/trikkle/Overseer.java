@@ -1,5 +1,10 @@
 package org.trikkle;
 
+import org.trikkle.utils.ArrayBitmask;
+import org.trikkle.utils.IBitmask;
+import org.trikkle.utils.MultiHashMap;
+import org.trikkle.utils.MultiMap;
+
 import java.util.*;
 import java.util.concurrent.*;
 

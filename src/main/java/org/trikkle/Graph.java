@@ -1,5 +1,8 @@
 package org.trikkle;
 
+import org.trikkle.utils.MultiHashMap;
+import org.trikkle.utils.MultiMap;
+
 import java.util.*;
 
 public class Graph {

@@ -1,4 +1,4 @@
-package org.trikkle;
+package org.trikkle.utils;
 
 import java.util.HashMap;
 import java.util.HashSet;

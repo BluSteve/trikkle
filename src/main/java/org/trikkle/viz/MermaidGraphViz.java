@@ -66,7 +66,6 @@ public class MermaidGraphViz implements IGraphViz {
 	@Override
 	public String visualize(Graph graph) {
 		Map<Node, String> nodeIdOfNode = new HashMap<>();
-		Map<Arc, String> arcIdOfArc = new HashMap<>();
 
 		List<String> lines = new ArrayList<>();
 		lines.add("flowchart LR");
@@ -110,5 +109,11 @@ public class MermaidGraphViz implements IGraphViz {
 		lines.addAll(linkLines);
 
 		return String.join("\n    ", lines);
+	}
+
+	private enum NodeType {
+		STARTING,
+		MIDDLE,
+		ENDING
 	}
 }
