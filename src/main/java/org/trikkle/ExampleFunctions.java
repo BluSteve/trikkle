@@ -43,9 +43,8 @@ public class ExampleFunctions {
 		Todo todo = new Todo(Set.of(inputNode), arc, outputNode);
 
 
-		Overseer overseer = new Overseer(Set.of(todo));
-		overseer.setAsStarting(Set.of(inputNode));
-		overseer.setAsEnding(Set.of(outputNode));
+		Graph graph = new Graph(Set.of(todo), Set.of(inputNode), Set.of(outputNode));
+		Overseer overseer = new Overseer(graph);
 
 		inputNode.addDatum("toSquare", 2.0);
 		overseer.start();
@@ -118,9 +117,8 @@ public class ExampleFunctions {
 		};
 		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
 
-		Overseer overseer = new Overseer(Set.of(todo, todo2, todo3, phantomTodo1, phantomTodo2));
-		overseer.setAsStarting(Set.of());
-		overseer.setAsEnding(Set.of(node4));
+		Graph graph = new Graph(Set.of(todo, todo2, todo3, phantomTodo1, phantomTodo2), Set.of(), Set.of(node4));
+		Overseer overseer = new Overseer(graph);
 		overseer.start();
 
 
@@ -177,8 +175,8 @@ public class ExampleFunctions {
 		Node outputNode = new DiscreteNode(Set.of("result1"));
 		Todo todo2 = new Todo(Set.of(streamNode), consumerArc, outputNode);
 
-		Overseer overseer = new Overseer(Set.of(todo, todo2));
-		overseer.setAsEnding(Set.of(outputNode));
+		Graph graph = new Graph(Set.of(todo, todo2), Set.of(), Set.of(outputNode));
+		Overseer overseer = new Overseer(graph);
 		overseer.start();
 
 		Map<String, Object> results = overseer.getResultCache();

@@ -7,18 +7,22 @@ public class Overseer {
 	private final Map<IBitmask, Set<Todo>> todos = new HashMap<>();
 	private final Map<String, Object> cache = new ConcurrentHashMap<>();
 	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
-	private final Set<Node> nodes = new HashSet<>();
-	private final Set<Node> startingNodes = new HashSet<>();
-	private final Set<Node> endingNodes = new HashSet<>();
+	private Set<Node> nodes;
+	private Set<Node> startingNodes;
+	private Set<Node> endingNodes;
 	private final List<Node> nodeOfIndex = new ArrayList<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
 	private int tick = 0;
 
-	public Overseer(Set<Todo> todoSet) {
-		for (Todo todo : todoSet) {
-			nodes.addAll(todo.getDependencies());
+	public Overseer(Graph graph) {
+		this.nodes = graph.getNodes();
+		this.startingNodes = graph.getStartingNodes();
+		this.endingNodes = graph.getEndingNodes();
 
+
+		// Create arcToOutputNode
+		for (Todo todo : graph.getTodos()) {
 			Collection<Node> existingOutputNodes = arcToOutputNode.values();
 			if (existingOutputNodes.contains(todo.getOutputNode())) {
 				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
@@ -28,10 +32,10 @@ public class Overseer {
 				throw new IllegalArgumentException("The same Arc cannot be used for two Todos!");
 			}
 			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
-
-			nodes.add(todo.getOutputNode());
 		}
 
+
+		// Prime Nodes and Arcs with this Overseer
 		for (Primable primable : nodes) {
 			primable.primeWith(this);
 		}
@@ -39,6 +43,8 @@ public class Overseer {
 			primable.primeWith(this);
 		}
 
+
+		// Generate helper indices
 		int i = 0;
 		for (Node node : nodes) {
 			nodeOfIndex.add(node);
@@ -49,7 +55,9 @@ public class Overseer {
 			i++;
 		}
 
-		for (Todo todo : todoSet) {
+
+		// Generate bitmasks for each Todo
+		for (Todo todo : graph.getTodos()) {
 			IBitmask bitmask = new ArrayBitmask(nodes.size()); // hardcode ArrayBitmask for now.
 			for (Node dependency : todo.getDependencies()) {
 				bitmask.set(indexOfNode.get(dependency));
@@ -165,28 +173,6 @@ public class Overseer {
 			}
 		}
 		return state;
-	}
-
-	public void setAsStarting(Set<Node> nodeSet) {
-		for (Node node : nodeSet) {
-			if (!nodes.contains(node)) {
-				throw new IllegalArgumentException("Node not part of graph!");
-			}
-			else {
-				startingNodes.add(node);
-			}
-		}
-	}
-
-	public void setAsEnding(Set<Node> nodeSet) {
-		for (Node node : nodeSet) {
-			if (!nodes.contains(node)) {
-				throw new IllegalArgumentException("Node not part of graph!");
-			}
-			else {
-				endingNodes.add(node);
-			}
-		}
 	}
 
 	public Node getOutputNodeOfArc(Arc arc) {

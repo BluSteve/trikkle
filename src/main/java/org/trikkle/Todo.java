@@ -3,7 +3,7 @@ package org.trikkle;
 import java.util.List;
 import java.util.Set;
 
-public class Todo implements IGraph {
+public class Todo {
 	private Set<Node> dependencies;
 	private Arc arc;
 	private Node outputNode;

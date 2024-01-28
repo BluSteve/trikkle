@@ -32,7 +32,7 @@ public abstract class Node implements Primable { // Generics are too restricting
 		this.usable = usable;
 	}
 
-	public double getProgress() { // 1 = usable, !1 = unusable. Might convert to boolean in the future.
+	public double getProgress() {
 		return progress;
 	}
 
