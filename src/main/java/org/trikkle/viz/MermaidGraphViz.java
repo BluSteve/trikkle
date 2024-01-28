@@ -9,43 +9,39 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MermaidGraphViz implements IGraphViz {
-	public static String nodeToMermaid(Node node, String nodeId, NodeType nodeType) {
+	private static String nodeToMermaid(Node node, String nodeId, NodeType nodeType) {
 		String nodeText = String.join("<br>", node.datumNames);
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(nodeId);
 		switch (nodeType) {
 			case STARTING:
+			case ENDING:
 				sb.append("[");
 				break;
 			case MIDDLE:
 				sb.append("((");
 				break;
-			case ENDING:
-				sb.append("{{");
-				break;
 		}
 		sb.append(nodeText);
 		switch (nodeType) {
 			case STARTING:
+			case ENDING:
 				sb.append("]");
 				break;
 			case MIDDLE:
 				sb.append("))");
-				break;
-			case ENDING:
-				sb.append("}}");
 				break;
 		}
 
 		return sb.toString();
 	}
 
-	public static String arcToMermaid(Arc arc, String arcId) {
+	private static String arcToMermaid(Arc arc, String arcId) {
 		return arcId + "{" + (arc.name == null ? arcId : arc.name) + "}";
 	}
 
-	public static String makeLink(Set<String> dependencyIds, String arcId, String outputNodeId) {
+	private static String makeLink(Set<String> dependencyIds, String arcId, String outputNodeId) {
 		StringBuilder sb = new StringBuilder();
 
 		String dependencyStr = dependencyIds.isEmpty() ? "NULL" : String.join(" & ", dependencyIds);
@@ -106,7 +102,8 @@ public class MermaidGraphViz implements IGraphViz {
 				linkLines.add(makeLink(dependencyIds, arcId, nodeIdOfNode.get(todo.getOutputNode())));
 			}
 			else {
-				linkLines.add(makeLink(dependencyIds, todo.getArc().name, nodeIdOfNode.get(todo.getOutputNode())));
+				String arcName = todo.getArc().name == null ? arcId : todo.getArc().name;
+				linkLines.add(makeLink(dependencyIds, arcName, nodeIdOfNode.get(todo.getOutputNode())));
 			}
 		}
 

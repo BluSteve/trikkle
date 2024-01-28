@@ -48,6 +48,7 @@ public class ExampleFunctions {
 
 
 		Graph graph = new Graph(Set.of(todo), Set.of(inputNode), Set.of(outputNode));
+		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
 
 		inputNode.addDatum("toSquare", 2.0);
@@ -242,6 +243,7 @@ public class ExampleFunctions {
 	}
 
 	public static void main(String[] args) {
+		simpleTest();
 		complexTest();
 //		streamTest();
 //		mergeTest();
