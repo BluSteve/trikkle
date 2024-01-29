@@ -121,7 +121,7 @@ public class Graph {
 			Graph graph = graphs.get(i);
 
 			for (Node node : endingNodesOfGraph.get(i)) {
-				Graph prunedGraph = graph.findPrunedGraphFor(node);
+				Graph prunedGraph = graph.findPrunedGraphFor(Set.of(node));
 				finalTodos.addAll(prunedGraph.todos);
 			}
 		}
@@ -146,22 +146,20 @@ public class Graph {
 		return aggGraph;
 	}
 
-	private Graph findPrunedGraphFor(Node endingNode) {
-		// Note: endingNode may not be in endingNodes. It's merely the endingNode of the PRUNED graph.
+	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {
+		// Note: targetEndingNodes may not be in endingNodes. It's merely the targetEndingNodes of the PRUNED graph.
 
-		if (prunedGraphOfNode == null) {
-			prunedGraphOfNode = new HashMap<>();
+		if (targetEndingNodes.size() == 1) {
+			if (prunedGraphOfNode == null) {
+				prunedGraphOfNode = new HashMap<>();
+			}
+			else if (prunedGraphOfNode.containsKey(targetEndingNodes.iterator().next())) { // cache hit
+				return prunedGraphOfNode.get(targetEndingNodes.iterator().next());
+			}
 		}
-		else if (prunedGraphOfNode.containsKey(endingNode)) { // cache hit
-			return prunedGraphOfNode.get(endingNode);
-		}
-
-//		if (!endingNodes.contains(endingNode)) {
-//			throw new IllegalArgumentException("That's not an ending Node!");
-//		}
 
 		/*
-		 find to do which creates this endingNode
+		 find to do which creates this targetEndingNodes
 		 record this to do
 		 get the dependencies of this to do
 		 for each dependency find to do which creates it
@@ -170,7 +168,9 @@ public class Graph {
 		Set<Todo> finalTodos = new HashSet<>();
 
 		Stack<Node> nodeStack = new Stack<>();
-		nodeStack.push(endingNode);
+		for (Node targetEndingNode : targetEndingNodes) {
+			nodeStack.push(targetEndingNode);
+		}
 		while (!nodeStack.empty()) {
 			Node node = nodeStack.pop();
 			Todo generatingTodo = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node).fi;
@@ -184,7 +184,9 @@ public class Graph {
 		}
 
 		Graph prunedGraph = new Graph(finalTodos);
-		prunedGraphOfNode.put(endingNode, prunedGraph);
+		if (targetEndingNodes.size() == 1) {
+			prunedGraphOfNode.put(targetEndingNodes.iterator().next(), prunedGraph);
+		}
 		return prunedGraph;
 	}
 

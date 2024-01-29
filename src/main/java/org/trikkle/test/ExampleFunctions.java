@@ -235,14 +235,19 @@ public class ExampleFunctions {
 			}
 		};
 
+		arc1.name = "arc1";
+		arc2.name = "arc2";
+		arc3.name = "arc3";
+		arc4.name = "arc4";
+
 		Todo todo1 = new Todo(Set.of(magicNode, paramNode), arc1, hfNode);
 		Todo todo4 = new Todo(Set.of(paramNode), arc4, dipoleNode);
 		Todo todo2 = new Todo(Set.of(matrixNode), arc2, hfNode);
 		Todo todo3 = new Todo(Set.of(matrixNode), arc3, dipoleNode);
 
-		Graph graph1 = new Graph(Set.of(todo1, todo4));
+		Graph graph1 = new Graph(Set.of(todo1));
 		Graph graph2 = new Graph(Set.of(todo2, todo3));
-		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
+		Graph graph3 = Graph.mergeGraphs(List.of(graph2, graph1), Set.of(hfNode, dipoleNode));
 
 		// visualize all three graphs with the graph variable name printed before the graph
 		System.out.println("graph1");
@@ -311,10 +316,6 @@ public class ExampleFunctions {
 
 	}
 	public static void main(String[] args) {
-		simpleTest();
-		complexTest();
-		streamTest();
 		mergeTest();
-		concatTest();
 	}
 }
