@@ -12,8 +12,8 @@ public interface IBitmask extends Comparable<IBitmask> {
 	void unset(int index);
 
 	@Override
-	int hashCode();
+	boolean equals(Object o);
 
 	@Override
-	boolean equals(Object o);
+	int hashCode();
 }

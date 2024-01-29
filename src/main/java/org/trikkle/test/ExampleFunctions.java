@@ -334,9 +334,47 @@ public class ExampleFunctions {
 		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2,graph4)).findPrunedGraphFor(Set.of(nodeG));
 		System.out.println("graph3");
 		System.out.println(new MermaidGraphViz("graph3").visualize(graph3));
+	}
+	static void softEqualsTest() {
+		// generate 4 nodes, with two having the same datumNames
+		Node nodeA = new DiscreteNode(Set.of("A"));
+		Node nodeC1 = new DiscreteNode(Set.of("C", "a"));
+		Node nodeC2 = new DiscreteNode(Set.of("a", "C"));
+		Node nodeD = new DiscreteNode(Set.of("D"));
 
+		// generate A to C1 and C2 to D arcs and todos
+		Arc arc1 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc1.name = "arc1";
+		Arc arc2 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc2.name = "arc2";
+		Todo todo1 = new Todo(Set.of(nodeA), arc1, nodeC1);
+		Todo todo2 = new Todo(Set.of(nodeC2), arc2, nodeD);
+
+		// generate a graph with todos 1 and 2
+		Graph graph = new Graph(Set.of(todo1, todo2));
+
+		// visualize
+		System.out.println(new MermaidGraphViz().visualize(graph));
+
+		// generate a graph with just todo1 and another with just todo2
+		Graph graph1 = new Graph(Set.of(todo1));
+		Graph graph2 = new Graph(Set.of(todo2));
+		// concat
+		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2));
+		// visualize
+		System.out.println(new MermaidGraphViz().visualize(graph3));
 	}
 	public static void main(String[] args) {
-		concatTest();
+		softEqualsTest();
 	}
 }

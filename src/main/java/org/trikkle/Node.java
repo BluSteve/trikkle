@@ -58,6 +58,19 @@ public abstract class Node implements Primable { // Generics are too restricting
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) return true;
+		if (!(obj instanceof Node)) return false;
+		Node node = (Node) obj;
+		return datumNames.equals(node.datumNames);
+	}
+
+	@Override
+	public int hashCode() {
+		return datumNames.hashCode();
+	}
+
+	@Override
 	public String toString() {
 		return "Node{" +
 				"datumNames=" + datumNames +
