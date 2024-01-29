@@ -329,14 +329,9 @@ public class ExampleFunctions {
 		Graph graph4 = new Graph(Set.of(todo4, todo5));
 
 		// display graph 1, 2, 4 with labels printed for each and namespace set to the labels
-		System.out.println("graph1");
-		System.out.println(new MermaidGraphViz("graph1").visualize(graph1));
-		System.out.println("graph2");
-		System.out.println(new MermaidGraphViz("graph2").visualize(graph2));
-		System.out.println("graph4");
-		System.out.println(new MermaidGraphViz("graph4").visualize(graph4));
+		System.out.println(new MermaidGraphViz().visualize(graph1, graph2, graph4));
 
-		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2,graph4)).findPrunedGraphFor(Set.of(nodeH, nodeC));
+		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2,graph4)).findPrunedGraphFor(Set.of(nodeG));
 		System.out.println("graph3");
 		System.out.println(new MermaidGraphViz("graph3").visualize(graph3));
 
