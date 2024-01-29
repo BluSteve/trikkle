@@ -44,7 +44,7 @@ public class MermaidGraphViz implements IGraphViz {
 	private static String makeLink(Set<String> dependencyIds, String arcId, String outputNodeId) {
 		StringBuilder sb = new StringBuilder();
 
-		String dependencyStr = dependencyIds.isEmpty() ? "NULL" : String.join(" & ", dependencyIds);
+		String dependencyStr = dependencyIds.isEmpty() ? "NULL" + arcId + ":::hidden" : String.join(" & ", dependencyIds);
 		sb.append(dependencyStr);
 
 		if (dependencyIds.size() > 1) {
@@ -69,18 +69,19 @@ public class MermaidGraphViz implements IGraphViz {
 
 		List<String> lines = new ArrayList<>();
 		lines.add("flowchart LR");
+		lines.add("classDef hidden display: none;");
 
 		int i = 0;
-		for (Node node : graph.getNodes()) {
+		for (Node node : graph.nodes) {
 			i++;
 			String nodeId = "node" + i;
 			nodeIdOfNode.put(node, nodeId);
 
 			NodeType nodeType = NodeType.MIDDLE;
-			if (graph.getStartingNodes().contains(node)) {
+			if (graph.startingNodes.contains(node)) {
 				nodeType = NodeType.STARTING;
 			}
-			else if (graph.getEndingNodes().contains(node)) {
+			else if (graph.endingNodes.contains(node)) {
 				nodeType = NodeType.ENDING;
 			}
 
@@ -89,11 +90,10 @@ public class MermaidGraphViz implements IGraphViz {
 
 		int k = 0;
 		List<String> linkLines = new ArrayList<>();
-		for (Todo todo : graph.getTodos()) {
+		for (Todo todo : graph.todos) {
 			k++;
 			String arcId = "arc" + k;
 
-			// todo what happens when no dependencies?
 			Set<String> dependencyIds = todo.getDependencies().stream()
 					.map(nodeIdOfNode::get).collect(Collectors.toSet());
 			if (todo.getDependencies().size() > 1) {

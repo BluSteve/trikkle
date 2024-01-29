@@ -14,7 +14,7 @@ public abstract class Node implements Primable { // Generics are too restricting
 
 	public void addDatum(String datumName, Object datum) {
 		if (!datumNames.contains(datumName)) {
-			throw new IllegalArgumentException("Datum " + datumName + " was not declared by this Node!");
+			throw new IllegalArgumentException("Datum \"" + datumName + "\" was not declared by this Node!");
 		}
 		uncheckedAddDatum(datumName, datum);
 	}
@@ -41,7 +41,10 @@ public abstract class Node implements Primable { // Generics are too restricting
 			throw new IllegalArgumentException("Progress not between 0 and 1!");
 		}
 		this.progress = progress;
-		if (progress == 1) onDone();
+		if (progress == 1) {
+			usable = true; // usable declares that this node is ready to be used
+			onDone();
+		}
 	}
 
 	@Override
@@ -57,8 +60,9 @@ public abstract class Node implements Primable { // Generics are too restricting
 	@Override
 	public String toString() {
 		return "Node{" +
-				"progress=" + progress +
-				", datumNames=" + datumNames +
+				"datumNames=" + datumNames +
+				", usable=" + usable +
+				", progress=" + progress +
 				'}';
 	}
 }

@@ -13,7 +13,7 @@ public class StreamNode extends Node {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	// Assumes that all datums of a particular name are of the same type
-	public void uncheckedAddDatum(String datumName, Object datum) {
+	protected void uncheckedAddDatum(String datumName, Object datum) {
 		Map<String, Object> cache = overseer.getCache();
 		if (cache.containsKey(datumName)) {
 			((Queue) cache.get(datumName)).add(datum);
@@ -32,7 +32,6 @@ public class StreamNode extends Node {
 
 	@Override
 	protected void onDone() {
-		usable = true; // usable tells the receiving arc to look at this node again
 		overseer.ticktock(this);
 	}
 }

@@ -2,21 +2,19 @@ package org.trikkle;
 
 import org.trikkle.utils.MultiHashMap;
 import org.trikkle.utils.MultiMap;
+import org.trikkle.utils.Pair;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Graph {
-	private final Set<Todo> todos;
-
-	private final Set<Node> nodes = new HashSet<>();
-	private final Set<Arc> arcs = new HashSet<>();
-	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
-
-	private final Set<Node> startingNodes = new HashSet<>();
-	private final Set<Node> endingNodes = new HashSet<>();
-
-	private final Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
-	private final Map<Node, Todo> todoOfOutputNode = new HashMap<>();
+	public final Set<Todo> todos;
+	public final Set<Arc> arcs;
+	public final Set<Node> nodes = new HashSet<>();
+	public final Set<Node> startingNodes = new HashSet<>();
+	public final Set<Node> endingNodes = new HashSet<>();
+	public final Map<Arc, Pair<Todo, Node>> arcMap = new HashMap<>();
+	public final Map<Node, Pair<Todo, Arc>> outputNodeMap = new HashMap<>();
 	private Map<Node, Graph> prunedGraphOfNode;
 
 	public Graph(Set<Todo> todos) {
@@ -24,25 +22,23 @@ public class Graph {
 
 		Set<Node> dependencies = new HashSet<>();
 		for (Todo todo : todos) {
-			// Create arcToOutputNode
-			Collection<Node> existingOutputNodes = arcToOutputNode.values();
+			Collection<Node> existingOutputNodes =
+					arcMap.values().stream().map(Pair::getSe).collect(Collectors.toList());
 			if (existingOutputNodes.contains(todo.getOutputNode())) {
 				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
 			}
-
-			if (arcToOutputNode.containsKey(todo.getArc())) {
+			if (arcMap.containsKey(todo.getArc())) {
 				throw new IllegalArgumentException("The same Arc cannot be used for two Todos!");
 			}
-			arcToOutputNode.put(todo.getArc(), todo.getOutputNode());
 
 			nodes.addAll(todo.getDependencies());
-			arcs.add(todo.getArc());
 			nodes.add(todo.getOutputNode());
-			todoOfOutputNode.put(todo.getOutputNode(), todo);
+			arcMap.put(todo.getArc(), new Pair<>(todo, todo.getOutputNode()));
+			outputNodeMap.put(todo.getOutputNode(), new Pair<>(todo, todo.getArc()));
 
-			dependenciesOfNode.put(todo.getOutputNode(), todo.getDependencies());
 			dependencies.addAll(todo.getDependencies());
 		}
+		arcs = arcMap.keySet();
 
 		// find ending nodes
 		for (Node node : nodes) {
@@ -53,7 +49,7 @@ public class Graph {
 
 		// find starting nodes
 		for (Node node : nodes) {
-			if (!dependenciesOfNode.containsKey(node)) {
+			if (!outputNodeMap.containsKey(node)) {
 				startingNodes.add(node);
 			}
 		}
@@ -66,7 +62,7 @@ public class Graph {
 				Graph graph = graphs.get(i);
 
 				if (graph.nodes.contains(endingNode)) { // if this Graph offers a path to obtain this ending Node
-					Way way = new Way(i, graph.dependenciesOfNode.get(endingNode));
+					Way way = new Way(i, graph.outputNodeMap.get(endingNode).fi.getDependencies());
 					waysToGetNode.putOne(endingNode, way);
 				}
 			}
@@ -121,14 +117,12 @@ public class Graph {
 
 
 		Set<Todo> finalTodos = new HashSet<>();
-		Set<Node> finalStartingNodes = new HashSet<>();
 		for (int i = 0; i < graphs.size(); i++) {
 			Graph graph = graphs.get(i);
 
 			for (Node node : endingNodesOfGraph.get(i)) {
 				Graph prunedGraph = graph.findPrunedGraphFor(node);
 				finalTodos.addAll(prunedGraph.todos);
-				finalStartingNodes.addAll(prunedGraph.startingNodes);
 			}
 		}
 
@@ -137,22 +131,10 @@ public class Graph {
 		return new Graph(finalTodos);
 	}
 
-	public static Graph concatGraphs(List<Graph> graphs) {
+	public static Graph concatGraphs(List<Graph> graphs) { // todo optimize
 		Graph aggGraph = graphs.get(0);
 		for (int i = 1; i < graphs.size(); i++) {
 			Graph graph = graphs.get(i);
-
-			// get intersection between aggGraph's endingNodes and graph's startingNodes
-			Set<Node> intersection = new HashSet<>(aggGraph.endingNodes);
-			intersection.retainAll(graph.startingNodes);
-
-			Set<Node> startingUnion = new HashSet<>(aggGraph.startingNodes);
-			startingUnion.addAll(graph.startingNodes);
-			startingUnion.removeAll(intersection);
-
-			Set<Node> endingUnion = new HashSet<>(aggGraph.endingNodes);
-			endingUnion.addAll(graph.endingNodes);
-			endingUnion.removeAll(intersection);
 
 			// get union of aggGraph and graph's todos
 			Set<Todo> todosUnion = new HashSet<>(aggGraph.todos);
@@ -186,19 +168,14 @@ public class Graph {
 		*/
 
 		Set<Todo> finalTodos = new HashSet<>();
-		Set<Node> finalStartingNodes = new HashSet<>();
-		Set<Node> finalEndingNodes = new HashSet<>();
 
 		Stack<Node> nodeStack = new Stack<>();
 		nodeStack.push(endingNode);
 		while (!nodeStack.empty()) {
 			Node node = nodeStack.pop();
-			Todo generatingTodo = todoOfOutputNode.get(node);
+			Todo generatingTodo = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node).fi;
 
-			if (generatingTodo == null) { // means it's a starting Node
-				finalStartingNodes.add(node);
-			}
-			else {
+			if (generatingTodo != null) {
 				finalTodos.add(generatingTodo);
 				for (Node dependency : generatingTodo.getDependencies()) {
 					nodeStack.push(dependency);
@@ -206,35 +183,9 @@ public class Graph {
 			}
 		}
 
-		finalEndingNodes.add(endingNode);
-
 		Graph prunedGraph = new Graph(finalTodos);
 		prunedGraphOfNode.put(endingNode, prunedGraph);
 		return prunedGraph;
-	}
-
-	public Set<Todo> getTodos() {
-		return todos;
-	}
-
-	public Set<Node> getNodes() {
-		return nodes;
-	}
-
-	public Map<Arc, Node> getArcToOutputNode() {
-		return arcToOutputNode;
-	}
-
-	public Set<Arc> getArcs() {
-		return arcs;
-	}
-
-	public Set<Node> getStartingNodes() {
-		return startingNodes;
-	}
-
-	public Set<Node> getEndingNodes() {
-		return endingNodes;
 	}
 
 	private static class Way {

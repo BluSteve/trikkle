@@ -1,42 +1,38 @@
 package org.trikkle;
 
-import org.trikkle.utils.*;
+import org.trikkle.utils.IBitmask;
+import org.trikkle.utils.MultiHashMap;
+import org.trikkle.utils.MultiMap;
+import org.trikkle.utils.StrictConcurrentHashMap;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
 public class Overseer {
+	private final Graph g;
 	private final MultiMap<IBitmask, Todo> todos = new MultiHashMap<>();
-	private final Map<String, Object> cache = new ConcurrentHashMap<>();
-	private final Map<Arc, Node> arcToOutputNode;
-	private final Set<Node> nodes;
-	private final Set<Node> startingNodes;
-	private final Set<Node> endingNodes;
+	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final List<Node> nodeOfIndex = new ArrayList<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
 	private int tick = 0;
 
 	public Overseer(Graph graph) {
-		this.nodes = graph.getNodes();
-		this.startingNodes = graph.getStartingNodes();
-		this.endingNodes = graph.getEndingNodes();
-		this.arcToOutputNode = graph.getArcToOutputNode();
+		this.g = graph;
 
 		// Prime Nodes and Arcs with this Overseer
-		for (Primable primable : nodes) {
+		for (Primable primable : g.nodes) {
 			primable.primeWith(this);
 		}
-		for (Primable primable : arcToOutputNode.keySet()) {
+		for (Primable primable : g.arcs) {
 			primable.primeWith(this);
 		}
 
 
 		// Generate helper indices
 		int i = 0;
-		for (Node node : nodes) {
+		for (Node node : g.nodes) {
 			nodeOfIndex.add(node);
 			indexOfNode.put(node, i);
 			for (String datumName : node.datumNames) {
@@ -47,8 +43,8 @@ public class Overseer {
 
 
 		// Generate bitmasks for each To do
-		for (Todo todo : graph.getTodos()) {
-			IBitmask bitmask = IBitmask.getBitmask(nodes.size());
+		for (Todo todo : g.todos) {
+			IBitmask bitmask = IBitmask.getBitmask(g.nodes.size());
 			for (Node dependency : todo.getDependencies()) {
 				bitmask.set(indexOfNode.get(dependency));
 			}
@@ -59,8 +55,8 @@ public class Overseer {
 
 	public void start() {
 		// check population of startingNodes
-		for (Node startingNode : startingNodes) {
-			if (startingNode.getProgress() != 1) {
+		for (Node startingNode : g.startingNodes) {
+			if (!startingNode.isUsable()) {
 				throw new IllegalStateException("Starting nodes not fully populated; unable to start!");
 			}
 		}
@@ -68,37 +64,7 @@ public class Overseer {
 		ticktock(null);
 	}
 
-	private void end() {
-		System.out.println("Overseer finished!");
-	}
-
-	public Map<String, Object> getResultCache() {
-		Map<String, Object> resultCache = new HashMap<>();
-		for (Node endingNode : endingNodes) {
-			for (String datumName : endingNode.datumNames) {
-				Object datum = cache.get(datumName);
-				// todo decide whether to throw an exception here.
-//				if (datum == null) {
-//					throw new NullPointerException("Result datum \""+ datumName + "\" is null!");
-//				}
-				resultCache.put(datumName, datum);
-			}
-		}
-
-		return resultCache;
-	}
-
-	private boolean hasEnded() {
-		for (Node endingNode : endingNodes) {
-			if (endingNode.getProgress() != 1) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
+	void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
 		tick++;
 		System.out.println("\ntick = " + tick);
 		if (hasEnded()) {
@@ -148,9 +114,35 @@ public class Overseer {
 		ForkJoinTask.invokeAll(tasks);
 	}
 
+	public Map<String, Object> getResultCache() {
+		Map<String, Object> resultCache = new HashMap<>();
+		for (Node endingNode : g.endingNodes) {
+			for (String datumName : endingNode.datumNames) {
+				Object datum = cache.get(datumName);
+				resultCache.put(datumName, datum);
+			}
+		}
+
+		return resultCache;
+	}
+
+	private void end() {
+		System.out.println("Overseer finished!");
+	}
+
+	private boolean hasEnded() {
+		for (Node endingNode : g.endingNodes) {
+			if (endingNode.getProgress() != 1) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private IBitmask getCurrentState() {
-		IBitmask state = IBitmask.getBitmask(nodes.size());
-		for (Node node : nodes) {
+		IBitmask state = IBitmask.getBitmask(g.nodes.size());
+		for (Node node : g.nodes) {
 			if (node.isUsable()) {
 				state.set(indexOfNode.get(node));
 			}
@@ -159,7 +151,7 @@ public class Overseer {
 	}
 
 	public Node getOutputNodeOfArc(Arc arc) {
-		return arcToOutputNode.get(arc);
+		return g.arcMap.get(arc).se;
 	}
 
 	public Node getOutputNodeOfDatum(String datumName) {

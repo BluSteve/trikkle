@@ -104,30 +104,32 @@ public class ExampleFunctions {
 		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
 
 
-//		Arc phantomArc1 = new Arc.AutoArc() {
-//			@Override
-//			public void run() {
-//				returnDatum("toSquare", 2.0);
-//			}
-//		};
-//		phantomArc1.name = "phantomArc1";
-//		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
-//
-//		Arc phantomArc2 = new Arc.AutoArc() {
-//			@Override
-//			public void run() {
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					throw new RuntimeException(e);
-//				}
-//				returnDatum("finalMultiplier", 3.0);
-//				returnDatum("finalExponent", 1.2);
-//			}
-//		};
-//		phantomArc2.name = "phantomArc2";
-//		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
+		Arc phantomArc1 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+				returnDatum("toSquare", 2.0);
+			}
+		};
+		phantomArc1.name = "phantomArc1";
+		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
 
+		Arc phantomArc2 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+				returnDatum("finalMultiplier", 3.0);
+				returnDatum("finalExponent", 1.2);
+			}
+		};
+		phantomArc2.name = "phantomArc2";
+		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
+
+//		inputNode.setUsable(true);
+//		inputNode2.setUsable(true);
 		Graph graph = new Graph(Set.of(todo, todo2, todo3));
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
@@ -242,10 +244,13 @@ public class ExampleFunctions {
 		Graph graph2 = new Graph(Set.of(todo2, todo3));
 		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
 
-		for (Todo todo : graph3.getTodos()) {
-			System.out.println(todo);
-		}
-		System.out.println();
+		// visualize all three graphs with the graph variable name printed before the graph
+		System.out.println("graph1");
+		System.out.println(new MermaidGraphViz().visualize(graph1));
+		System.out.println("graph2");
+		System.out.println(new MermaidGraphViz().visualize(graph2));
+		System.out.println("graph3");
+		System.out.println(new MermaidGraphViz().visualize(graph3));
 	}
 
 	static void concatTest() {
