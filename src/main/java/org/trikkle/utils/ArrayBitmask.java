@@ -13,17 +13,14 @@ public class ArrayBitmask implements IBitmask {
 
 	@Override
 	public void set(int index) {
+		if (index > length) throw new IllegalArgumentException("Index out of range!");
 		array[index] = true;
 	}
 
 	@Override
 	public void unset(int index) {
+		if (index > length) throw new IllegalArgumentException("Index out of range!");
 		array[index] = false;
-	}
-
-	@Override
-	public int hashCode() {
-		return Arrays.hashCode(array);
 	}
 
 	@Override
@@ -34,10 +31,15 @@ public class ArrayBitmask implements IBitmask {
 	}
 
 	@Override
+	public int hashCode() {
+		return Arrays.hashCode(array);
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (boolean b : array) {
-			sb.append(b?1:0);
+			sb.append(b ? 1 : 0);
 		}
 		return sb.toString();
 	}
@@ -47,7 +49,7 @@ public class ArrayBitmask implements IBitmask {
 		if (this == o) return 0;
 
 		ArrayBitmask ab = (ArrayBitmask) o;
-		if (array.length != ab.array.length) {
+		if (length != ab.length) {
 			throw new IllegalArgumentException("ArrayBitmasks not of the same length!");
 		}
 		else {

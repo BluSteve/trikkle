@@ -1,12 +1,11 @@
 package org.trikkle;
 
-import org.trikkle.utils.ArrayBitmask;
-import org.trikkle.utils.IBitmask;
-import org.trikkle.utils.MultiHashMap;
-import org.trikkle.utils.MultiMap;
+import org.trikkle.utils.*;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
 
 public class Overseer {
 	private final MultiMap<IBitmask, Todo> todos = new MultiHashMap<>();
@@ -49,7 +48,7 @@ public class Overseer {
 
 		// Generate bitmasks for each To do
 		for (Todo todo : graph.getTodos()) {
-			IBitmask bitmask = new ArrayBitmask(nodes.size()); // hardcode ArrayBitmask for now.
+			IBitmask bitmask = IBitmask.getBitmask(nodes.size()); // hardcode ArrayBitmask for now.
 			for (Node dependency : todo.getDependencies()) {
 				bitmask.set(indexOfNode.get(dependency));
 			}
@@ -150,7 +149,7 @@ public class Overseer {
 	}
 
 	private IBitmask getCurrentState() {
-		IBitmask state = new ArrayBitmask(nodes.size());
+		IBitmask state = IBitmask.getBitmask(nodes.size());
 		for (Node node : nodes) {
 			if (node.isUsable()) {
 				state.set(indexOfNode.get(node));
