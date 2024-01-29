@@ -137,6 +137,33 @@ public class Graph {
 		return new Graph(finalTodos, finalStartingNodes, endingNodes);
 	}
 
+	public static Graph concatGraphs(List<Graph> graphs) {
+		Graph aggGraph = graphs.get(0);
+		for (int i = 1; i < graphs.size(); i++) {
+			Graph graph = graphs.get(i);
+
+			// get intersection between aggGraph's endingNodes and graph's startingNodes
+			Set<Node> intersection = new HashSet<>(aggGraph.endingNodes);
+			intersection.retainAll(graph.startingNodes);
+
+			Set<Node> startingUnion = new HashSet<>(aggGraph.startingNodes);
+			startingUnion.addAll(graph.startingNodes);
+			startingUnion.removeAll(intersection);
+
+			Set<Node> endingUnion = new HashSet<>(aggGraph.endingNodes);
+			endingUnion.addAll(graph.endingNodes);
+			endingUnion.removeAll(intersection);
+
+			// get union of aggGraph and graph's todos
+			Set<Todo> todosUnion = new HashSet<>(aggGraph.todos);
+			todosUnion.addAll(graph.todos);
+
+			aggGraph = new Graph(todosUnion, startingUnion, endingUnion);
+		}
+
+		return aggGraph;
+	}
+
 	private Graph findPrunedGraphFor(Node endingNode) {
 		// Note: endingNode may not be in endingNodes. It's merely the endingNode of the PRUNED graph.
 
@@ -146,6 +173,7 @@ public class Graph {
 		else if (prunedGraphOfNode.containsKey(endingNode)) { // cache hit
 			return prunedGraphOfNode.get(endingNode);
 		}
+
 //		if (!endingNodes.contains(endingNode)) {
 //			throw new IllegalArgumentException("That's not an ending Node!");
 //		}

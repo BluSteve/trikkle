@@ -248,10 +248,68 @@ public class ExampleFunctions {
 		System.out.println();
 	}
 
+	static void concatTest() {
+		// make nodes with datumNames A to F
+		Node nodeA = new DiscreteNode(Set.of("A"));
+		Node nodeB = new DiscreteNode(Set.of("B"));
+		Node nodeC = new DiscreteNode(Set.of("C"));
+		Node nodeD = new DiscreteNode(Set.of("D"));
+		Node nodeE = new DiscreteNode(Set.of("E"));
+		Node nodeF = new DiscreteNode(Set.of("F"));
+
+		// make three empty arcs and set arc.name to their variable names
+		Arc arc1 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc1.name = "arc1";
+		Arc arc2 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc2.name = "arc2";
+		Arc arc3 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc3.name = "arc3";
+
+
+
+		// make a todo connecting nodeB to nodeF with arc1
+		Todo todo1 = new Todo(Set.of(nodeB), arc1, nodeF);
+
+		// make a todo connecting node A and B to node C with arc2
+		Todo todo2 = new Todo(Set.of(nodeA, nodeB), arc2, nodeC);
+
+		// make a todo connecting node C and E to node D with arc3
+		Todo todo3 = new Todo(Set.of(nodeC, nodeE), arc3, nodeD);
+
+		// make a graph with todos 1 and 2
+		Graph graph1 = new Graph(Set.of(todo1, todo2), Set.of(nodeA, nodeB), Set.of(nodeC, nodeF));
+		// make a graph with todo3
+		Graph graph2 = new Graph(Set.of(todo3), Set.of(nodeC, nodeE), Set.of(nodeD));
+
+		// display graph1
+		System.out.println(new MermaidGraphViz().visualize(graph1));
+		// display graph2
+		System.out.println(new MermaidGraphViz().visualize(graph2));
+		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2));
+		// display graph3
+		System.out.println(new MermaidGraphViz().visualize(graph3));
+
+	}
 	public static void main(String[] args) {
-		simpleTest();
-		complexTest();
+//		simpleTest();
+//		complexTest();
 //		streamTest();
 //		mergeTest();
+		concatTest();
 	}
 }
