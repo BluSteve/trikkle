@@ -148,7 +148,7 @@ public class Graph {
 			if (prunedGraphOfNode == null) {
 				prunedGraphOfNode = new HashMap<>();
 			}
-			else if (prunedGraphOfNode.containsKey(targetEndingNodes.iterator().next())) { // cache hit
+			if (prunedGraphOfNode.containsKey(targetEndingNodes.iterator().next())) { // cache hit
 				return prunedGraphOfNode.get(targetEndingNodes.iterator().next());
 			}
 		}
