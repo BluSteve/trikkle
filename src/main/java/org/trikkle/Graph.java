@@ -12,16 +12,17 @@ public class Graph {
 	private final Set<Arc> arcs = new HashSet<>();
 	private final Map<Arc, Node> arcToOutputNode = new HashMap<>();
 
-	private final Set<Node> startingNodes;
-	private final Set<Node> endingNodes;
+	private final Set<Node> startingNodes = new HashSet<>();
+	private final Set<Node> endingNodes = new HashSet<>();
 
 	private final Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
 	private final Map<Node, Todo> todoOfOutputNode = new HashMap<>();
 	private Map<Node, Graph> prunedGraphOfNode;
 
-	public Graph(Set<Todo> todos, Set<Node> startingNodes, Set<Node> endingNodes) {
+	public Graph(Set<Todo> todos) {
 		this.todos = todos;
 
+		Set<Node> dependencies = new HashSet<>();
 		for (Todo todo : todos) {
 			// Create arcToOutputNode
 			Collection<Node> existingOutputNodes = arcToOutputNode.values();
@@ -38,24 +39,23 @@ public class Graph {
 			arcs.add(todo.getArc());
 			nodes.add(todo.getOutputNode());
 			todoOfOutputNode.put(todo.getOutputNode(), todo);
-		}
 
-		for (Node node : startingNodes) {
-			if (!nodes.contains(node)) {
-				throw new IllegalArgumentException("Starting Node not part of Graph!");
-			}
-		}
-		for (Node node : endingNodes) {
-			if (!nodes.contains(node)) {
-				throw new IllegalArgumentException("Ending Node not part of Graph!");
-			}
-		}
-
-		this.startingNodes = startingNodes;
-		this.endingNodes = endingNodes;
-
-		for (Todo todo : todos) {
 			dependenciesOfNode.put(todo.getOutputNode(), todo.getDependencies());
+			dependencies.addAll(todo.getDependencies());
+		}
+
+		// find ending nodes
+		for (Node node : nodes) {
+			if (!dependencies.contains(node)) {
+				endingNodes.add(node);
+			}
+		}
+
+		// find starting nodes
+		for (Node node : nodes) {
+			if (!dependenciesOfNode.containsKey(node)) {
+				startingNodes.add(node);
+			}
 		}
 	}
 
@@ -134,7 +134,7 @@ public class Graph {
 
 		// endingNodes is a subset of "finalEndingNodes". This allows the program to finish earlier, computing only
 		// necessary nodes.
-		return new Graph(finalTodos, finalStartingNodes, endingNodes);
+		return new Graph(finalTodos);
 	}
 
 	public static Graph concatGraphs(List<Graph> graphs) {
@@ -158,7 +158,7 @@ public class Graph {
 			Set<Todo> todosUnion = new HashSet<>(aggGraph.todos);
 			todosUnion.addAll(graph.todos);
 
-			aggGraph = new Graph(todosUnion, startingUnion, endingUnion);
+			aggGraph = new Graph(todosUnion);
 		}
 
 		return aggGraph;
@@ -208,7 +208,7 @@ public class Graph {
 
 		finalEndingNodes.add(endingNode);
 
-		Graph prunedGraph = new Graph(finalTodos, finalStartingNodes, finalEndingNodes);
+		Graph prunedGraph = new Graph(finalTodos);
 		prunedGraphOfNode.put(endingNode, prunedGraph);
 		return prunedGraph;
 	}

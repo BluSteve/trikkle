@@ -48,7 +48,7 @@ public class ExampleFunctions {
 		Todo todo = new Todo(Set.of(inputNode), arc, outputNode);
 
 
-		Graph graph = new Graph(Set.of(todo), Set.of(inputNode), Set.of(outputNode));
+		Graph graph = new Graph(Set.of(todo));
 		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
 
@@ -128,7 +128,7 @@ public class ExampleFunctions {
 //		phantomArc2.name = "phantomArc2";
 //		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
 
-		Graph graph = new Graph(Set.of(todo, todo2, todo3), Set.of(inputNode, inputNode2), Set.of(node4));
+		Graph graph = new Graph(Set.of(todo, todo2, todo3));
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
@@ -193,7 +193,7 @@ public class ExampleFunctions {
 		Node outputNode = new DiscreteNode(Set.of("result1"));
 		Todo todo2 = new Todo(Set.of(streamNode), consumerArc, outputNode);
 
-		Graph graph = new Graph(Set.of(todo, todo2), Set.of(), Set.of(outputNode));
+		Graph graph = new Graph(Set.of(todo, todo2));
 		Overseer overseer = new Overseer(graph);
 		overseer.start();
 
@@ -238,8 +238,8 @@ public class ExampleFunctions {
 		Todo todo2 = new Todo(Set.of(matrixNode), arc2, hfNode);
 		Todo todo3 = new Todo(Set.of(matrixNode), arc3, dipoleNode);
 
-		Graph graph1 = new Graph(Set.of(todo1, todo4), Set.of(paramNode), Set.of(hfNode));
-		Graph graph2 = new Graph(Set.of(todo2, todo3), Set.of(matrixNode), Set.of(hfNode, dipoleNode));
+		Graph graph1 = new Graph(Set.of(todo1, todo4));
+		Graph graph2 = new Graph(Set.of(todo2, todo3));
 		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
 
 		for (Todo todo : graph3.getTodos()) {
@@ -292,9 +292,9 @@ public class ExampleFunctions {
 		Todo todo3 = new Todo(Set.of(nodeC, nodeE), arc3, nodeD);
 
 		// make a graph with todos 1 and 2
-		Graph graph1 = new Graph(Set.of(todo1, todo2), Set.of(nodeA, nodeB), Set.of(nodeC, nodeF));
+		Graph graph1 = new Graph(Set.of(todo1, todo2));
 		// make a graph with todo3
-		Graph graph2 = new Graph(Set.of(todo3), Set.of(nodeC, nodeE), Set.of(nodeD));
+		Graph graph2 = new Graph(Set.of(todo3));
 
 		// display graph1
 		System.out.println(new MermaidGraphViz().visualize(graph1));
@@ -306,10 +306,10 @@ public class ExampleFunctions {
 
 	}
 	public static void main(String[] args) {
-//		simpleTest();
-//		complexTest();
-//		streamTest();
-//		mergeTest();
+		simpleTest();
+		complexTest();
+		streamTest();
+		mergeTest();
 		concatTest();
 	}
 }
