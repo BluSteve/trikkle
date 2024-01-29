@@ -3,9 +3,9 @@ package org.trikkle;
 import java.util.Set;
 
 public class Todo {
-	private Set<Node> dependencies;
-	private Arc arc;
-	private Node outputNode;
+	private final Set<Node> dependencies;
+	private final Arc arc;
+	private final Node outputNode;
 
 	public Todo(Set<Node> dependencies, Arc arc, Node outputNode) {
 		this.dependencies = dependencies;

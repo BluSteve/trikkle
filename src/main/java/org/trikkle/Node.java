@@ -40,6 +40,10 @@ public abstract class Node implements Primable { // Generics are too restricting
 		if (progress < 0 || progress > 1) {
 			throw new IllegalArgumentException("Progress not between 0 and 1!");
 		}
+		if (progress < this.progress) {
+			throw new IllegalArgumentException("Progress cannot decrease!");
+		}
+
 		this.progress = progress;
 		if (progress == 1) {
 			usable = true; // usable declares that this node is ready to be used

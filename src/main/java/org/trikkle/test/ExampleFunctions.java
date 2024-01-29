@@ -10,26 +10,6 @@ import java.util.Queue;
 import java.util.Set;
 
 public class ExampleFunctions {
-	static double fn1() {
-		return 1;
-	}
-
-	static double fn2() {
-		return 2;
-	}
-
-	static double fn3() {
-		return 3;
-	}
-
-	static double[] fn4(double[] input) {
-		double[] output = new double[input.length];
-		for (int i = 0; i < input.length; i++) {
-			output[i] = input[i] * input[i];
-		}
-		return output;
-	}
-
 	static double simpleFn(double x) {
 		return x * x;
 	}
@@ -163,6 +143,7 @@ public class ExampleFunctions {
 
 		Arc consumerArc = new Arc() {
 			double total = 0; // is this a pure function?
+
 			@Override
 			public void run() {
 				Queue<Double> queue = (Queue<Double>) getDatum("stream1");
@@ -291,7 +272,6 @@ public class ExampleFunctions {
 		arc3.name = "arc3";
 
 
-
 		// make a to do connecting nodeB to nodeF with arc1
 		Todo todo1 = new Todo(Set.of(nodeB), arc1, nodeF);
 
@@ -331,10 +311,11 @@ public class ExampleFunctions {
 		// display graph 1, 2, 4 with labels printed for each and namespace set to the labels
 		System.out.println(new MermaidGraphViz().visualize(graph1, graph2, graph4));
 
-		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2,graph4)).findPrunedGraphFor(Set.of(nodeG));
+		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2, graph4)).findPrunedGraphFor(Set.of(nodeG));
 		System.out.println("graph3");
 		System.out.println(new MermaidGraphViz("graph3").visualize(graph3));
 	}
+
 	static void softEqualsTest() {
 		// generate 4 nodes, with two having the same datumNames
 		Node nodeA = new DiscreteNode(Set.of("A"));
@@ -374,7 +355,14 @@ public class ExampleFunctions {
 		// visualize
 		System.out.println(new MermaidGraphViz().visualize(graph3));
 	}
+
 	public static void main(String[] args) {
+		// run all test
+		simpleTest();
+		complexTest();
+		streamTest();
+		mergeTest();
+		concatTest();
 		softEqualsTest();
 	}
 }

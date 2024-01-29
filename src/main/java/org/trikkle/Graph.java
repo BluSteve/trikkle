@@ -126,8 +126,6 @@ public class Graph {
 			}
 		}
 
-		// endingNodes is a subset of "finalEndingNodes". This allows the program to finish earlier, computing only
-		// necessary nodes.
 		return new Graph(finalTodos);
 	}
 
@@ -142,6 +140,9 @@ public class Graph {
 
 	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {
 		// Note: targetEndingNodes may not be in endingNodes. It's merely the targetEndingNodes of the PRUNED graph.
+		if (!nodes.containsAll(targetEndingNodes)) {
+			throw new IllegalArgumentException("targetEndingNodes must be a subset of nodes!");
+		}
 
 		if (targetEndingNodes.size() == 1) {
 			if (prunedGraphOfNode == null) {

@@ -68,7 +68,7 @@ public class Overseer {
 		tick++;
 		System.out.println("\ntick = " + tick);
 		if (hasEnded()) {
-			end();
+			onEnd();
 			return;
 		}
 
@@ -114,6 +114,10 @@ public class Overseer {
 		ForkJoinTask.invokeAll(tasks);
 	}
 
+	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
+		return cache;
+	}
+
 	public Map<String, Object> getResultCache() {
 		Map<String, Object> resultCache = new HashMap<>();
 		for (Node endingNode : g.endingNodes) {
@@ -126,18 +130,16 @@ public class Overseer {
 		return resultCache;
 	}
 
-	private void end() {
-		System.out.println("Overseer finished!");
+	public Map<String, Object> getCacheCopy() {
+		return new HashMap<>(cache);
 	}
 
-	private boolean hasEnded() {
-		for (Node endingNode : g.endingNodes) {
-			if (endingNode.getProgress() != 1) {
-				return false;
-			}
-		}
+	public Node getOutputNodeOfDatum(String datumName) {
+		return nodeOfDatumName.get(datumName);
+	}
 
-		return true;
+	Node getOutputNodeOfArc(Arc arc) {
+		return g.arcMap.get(arc).se;
 	}
 
 	private IBitmask getCurrentState() {
@@ -150,15 +152,21 @@ public class Overseer {
 		return state;
 	}
 
-	public Node getOutputNodeOfArc(Arc arc) {
-		return g.arcMap.get(arc).se;
+	private boolean hasEnded() {
+		for (Node endingNode : g.endingNodes) {
+			if (endingNode.getProgress() != 1) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
-	public Node getOutputNodeOfDatum(String datumName) {
-		return nodeOfDatumName.get(datumName);
+	private void onEnd() {
+		System.out.println("Overseer finished!");
 	}
 
-	public Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
-		return cache;
+	public Graph getGraph() {
+		return g;
 	}
 }

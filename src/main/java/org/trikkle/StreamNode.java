@@ -8,6 +8,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class StreamNode extends Node {
 	public StreamNode(Set<String> datumNames) {
 		super(datumNames);
+		if (datumNames.size() != 1) {
+			throw new IllegalArgumentException("StreamNode must have exactly one datum name!");
+		}
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
