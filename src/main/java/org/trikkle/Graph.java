@@ -131,19 +131,13 @@ public class Graph {
 		return new Graph(finalTodos);
 	}
 
-	public static Graph concatGraphs(List<Graph> graphs) { // todo optimize
-		Graph aggGraph = graphs.get(0);
-		for (int i = 1; i < graphs.size(); i++) {
-			Graph graph = graphs.get(i);
-
-			// get union of aggGraph and graph's todos
-			Set<Todo> todosUnion = new HashSet<>(aggGraph.todos);
-			todosUnion.addAll(graph.todos);
-
-			aggGraph = new Graph(todosUnion);
+	public static Graph concatGraphs(List<Graph> graphs) {
+		Set<Todo> finalTodos = new HashSet<>();
+		for (Graph graph : graphs) {
+			finalTodos.addAll(graph.todos);
 		}
 
-		return aggGraph;
+		return new Graph(finalTodos);
 	}
 
 	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {

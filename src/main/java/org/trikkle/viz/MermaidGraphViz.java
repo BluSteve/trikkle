@@ -9,6 +9,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MermaidGraphViz implements IGraphViz {
+	public final String namespace;
+
+	public MermaidGraphViz() {
+		namespace = "";
+	}
+
+	public MermaidGraphViz(String namespace) {
+		this.namespace = namespace + "_";
+	}
+
 	private static String nodeToMermaid(Node node, String nodeId, NodeType nodeType) {
 		String nodeText = String.join("<br>", node.datumNames);
 		StringBuilder sb = new StringBuilder();
@@ -44,7 +54,8 @@ public class MermaidGraphViz implements IGraphViz {
 	private static String makeLink(Set<String> dependencyIds, String arcId, String outputNodeId) {
 		StringBuilder sb = new StringBuilder();
 
-		String dependencyStr = dependencyIds.isEmpty() ? "NULL" + arcId + ":::hidden" : String.join(" & ", dependencyIds);
+		String dependencyStr =
+				dependencyIds.isEmpty() ? "NULL" + arcId + ":::hidden" : String.join(" & ", dependencyIds);
 		sb.append(dependencyStr);
 
 		if (dependencyIds.size() > 1) {
@@ -74,7 +85,7 @@ public class MermaidGraphViz implements IGraphViz {
 		int i = 0;
 		for (Node node : graph.nodes) {
 			i++;
-			String nodeId = "node" + i;
+			String nodeId = namespace + "node" + i;
 			nodeIdOfNode.put(node, nodeId);
 
 			NodeType nodeType = NodeType.MIDDLE;
@@ -92,7 +103,7 @@ public class MermaidGraphViz implements IGraphViz {
 		List<String> linkLines = new ArrayList<>();
 		for (Todo todo : graph.todos) {
 			k++;
-			String arcId = "arc" + k;
+			String arcId = namespace + "arc" + k;
 
 			Set<String> dependencyIds = todo.getDependencies().stream()
 					.map(nodeIdOfNode::get).collect(Collectors.toSet());

@@ -292,13 +292,13 @@ public class ExampleFunctions {
 
 
 
-		// make a todo connecting nodeB to nodeF with arc1
+		// make a to do connecting nodeB to nodeF with arc1
 		Todo todo1 = new Todo(Set.of(nodeB), arc1, nodeF);
 
-		// make a todo connecting node A and B to node C with arc2
+		// make a to do connecting node A and B to node C with arc2
 		Todo todo2 = new Todo(Set.of(nodeA, nodeB), arc2, nodeC);
 
-		// make a todo connecting node C and E to node D with arc3
+		// make a to do connecting node C and E to node D with arc3
 		Todo todo3 = new Todo(Set.of(nodeC, nodeE), arc3, nodeD);
 
 		// make a graph with todos 1 and 2
@@ -306,16 +306,42 @@ public class ExampleFunctions {
 		// make a graph with todo3
 		Graph graph2 = new Graph(Set.of(todo3));
 
-		// display graph1
-		System.out.println(new MermaidGraphViz().visualize(graph1));
-		// display graph2
-		System.out.println(new MermaidGraphViz().visualize(graph2));
-		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2));
-		// display graph3
-		System.out.println(new MermaidGraphViz().visualize(graph3));
+		Node nodeG = new DiscreteNode(Set.of("G"));
+		Node nodeH = new DiscreteNode(Set.of("H"));
+		Arc arc4 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc4.name = "arc4";
+		Arc arc5 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc5.name = "arc5";
+		Todo todo4 = new Todo(Set.of(nodeD), arc4, nodeG);
+		Node nodeI = new DiscreteNode(Set.of("I"));
+		Todo todo5 = new Todo(Set.of(nodeI), arc5, nodeH);
+
+		Graph graph4 = new Graph(Set.of(todo4, todo5));
+
+		// display graph 1, 2, 4 with labels printed for each and namespace set to the labels
+		System.out.println("graph1");
+		System.out.println(new MermaidGraphViz("graph1").visualize(graph1));
+		System.out.println("graph2");
+		System.out.println(new MermaidGraphViz("graph2").visualize(graph2));
+		System.out.println("graph4");
+		System.out.println(new MermaidGraphViz("graph4").visualize(graph4));
+
+		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2,graph4)).findPrunedGraphFor(Set.of(nodeH, nodeC));
+		System.out.println("graph3");
+		System.out.println(new MermaidGraphViz("graph3").visualize(graph3));
 
 	}
 	public static void main(String[] args) {
-		mergeTest();
+		concatTest();
 	}
 }
