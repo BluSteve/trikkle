@@ -6,7 +6,7 @@ public class ArrayBitmask implements IBitmask {
 	public final int length;
 	private final boolean[] array;
 
-	public ArrayBitmask(int length) {
+	ArrayBitmask(int length) {
 		this.length = length;
 		array = new boolean[length];
 	}

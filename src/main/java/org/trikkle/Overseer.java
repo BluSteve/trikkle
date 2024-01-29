@@ -48,7 +48,7 @@ public class Overseer {
 
 		// Generate bitmasks for each To do
 		for (Todo todo : graph.getTodos()) {
-			IBitmask bitmask = IBitmask.getBitmask(nodes.size()); // hardcode ArrayBitmask for now.
+			IBitmask bitmask = IBitmask.getBitmask(nodes.size());
 			for (Node dependency : todo.getDependencies()) {
 				bitmask.set(indexOfNode.get(dependency));
 			}
@@ -98,7 +98,7 @@ public class Overseer {
 		return true;
 	}
 
-	public void ticktock(Node outputNode) { // passing callingArc is only for debugging purposes
+	public void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
 		tick++;
 		System.out.println("\ntick = " + tick);
 		if (hasEnded()) {

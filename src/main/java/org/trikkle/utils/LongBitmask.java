@@ -4,7 +4,7 @@ public class LongBitmask implements IBitmask {
 	public final int length;
 	private long bitmask;
 
-	public LongBitmask(int length) {
+	LongBitmask(int length) {
 		if (length > 64) {
 			throw new IllegalArgumentException("Bitmask length out of range!");
 		}
