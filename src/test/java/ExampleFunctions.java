@@ -369,6 +369,11 @@ public class ExampleFunctions {
 
 	public static void main(String[] args) {
 		// run all test
+		simpleTest();
+		complexTest();
+		streamTest();
+		mergeTest();
+		concatTest();
 		softEqualsTest();
 	}
 }

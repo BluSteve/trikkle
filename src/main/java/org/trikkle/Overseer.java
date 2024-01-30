@@ -139,7 +139,7 @@ public class Overseer {
 	}
 
 	Node getOutputNodeOfArc(Arc arc) {
-		return g.arcMap.get(arc).se;
+		return g.arcMap.get(arc).getOutputNode();
 	}
 
 	private IBitmask getCurrentState() {

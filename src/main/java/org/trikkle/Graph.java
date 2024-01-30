@@ -2,10 +2,8 @@ package org.trikkle;
 
 import org.trikkle.utils.MultiHashMap;
 import org.trikkle.utils.MultiMap;
-import org.trikkle.utils.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Graph {
 	public final Set<Todo> todos;
@@ -13,8 +11,8 @@ public class Graph {
 	public final Set<Node> nodes = new HashSet<>();
 	public final Set<Node> startingNodes = new HashSet<>();
 	public final Set<Node> endingNodes = new HashSet<>();
-	public final Map<Arc, Pair<Todo, Node>> arcMap = new HashMap<>(); // todo can get rid of pair here
-	public final Map<Node, Pair<Todo, Arc>> outputNodeMap = new HashMap<>();
+	public final Map<Arc, Todo> arcMap = new HashMap<>();
+	public final Map<Node, Todo> outputNodeMap = new HashMap<>();
 	private Map<Node, Graph> prunedGraphOfNode;
 
 	public Graph(Set<Todo> todos) {
@@ -22,8 +20,7 @@ public class Graph {
 
 		Set<Node> dependencies = new HashSet<>();
 		for (Todo todo : todos) {
-			Collection<Node> existingOutputNodes =
-					arcMap.values().stream().map(Pair::getSe).collect(Collectors.toList());
+			Set<Node> existingOutputNodes = outputNodeMap.keySet();
 			if (existingOutputNodes.contains(todo.getOutputNode())) {
 				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
 			}
@@ -33,8 +30,8 @@ public class Graph {
 
 			nodes.addAll(todo.getDependencies());
 			nodes.add(todo.getOutputNode());
-			arcMap.put(todo.getArc(), new Pair<>(todo, todo.getOutputNode()));
-			outputNodeMap.put(todo.getOutputNode(), new Pair<>(todo, todo.getArc()));
+			arcMap.put(todo.getArc(), todo);
+			outputNodeMap.put(todo.getOutputNode(), todo);
 
 			dependencies.addAll(todo.getDependencies());
 		}
@@ -62,7 +59,7 @@ public class Graph {
 				Graph graph = graphs.get(i);
 
 				if (graph.nodes.contains(endingNode)) { // if this Graph offers a path to obtain this ending Node
-					Way way = new Way(i, graph.outputNodeMap.get(endingNode).fi.getDependencies());
+					Way way = new Way(i, graph.outputNodeMap.get(endingNode).getDependencies());
 					waysToGetNode.putOne(endingNode, way);
 				}
 			}
@@ -155,7 +152,7 @@ public class Graph {
 		}
 		while (!nodeStack.empty()) {
 			Node node = nodeStack.pop();
-			Todo generatingTodo = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node).fi;
+			Todo generatingTodo = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node);
 
 			if (generatingTodo != null) {
 				finalTodos.add(generatingTodo);
@@ -184,9 +181,9 @@ public class Graph {
 					continue;
 				}
 
-				Pair<Todo, Arc> todoArcPair = outputNodeMap.get(popped);
-				if (todoArcPair == null) continue;
-				Set<Node> dependencies = todoArcPair.fi.getDependencies();
+				Todo todo = outputNodeMap.get(popped);
+				if (todo == null) continue;
+				Set<Node> dependencies = todo.getDependencies();
 				if (dependencies.contains(node)) {
 					return true;
 				}
