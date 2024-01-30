@@ -62,8 +62,7 @@ public class MermaidGraphViz implements IGraphViz {
 			sb.append(" --- ");
 			sb.append(arcId);
 			sb.append(" --> ");
-		}
-		else {
+		} else {
 			sb.append(" -- ");
 			sb.append(arcId);
 			sb.append(" --> ");
@@ -93,8 +92,7 @@ public class MermaidGraphViz implements IGraphViz {
 				lines.add("subgraph " + graphId);
 				lines.add("direction LR");
 				prefix = graphId + "_";
-			}
-			else {
+			} else {
 				prefix = namespace;
 			}
 
@@ -108,8 +106,7 @@ public class MermaidGraphViz implements IGraphViz {
 				NodeType nodeType = NodeType.MIDDLE;
 				if (graph.startingNodes.contains(node)) {
 					nodeType = NodeType.STARTING;
-				}
-				else if (graph.endingNodes.contains(node)) {
+				} else if (graph.endingNodes.contains(node)) {
 					nodeType = NodeType.ENDING;
 				}
 
@@ -127,8 +124,7 @@ public class MermaidGraphViz implements IGraphViz {
 				if (todo.getDependencies().size() > 1) {
 					lines.add(arcToMermaid(todo.getArc(), arcId));
 					linkLines.add(makeLink(dependencyIds, arcId, nodeIdOfNode.get(todo.getOutputNode())));
-				}
-				else {
+				} else {
 					String arcName = todo.getArc().name == null ? arcId : todo.getArc().name;
 					linkLines.add(makeLink(dependencyIds, arcName, nodeIdOfNode.get(todo.getOutputNode())));
 				}

@@ -71,15 +71,12 @@ class LongBitmask implements IBitmask {
 		LongBitmask lb = (LongBitmask) o;
 		if (length != lb.length) {
 			throw new IllegalArgumentException("LongBitmasks not of the same length!");
-		}
-		else {
+		} else {
 			if (bitmask == lb.bitmask) {
 				return 0;
-			}
-			else if (bitmask == (bitmask | lb.bitmask)) {
+			} else if (bitmask == (bitmask | lb.bitmask)) {
 				return 1;
-			}
-			else return -1;
+			} else return -1;
 		}
 	}
 }

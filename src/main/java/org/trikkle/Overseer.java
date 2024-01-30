@@ -77,8 +77,7 @@ public class Overseer {
 
 		if (outputNode != null) {
 			System.out.printf("tick = %d, just filled %s%n", tick, outputNode.datumNames);
-		}
-		else {
+		} else {
 			System.out.printf("tick = %d, outputNode not passed%n", tick);
 		}
 

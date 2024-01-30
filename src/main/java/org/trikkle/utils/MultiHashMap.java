@@ -11,8 +11,7 @@ public class MultiHashMap<K, V> extends HashMap<K, Set<V>> implements MultiMap<K
 		if (super.containsKey(key)) {
 			set = super.get(key);
 			return set.add(value);
-		}
-		else {
+		} else {
 			set = new HashSet<>();
 			set.add(value);
 			super.put(key, set);

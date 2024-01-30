@@ -20,8 +20,7 @@ public class StreamNode extends Node {
 		Map<String, Object> cache = overseer.getCache();
 		if (cache.containsKey(datumName)) {
 			((Queue) cache.get(datumName)).add(datum);
-		}
-		else {
+		} else {
 			Queue queue = new ConcurrentLinkedQueue();
 			queue.add(datum);
 			cache.put(datumName, queue);

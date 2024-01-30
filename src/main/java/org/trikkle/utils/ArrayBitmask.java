@@ -55,8 +55,7 @@ class ArrayBitmask implements IBitmask {
 		ArrayBitmask ab = (ArrayBitmask) o;
 		if (length != ab.length) {
 			throw new IllegalArgumentException("ArrayBitmasks not of the same length!");
-		}
-		else {
+		} else {
 			boolean allSame = true;
 			for (int i = 0; i < array.length; i++) {
 				if (ab.array[i] != array[i]) {

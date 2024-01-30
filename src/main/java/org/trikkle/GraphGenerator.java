@@ -98,8 +98,7 @@ public class GraphGenerator {
 			if (rem == 0) {
 				sb.append('Z');
 				n = (n / 26) - 1;
-			}
-			else {
+			} else {
 				sb.append((char) ((rem - 1) + 'A'));
 				n = n / 26;
 			}
