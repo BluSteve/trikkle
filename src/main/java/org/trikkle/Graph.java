@@ -13,7 +13,7 @@ public class Graph {
 	public final Set<Node> nodes = new HashSet<>();
 	public final Set<Node> startingNodes = new HashSet<>();
 	public final Set<Node> endingNodes = new HashSet<>();
-	public final Map<Arc, Pair<Todo, Node>> arcMap = new HashMap<>();
+	public final Map<Arc, Pair<Todo, Node>> arcMap = new HashMap<>(); // todo can get rid of pair here
 	public final Map<Node, Pair<Todo, Arc>> outputNodeMap = new HashMap<>();
 	private Map<Node, Graph> prunedGraphOfNode;
 
@@ -170,6 +170,34 @@ public class Graph {
 			prunedGraphOfNode.put(targetEndingNodes.iterator().next(), prunedGraph);
 		}
 		return prunedGraph;
+	}
+
+	public boolean hasCycle() {
+		Set<Node> checked = new HashSet<>();
+		for (Node node : nodes) {
+			Stack<Node> nodeStack = new Stack<>();
+			nodeStack.push(node);
+
+			while (!nodeStack.empty()) {
+				Node popped = nodeStack.pop();
+				if (checked.contains(popped)) {
+					continue;
+				}
+
+				Pair<Todo, Arc> todoArcPair = outputNodeMap.get(popped);
+				if (todoArcPair == null) continue;
+				Set<Node> dependencies = todoArcPair.fi.getDependencies();
+				if (dependencies.contains(node)) {
+					return true;
+				}
+
+				nodeStack.addAll(dependencies);
+			}
+
+			checked.add(node);
+		}
+
+		return false;
 	}
 
 	public boolean congruentTo(Graph graph) {

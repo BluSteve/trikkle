@@ -78,7 +78,8 @@ public class GraphGenerator {
 	}
 
 	public static void main(String[] args) {
-		Graph graph = generateGraph(25, 25);
+		Graph graph = generateGraph(2, 1);
 		System.out.println(new MermaidGraphViz().visualize(graph));
+		System.out.println(graph.hasCycle());
 	}
 }

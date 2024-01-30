@@ -351,6 +351,7 @@ public class ExampleFunctions {
 		// visualize
 
 		System.out.println(new MermaidGraphViz().visualize(graph3));
+		System.out.println("graph3.hasCycle() = " + graph3.hasCycle());
 
 		// make todo1a with the same nodes but a new, different arc from todo1
 		Arc arc1a = new Arc.AutoArc() {
