@@ -8,6 +8,14 @@ java {
     }
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.trikkle.Main'
+        )
+    }
+}
+
 group = 'org.trikkle'
 version = '0.1.0'
 
