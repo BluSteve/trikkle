@@ -87,13 +87,16 @@ public class MermaidGraphViz implements IGraphViz {
 			Graph graph = graphs[j];
 			I++;
 
-			String graphId = namespace + "graph" + I;
+			String prefix;
 			if (!single) {
+				String graphId = namespace + "graph" + I;
 				lines.add("subgraph " + graphId);
 				lines.add("direction LR");
+				prefix = graphId + "_";
 			}
-
-			String prefix = graphId + "_";
+			else {
+				prefix = namespace;
+			}
 
 			Map<Node, String> nodeIdOfNode = new HashMap<>();
 			int i = 0;
