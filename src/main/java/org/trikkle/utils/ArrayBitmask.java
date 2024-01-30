@@ -3,7 +3,7 @@ package org.trikkle.utils;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class ArrayBitmask implements IBitmask {
+class ArrayBitmask implements IBitmask {
 	public final int length;
 	private final boolean[] array;
 

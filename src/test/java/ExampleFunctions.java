@@ -226,14 +226,10 @@ public class ExampleFunctions {
 
 		Graph graph1 = new Graph(Set.of(todo1));
 		Graph graph2 = new Graph(Set.of(todo2, todo3));
-		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode));
+		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
 
 		// visualize all three graphs with the graph variable name printed before the graph
-		System.out.println("graph1");
-		System.out.println(new MermaidGraphViz().visualize(graph1));
-		System.out.println("graph2");
-		System.out.println(new MermaidGraphViz().visualize(graph2));
-		System.out.println("graph3");
+		System.out.println(new MermaidGraphViz().visualize(graph1, graph2));
 		System.out.println(new MermaidGraphViz().visualize(graph3));
 	}
 
@@ -372,11 +368,6 @@ public class ExampleFunctions {
 
 	public static void main(String[] args) {
 		// run all test
-		simpleTest();
-		complexTest();
-		streamTest();
-		mergeTest();
 		concatTest();
-		softEqualsTest();
 	}
 }

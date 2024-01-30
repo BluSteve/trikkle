@@ -5,17 +5,15 @@ import java.util.*;
 public class GraphGenerator {
 	private final static long SEED = 504957110;
 
-	public static Graph generateGraph(int numNodes, int numArcs) {
-		if (numArcs > numNodes) {
-			throw new IllegalArgumentException("numArcs must be less than or equal to numNodes");
-		}
-
-		// generate nodes
+	public static List<Node> generateNodes(int numNodes) {
 		List<Node> nodes = new ArrayList<>();
 		for (int i = 0; i < numNodes; i++) {
 			nodes.add(new DiscreteNode(Collections.singleton(intToExcelColumn(i + 1))));
 		}
-		// generate arcs
+		return nodes;
+	}
+
+	public static List<Arc> generateArcs(int numArcs) {
 		List<Arc> arcs = new ArrayList<>();
 		for (int i = 0; i < numArcs; i++) {
 			Arc arc = new Arc.AutoArc() {
@@ -26,9 +24,23 @@ public class GraphGenerator {
 			arc.name = String.valueOf(i + 1);
 			arcs.add(arc);
 		}
+		return arcs;
+	}
+
+	public static Graph generateGraph(int numNodes, int numArcs, Random random) {
+		if (numArcs > numNodes) {
+			throw new IllegalArgumentException("numArcs must be less than or equal to numNodes");
+		}
+
+		List<Node> nodes = generateNodes(numNodes);
+		List<Arc> arcs = generateArcs(numArcs);
 
 		// randomly generate todos
-		return getGraph(nodes, arcs, new Random(SEED));
+		return getGraph(nodes, arcs, random);
+	}
+
+	public static Graph generateGraph(int numNodes, int numArcs) {
+		return generateGraph(numNodes, numArcs, new Random(SEED));
 	}
 
 	private static Graph getGraph(List<Node> nodes, List<Arc> arcs, Random random) {

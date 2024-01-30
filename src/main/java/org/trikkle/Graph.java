@@ -6,6 +6,7 @@ import org.trikkle.utils.MultiMap;
 import java.util.*;
 
 public class Graph {
+	public static boolean ALLOW_CYCLES = false;
 	public final Set<Todo> todos;
 	public final Set<Arc> arcs;
 	public final Set<Node> nodes = new HashSet<>();
@@ -53,8 +54,8 @@ public class Graph {
 			}
 		}
 
-		if (hasCycle()) {
-			System.err.println("WARNING: Graph has cycle!");
+		if (hasCycle() && !ALLOW_CYCLES) {
+			throw new IllegalArgumentException("Graph has a cycle!");
 		}
 	}
 

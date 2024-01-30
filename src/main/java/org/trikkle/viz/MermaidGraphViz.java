@@ -141,7 +141,7 @@ public class MermaidGraphViz implements IGraphViz {
 			}
 		}
 
-		return String.join("\n    ", lines);
+		return String.join(System.lineSeparator(), lines);
 	}
 
 	private enum NodeType {

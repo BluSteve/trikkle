@@ -2,7 +2,7 @@ package org.trikkle.utils;
 
 import java.util.Objects;
 
-public class LongBitmask implements IBitmask {
+class LongBitmask implements IBitmask {
 	public final int length;
 	private long bitmask;
 
