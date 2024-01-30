@@ -128,7 +128,7 @@ class GraphTest {
 
 		Graph graph4 = new Graph(Set.of(link4, link5));
 
-		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2, graph4));
+		Graph graph3 = Graph.concatGraphs(Set.of(graph1, graph2, graph4));
 
 		Graph manualGraph = new Graph(Set.of(
 				new Link(Set.of(nodeB), arc1, nodeF),

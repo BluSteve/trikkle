@@ -54,6 +54,15 @@ public class Overseer {
 		}
 	}
 
+	public void addStartingDatum(String datumName, Object datum) {
+		Node node = nodeOfDatumName.get(datumName);
+		if (!g.startingNodes.contains(node)) {
+			throw new IllegalArgumentException("Node of datumName \"" + datumName + "\" does not belong to a starting node!");
+		}
+
+		node.addDatum(datumName, datum);
+	}
+
 	public void start() {
 		// check population of startingNodes
 		for (Node startingNode : g.startingNodes) {

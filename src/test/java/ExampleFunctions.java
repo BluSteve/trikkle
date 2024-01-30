@@ -305,7 +305,7 @@ public class ExampleFunctions {
 		// display graph 1, 2, 4 with labels printed for each and namespace set to the labels
 		System.out.println(new MermaidGraphViz().visualize(graph1, graph2, graph4));
 
-		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2, graph4)).findPrunedGraphFor(Set.of(nodeG));
+		Graph graph3 = Graph.concatGraphs(Set.of(graph1, graph2, graph4)).findPrunedGraphFor(Set.of(nodeG));
 		System.out.println("graph3");
 		System.out.println(new MermaidGraphViz("graph3").visualize(graph3));
 	}
@@ -346,7 +346,7 @@ public class ExampleFunctions {
 		Graph graph1 = new Graph(Set.of(link1));
 		Graph graph2 = new Graph(Set.of(link2));
 		// concat
-		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2));
+		Graph graph3 = Graph.concatGraphs(Set.of(graph1, graph2));
 		// visualize
 
 		System.out.println(new MermaidGraphViz().visualize(graph3));

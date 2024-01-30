@@ -120,7 +120,7 @@ public class Graph {
 		return new Graph(finalLinks).findPrunedGraphFor(endingNodes);
 	}
 
-	public static Graph concatGraphs(List<Graph> graphs) {
+	public static Graph concatGraphs(Set<Graph> graphs) {
 		Set<Link> finalLinks = new HashSet<>();
 		for (Graph graph : graphs) {
 			finalLinks.addAll(graph.links);
