@@ -2,7 +2,10 @@ import org.trikkle.*;
 import org.trikkle.viz.IGraphViz;
 import org.trikkle.viz.MermaidGraphViz;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 public class ExampleFunctions {
 	static double simpleFn(double x) {

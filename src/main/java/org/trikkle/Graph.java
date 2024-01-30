@@ -13,6 +13,7 @@ public class Graph {
 	public final Set<Node> endingNodes = new HashSet<>();
 	public final Map<Arc, Todo> arcMap = new HashMap<>();
 	public final Map<Node, Todo> outputNodeMap = new HashMap<>();
+	public final Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
 	private Map<Node, Graph> prunedGraphOfNode;
 
 	public Graph(Set<Todo> todos) {
@@ -32,6 +33,7 @@ public class Graph {
 			nodes.add(todo.getOutputNode());
 			arcMap.put(todo.getArc(), todo);
 			outputNodeMap.put(todo.getOutputNode(), todo);
+			dependenciesOfNode.put(todo.getOutputNode(), todo.getDependencies());
 
 			dependencies.addAll(todo.getDependencies());
 		}
@@ -49,6 +51,10 @@ public class Graph {
 			if (!outputNodeMap.containsKey(node)) {
 				startingNodes.add(node);
 			}
+		}
+
+		if (hasCycle()) {
+			System.err.println("WARNING: Graph has cycle!");
 		}
 	}
 
@@ -122,6 +128,31 @@ public class Graph {
 		return new Graph(finalTodos);
 	}
 
+	public static boolean hasCycle(Map<Node, Set<Node>> dependenciesOfNode) {
+		Set<Node> nodes = dependenciesOfNode.keySet();
+		Set<Node> checked = new HashSet<>();
+		for (Node node : nodes) {
+			Stack<Node> nodeStack = new Stack<>();
+			nodeStack.push(node);
+
+			while (!nodeStack.empty()) {
+				Node popped = nodeStack.pop();
+				if (checked.contains(popped)) continue;
+
+				Set<Node> dependencies = dependenciesOfNode.get(popped);
+				if (dependencies == null) continue;
+				// without the below line it'll loop forever when a node has itself as a dependency
+				if (dependencies.contains(node) || dependencies.contains(popped)) return true;
+
+				nodeStack.addAll(dependencies);
+			}
+
+			checked.add(node);
+		}
+
+		return false;
+	}
+
 	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {
 		// Note: targetEndingNodes may not be in endingNodes. It's merely the targetEndingNodes of the PRUNED graph.
 		if (!nodes.containsAll(targetEndingNodes)) {
@@ -170,31 +201,7 @@ public class Graph {
 	}
 
 	public boolean hasCycle() {
-		Set<Node> checked = new HashSet<>();
-		for (Node node : nodes) {
-			Stack<Node> nodeStack = new Stack<>();
-			nodeStack.push(node);
-
-			while (!nodeStack.empty()) {
-				Node popped = nodeStack.pop();
-				if (checked.contains(popped)) {
-					continue;
-				}
-
-				Todo todo = outputNodeMap.get(popped);
-				if (todo == null) continue;
-				Set<Node> dependencies = todo.getDependencies();
-				if (dependencies.contains(node)) {
-					return true;
-				}
-
-				nodeStack.addAll(dependencies);
-			}
-
-			checked.add(node);
-		}
-
-		return false;
+		return hasCycle(dependenciesOfNode);
 	}
 
 	public boolean congruentTo(Graph graph) {
