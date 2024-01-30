@@ -17,6 +17,7 @@ public class Overseer {
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
 	private int tick = 0;
+	private boolean started = false;
 
 	public Overseer(Graph graph) {
 		this.g = graph;
@@ -61,10 +62,12 @@ public class Overseer {
 			}
 		}
 
+		started = true;
 		ticktock(null);
 	}
 
 	void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
+		if (!started) return; // for adding datums manually
 		tick++;
 		System.out.println("\ntick = " + tick);
 		if (hasEnded()) {
@@ -76,7 +79,7 @@ public class Overseer {
 			System.out.printf("tick = %d, just filled %s%n", tick, outputNode.datumNames);
 		}
 		else {
-			System.out.printf("tick = %d, callingArc not passed%n", tick);
+			System.out.printf("tick = %d, outputNode not passed%n", tick);
 		}
 
 
