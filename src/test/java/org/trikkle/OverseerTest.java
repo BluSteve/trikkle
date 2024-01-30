@@ -22,10 +22,10 @@ class OverseerTest {
 			}
 		};
 		Node outputNode = new DiscreteNode(Set.of("squared"));
-		Todo todo = new Todo(Set.of(inputNode), arc, outputNode);
+		Link link = new Link(Set.of(inputNode), arc, outputNode);
 
 
-		Graph graph = new Graph(Set.of(todo));
+		Graph graph = new Graph(Set.of(link));
 		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
 
@@ -51,7 +51,7 @@ class OverseerTest {
 		};
 		arc.name = "squarer";
 		Node node2 = new DiscreteNode(Set.of("squared"));
-		Todo todo = new Todo(Set.of(inputNode), arc, node2);
+		Link link = new Link(Set.of(inputNode), arc, node2);
 
 
 		Arc arc2 = new Arc.AutoArc() {
@@ -66,7 +66,7 @@ class OverseerTest {
 		};
 		arc2.name = "process 1";
 		Node node3 = new DiscreteNode(Set.of("result1"));
-		Todo todo2 = new Todo(Set.of(inputNode, node2), arc2, node3);
+		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
 		Arc arc3 = new Arc.AutoArc() {
 			@Override
@@ -79,7 +79,7 @@ class OverseerTest {
 		};
 		arc3.name = "aggregator";
 		Node node4 = new DiscreteNode(Set.of("result2"));
-		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
+		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
 
 		Arc phantomArc1 = new Arc.AutoArc() {
@@ -89,7 +89,7 @@ class OverseerTest {
 			}
 		};
 		phantomArc1.name = "phantomArc1";
-		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
+		Link phantomLink1 = new Link(Set.of(), phantomArc1, inputNode);
 
 		Arc phantomArc2 = new Arc.AutoArc() {
 			@Override
@@ -104,9 +104,9 @@ class OverseerTest {
 			}
 		};
 		phantomArc2.name = "phantomArc2";
-		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
+		Link phantomLink2 = new Link(Set.of(), phantomArc2, inputNode2);
 
-		Graph graph = new Graph(Set.of(todo, todo2, todo3));
+		Graph graph = new Graph(Set.of(link, link2, link3));
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);

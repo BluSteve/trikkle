@@ -7,36 +7,36 @@ import java.util.*;
 
 public class Graph {
 	public static boolean ALLOW_CYCLES = false;
-	public final Set<Todo> todos;
+	public final Set<Link> links;
 	public final Set<Arc> arcs;
 	public final Set<Node> nodes = new HashSet<>();
 	public final Set<Node> startingNodes = new HashSet<>();
 	public final Set<Node> endingNodes = new HashSet<>();
-	public final Map<Arc, Todo> arcMap = new HashMap<>();
-	public final Map<Node, Todo> outputNodeMap = new HashMap<>();
+	public final Map<Arc, Link> arcMap = new HashMap<>();
+	public final Map<Node, Link> outputNodeMap = new HashMap<>();
 	public final Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
 	private Map<Node, Graph> prunedGraphOfNode;
 
-	public Graph(Set<Todo> todos) {
-		this.todos = todos;
+	public Graph(Set<Link> links) {
+		this.links = links;
 
 		Set<Node> dependencies = new HashSet<>();
-		for (Todo todo : todos) {
+		for (Link link : links) {
 			Set<Node> existingOutputNodes = outputNodeMap.keySet();
-			if (existingOutputNodes.contains(todo.getOutputNode())) {
+			if (existingOutputNodes.contains(link.getOutputNode())) {
 				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
 			}
-			if (arcMap.containsKey(todo.getArc())) {
-				throw new IllegalArgumentException("The same Arc cannot be used for two Todos!");
+			if (arcMap.containsKey(link.getArc())) {
+				throw new IllegalArgumentException("The same Arc cannot be used for two Links!");
 			}
 
-			nodes.addAll(todo.getDependencies());
-			nodes.add(todo.getOutputNode());
-			arcMap.put(todo.getArc(), todo);
-			outputNodeMap.put(todo.getOutputNode(), todo);
-			dependenciesOfNode.put(todo.getOutputNode(), todo.getDependencies());
+			nodes.addAll(link.getDependencies());
+			nodes.add(link.getOutputNode());
+			arcMap.put(link.getArc(), link);
+			outputNodeMap.put(link.getOutputNode(), link);
+			dependenciesOfNode.put(link.getOutputNode(), link.getDependencies());
 
-			dependencies.addAll(todo.getDependencies());
+			dependencies.addAll(link.getDependencies());
 		}
 		arcs = arcMap.keySet();
 
@@ -111,22 +111,22 @@ public class Graph {
 			}
 		}
 
-		Set<Todo> finalTodos = new HashSet<>();
+		Set<Link> finalLinks = new HashSet<>();
 		for (int i : graphUsedOfNode.values()) {
 			Graph graph = graphs.get(i);
-			finalTodos.addAll(graph.todos);
+			finalLinks.addAll(graph.links);
 		}
 
-		return new Graph(finalTodos).findPrunedGraphFor(endingNodes);
+		return new Graph(finalLinks).findPrunedGraphFor(endingNodes);
 	}
 
 	public static Graph concatGraphs(List<Graph> graphs) {
-		Set<Todo> finalTodos = new HashSet<>();
+		Set<Link> finalLinks = new HashSet<>();
 		for (Graph graph : graphs) {
-			finalTodos.addAll(graph.todos);
+			finalLinks.addAll(graph.links);
 		}
 
-		return new Graph(finalTodos);
+		return new Graph(finalLinks);
 	}
 
 	public static boolean hasCycle(Map<Node, Set<Node>> dependenciesOfNode) {
@@ -169,13 +169,13 @@ public class Graph {
 		}
 
 		/*
-		 find to do which creates this targetEndingNodes
-		 record this to do
-		 get the dependencies of this to do
-		 for each dependency find to do which creates it
+		 find link which creates this targetEndingNodes
+		 record this link
+		 get the dependencies of this link
+		 for each dependency find link which creates it
 		*/
 
-		Set<Todo> finalTodos = new HashSet<>();
+		Set<Link> finalLinks = new HashSet<>();
 
 		Stack<Node> nodeStack = new Stack<>();
 		for (Node targetEndingNode : targetEndingNodes) {
@@ -183,17 +183,17 @@ public class Graph {
 		}
 		while (!nodeStack.empty()) {
 			Node node = nodeStack.pop();
-			Todo generatingTodo = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node);
+			Link generatingLink = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node);
 
-			if (generatingTodo != null) {
-				finalTodos.add(generatingTodo);
-				for (Node dependency : generatingTodo.getDependencies()) {
+			if (generatingLink != null) {
+				finalLinks.add(generatingLink);
+				for (Node dependency : generatingLink.getDependencies()) {
 					nodeStack.push(dependency);
 				}
 			}
 		}
 
-		Graph prunedGraph = new Graph(finalTodos);
+		Graph prunedGraph = new Graph(finalLinks);
 		if (targetEndingNodes.size() == 1) {
 			prunedGraphOfNode.put(targetEndingNodes.iterator().next(), prunedGraph);
 		}
@@ -205,14 +205,14 @@ public class Graph {
 	}
 
 	public boolean congruentTo(Graph graph) {
-		// check that todos are the same size and that all todos are congruent to some to do in graph.todos
-		if (todos.size() != graph.todos.size()) {
+		// check that links are the same size and that all links are congruent to some link in graph.links
+		if (links.size() != graph.links.size()) {
 			return false;
 		}
-		for (Todo todo : todos) {
+		for (Link link : links) {
 			boolean found = false;
-			for (Todo graphTodo : graph.todos) {
-				if (todo.congruentTo(graphTodo)) {
+			for (Link graphLink : graph.links) {
+				if (link.congruentTo(graphLink)) {
 					found = true;
 					break;
 				}
@@ -229,12 +229,12 @@ public class Graph {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Graph graph = (Graph) o;
-		return Objects.equals(todos, graph.todos);
+		return Objects.equals(links, graph.links);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(todos);
+		return Objects.hash(links);
 	}
 
 	private static class Way {

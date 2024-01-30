@@ -23,10 +23,10 @@ public class ExampleFunctions {
 			}
 		};
 		Node outputNode = new DiscreteNode(Set.of("squared"));
-		Todo todo = new Todo(Set.of(inputNode), arc, outputNode);
+		Link link = new Link(Set.of(inputNode), arc, outputNode);
 
 
-		Graph graph = new Graph(Set.of(todo));
+		Graph graph = new Graph(Set.of(link));
 		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
 
@@ -51,7 +51,7 @@ public class ExampleFunctions {
 		};
 		arc.name = "squarer";
 		Node node2 = new DiscreteNode(Set.of("squared"));
-		Todo todo = new Todo(Set.of(inputNode), arc, node2);
+		Link link = new Link(Set.of(inputNode), arc, node2);
 
 
 		Arc arc2 = new Arc.AutoArc() {
@@ -66,7 +66,7 @@ public class ExampleFunctions {
 		};
 		arc2.name = "process 1";
 		Node node3 = new DiscreteNode(Set.of("result1"));
-		Todo todo2 = new Todo(Set.of(inputNode, node2), arc2, node3);
+		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
 		Arc arc3 = new Arc.AutoArc() {
 			@Override
@@ -79,7 +79,7 @@ public class ExampleFunctions {
 		};
 		arc3.name = "aggregator";
 		Node node4 = new DiscreteNode(Set.of("result2"));
-		Todo todo3 = new Todo(Set.of(node3, inputNode2), arc3, node4);
+		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
 
 		Arc phantomArc1 = new Arc.AutoArc() {
@@ -89,7 +89,7 @@ public class ExampleFunctions {
 			}
 		};
 		phantomArc1.name = "phantomArc1";
-		Todo phantomTodo1 = new Todo(Set.of(), phantomArc1, inputNode);
+		Link phantomLink1 = new Link(Set.of(), phantomArc1, inputNode);
 
 		Arc phantomArc2 = new Arc.AutoArc() {
 			@Override
@@ -104,11 +104,11 @@ public class ExampleFunctions {
 			}
 		};
 		phantomArc2.name = "phantomArc2";
-		Todo phantomTodo2 = new Todo(Set.of(), phantomArc2, inputNode2);
+		Link phantomLink2 = new Link(Set.of(), phantomArc2, inputNode2);
 
 //		inputNode.setUsable(true);
 //		inputNode2.setUsable(true);
-		Graph graph = new Graph(Set.of(todo, todo2, todo3));
+		Graph graph = new Graph(Set.of(link, link2, link3));
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
@@ -137,7 +137,7 @@ public class ExampleFunctions {
 			}
 		};
 		Node streamNode = new StreamNode(Set.of("stream1"));
-		Todo todo = new Todo(Set.of(), inputArc, streamNode);
+		Link link = new Link(Set.of(), inputArc, streamNode);
 
 		Arc consumerArc = new Arc() {
 			double total = 0; // is this a pure function?
@@ -172,9 +172,9 @@ public class ExampleFunctions {
 			}
 		};
 		Node outputNode = new DiscreteNode(Set.of("result1"));
-		Todo todo2 = new Todo(Set.of(streamNode), consumerArc, outputNode);
+		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
 
-		Graph graph = new Graph(Set.of(todo, todo2));
+		Graph graph = new Graph(Set.of(link, link2));
 		Overseer overseer = new Overseer(graph);
 		overseer.start();
 
@@ -219,13 +219,13 @@ public class ExampleFunctions {
 		arc3.name = "arc3";
 		arc4.name = "arc4";
 
-		Todo todo1 = new Todo(Set.of(magicNode, paramNode), arc1, hfNode);
-		Todo todo4 = new Todo(Set.of(paramNode), arc4, dipoleNode);
-		Todo todo2 = new Todo(Set.of(matrixNode), arc2, hfNode);
-		Todo todo3 = new Todo(Set.of(matrixNode), arc3, dipoleNode);
+		Link link1 = new Link(Set.of(magicNode, paramNode), arc1, hfNode);
+		Link link4 = new Link(Set.of(paramNode), arc4, dipoleNode);
+		Link link2 = new Link(Set.of(matrixNode), arc2, hfNode);
+		Link link3 = new Link(Set.of(matrixNode), arc3, dipoleNode);
 
-		Graph graph1 = new Graph(Set.of(todo1));
-		Graph graph2 = new Graph(Set.of(todo2, todo3));
+		Graph graph1 = new Graph(Set.of(link1));
+		Graph graph2 = new Graph(Set.of(link2, link3));
 		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
 
 		// visualize all three graphs with the graph variable name printed before the graph
@@ -266,19 +266,19 @@ public class ExampleFunctions {
 		arc3.name = "arc3";
 
 
-		// make a to do connecting nodeB to nodeF with arc1
-		Todo todo1 = new Todo(Set.of(nodeB), arc1, nodeF);
+		// make a link connecting nodeB to nodeF with arc1
+		Link link1 = new Link(Set.of(nodeB), arc1, nodeF);
 
-		// make a to do connecting node A and B to node C with arc2
-		Todo todo2 = new Todo(Set.of(nodeA, nodeB), arc2, nodeC);
+		// make a link connecting node A and B to node C with arc2
+		Link link2 = new Link(Set.of(nodeA, nodeB), arc2, nodeC);
 
-		// make a to do connecting node C and E to node D with arc3
-		Todo todo3 = new Todo(Set.of(nodeC, nodeE), arc3, nodeD);
+		// make a link connecting node C and E to node D with arc3
+		Link link3 = new Link(Set.of(nodeC, nodeE), arc3, nodeD);
 
-		// make a graph with todos 1 and 2
-		Graph graph1 = new Graph(Set.of(todo1, todo2));
-		// make a graph with todo3
-		Graph graph2 = new Graph(Set.of(todo3));
+		// make a graph with links 1 and 2
+		Graph graph1 = new Graph(Set.of(link1, link2));
+		// make a graph with link3
+		Graph graph2 = new Graph(Set.of(link3));
 
 		Node nodeG = new DiscreteNode(Set.of("G"));
 		Node nodeH = new DiscreteNode(Set.of("H"));
@@ -296,11 +296,11 @@ public class ExampleFunctions {
 			}
 		};
 		arc5.name = "arc5";
-		Todo todo4 = new Todo(Set.of(nodeD), arc4, nodeG);
+		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
 		Node nodeI = new DiscreteNode(Set.of("I"));
-		Todo todo5 = new Todo(Set.of(nodeI), arc5, nodeH);
+		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
 
-		Graph graph4 = new Graph(Set.of(todo4, todo5));
+		Graph graph4 = new Graph(Set.of(link4, link5));
 
 		// display graph 1, 2, 4 with labels printed for each and namespace set to the labels
 		System.out.println(new MermaidGraphViz().visualize(graph1, graph2, graph4));
@@ -317,7 +317,7 @@ public class ExampleFunctions {
 		Node nodeC2 = new DiscreteNode(Set.of("a", "C"));
 		Node nodeD = new DiscreteNode(Set.of("D"));
 
-		// generate A to C1 and C2 to D arcs and todos
+		// generate A to C1 and C2 to D arcs and links
 		Arc arc1 = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -332,19 +332,19 @@ public class ExampleFunctions {
 			}
 		};
 		arc2.name = "arc2";
-		Todo todo1 = new Todo(Set.of(nodeA), arc1, nodeC1);
-		Todo todo2 = new Todo(Set.of(nodeC2), arc2, nodeD);
+		Link link1 = new Link(Set.of(nodeA), arc1, nodeC1);
+		Link link2 = new Link(Set.of(nodeC2), arc2, nodeD);
 
 
-		// generate a graph with todos 1 and 2
-		Graph graph = new Graph(Set.of(todo1, todo2));
+		// generate a graph with links 1 and 2
+		Graph graph = new Graph(Set.of(link1, link2));
 
 		// visualize
 		System.out.println(new MermaidGraphViz().visualize(graph));
 
-		// generate a graph with just todo1 and another with just todo2
-		Graph graph1 = new Graph(Set.of(todo1));
-		Graph graph2 = new Graph(Set.of(todo2));
+		// generate a graph with just link1 and another with just link2
+		Graph graph1 = new Graph(Set.of(link1));
+		Graph graph2 = new Graph(Set.of(link2));
 		// concat
 		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2));
 		// visualize
@@ -352,7 +352,7 @@ public class ExampleFunctions {
 		System.out.println(new MermaidGraphViz().visualize(graph3));
 		System.out.println("graph3.hasCycle() = " + graph3.hasCycle());
 
-		// make todo1a with the same nodes but a new, different arc from todo1
+		// make link1a with the same nodes but a new, different arc from link1
 		Arc arc1a = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -360,8 +360,8 @@ public class ExampleFunctions {
 			}
 		};
 		arc1a.name = "arc1a";
-		Todo todo1a = new Todo(Set.of(nodeA), arc1a, nodeC1);
-		Graph graph1a = new Graph(Set.of(todo1a, todo2));
+		Link link1A = new Link(Set.of(nodeA), arc1a, nodeC1);
+		Graph graph1a = new Graph(Set.of(link1A, link2));
 		System.out.println(graph.equals(graph1a));
 		System.out.println(graph.congruentTo(graph1a));
 	}

@@ -15,12 +15,12 @@ class GraphTest {
 	static Node matrixNode = new DiscreteNode(Set.of("matrix"));
 	static Node dipoleNode = new DiscreteNode(Set.of("dipole"));
 	static List<Arc> arcs = GraphGenerator.generateArcs(4);
-	static Todo todo1 = new Todo(Set.of(magicNode, paramNode), arcs.get(0), hfNode);
-	static Graph graph1 = new Graph(Set.of(todo1));
-	static Todo todo2 = new Todo(Set.of(matrixNode), arcs.get(1), hfNode);
-	static Todo todo3 = new Todo(Set.of(matrixNode), arcs.get(2), dipoleNode);
-	static Graph graph2 = new Graph(Set.of(todo2, todo3));
-	static Todo todo4 = new Todo(Set.of(paramNode), arcs.get(3), dipoleNode);
+	static Link link1 = new Link(Set.of(magicNode, paramNode), arcs.get(0), hfNode);
+	static Graph graph1 = new Graph(Set.of(link1));
+	static Link link2 = new Link(Set.of(matrixNode), arcs.get(1), hfNode);
+	static Link link3 = new Link(Set.of(matrixNode), arcs.get(2), dipoleNode);
+	static Graph graph2 = new Graph(Set.of(link2, link3));
+	static Link link4 = new Link(Set.of(paramNode), arcs.get(3), dipoleNode);
 
 	// learn from ExampleFunctions.java
 
@@ -28,31 +28,31 @@ class GraphTest {
 	void twoArcsSameNode() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(Set.of(
-					new Todo(Set.of(paramNode), arcs.get(0), magicNode),
-					new Todo(Set.of(paramNode), arcs.get(1), magicNode)
+					new Link(Set.of(paramNode), arcs.get(0), magicNode),
+					new Link(Set.of(paramNode), arcs.get(1), magicNode)
 			));
 		});
 		assertTrue(exception.getMessage().contains("Two Arcs cannot point to the same output Node!"));
 	}
 
 	@Test
-	void twoTodosSameArc() {
+	void twoLinksSameArc() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(Set.of(
-					new Todo(Set.of(paramNode), arcs.get(0), magicNode),
-					new Todo(Set.of(magicNode), arcs.get(0), hfNode)
+					new Link(Set.of(paramNode), arcs.get(0), magicNode),
+					new Link(Set.of(magicNode), arcs.get(0), hfNode)
 			));
 		});
-		assertTrue(exception.getMessage().contains("The same Arc cannot be used for two Todos!"));
+		assertTrue(exception.getMessage().contains("The same Arc cannot be used for two Links!"));
 	}
 
 	@Test
 	void hasCycle() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(Set.of(
-					new Todo(Set.of(paramNode), arcs.get(0), magicNode),
-					new Todo(Set.of(magicNode), arcs.get(1), hfNode),
-					new Todo(Set.of(hfNode), arcs.get(2), paramNode)
+					new Link(Set.of(paramNode), arcs.get(0), magicNode),
+					new Link(Set.of(magicNode), arcs.get(1), hfNode),
+					new Link(Set.of(hfNode), arcs.get(2), paramNode)
 			));
 		});
 		assertTrue(exception.getMessage().contains("Graph has a cycle!"));
@@ -92,19 +92,19 @@ class GraphTest {
 		arc3.name = "arc3";
 
 
-		// make a to do connecting nodeB to nodeF with arc1
-		Todo todo1 = new Todo(Set.of(nodeB), arc1, nodeF);
+		// make a link connecting nodeB to nodeF with arc1
+		Link link1 = new Link(Set.of(nodeB), arc1, nodeF);
 
-		// make a to do connecting node A and B to node C with arc2
-		Todo todo2 = new Todo(Set.of(nodeA, nodeB), arc2, nodeC);
+		// make a link connecting node A and B to node C with arc2
+		Link link2 = new Link(Set.of(nodeA, nodeB), arc2, nodeC);
 
-		// make a to do connecting node C and E to node D with arc3
-		Todo todo3 = new Todo(Set.of(nodeC, nodeE), arc3, nodeD);
+		// make a link connecting node C and E to node D with arc3
+		Link link3 = new Link(Set.of(nodeC, nodeE), arc3, nodeD);
 
-		// make a graph with todos 1 and 2
-		Graph graph1 = new Graph(Set.of(todo1, todo2));
-		// make a graph with todo3
-		Graph graph2 = new Graph(Set.of(todo3));
+		// make a graph with links 1 and 2
+		Graph graph1 = new Graph(Set.of(link1, link2));
+		// make a graph with link3
+		Graph graph2 = new Graph(Set.of(link3));
 
 		Node nodeG = new DiscreteNode(Set.of("G"));
 		Node nodeH = new DiscreteNode(Set.of("H"));
@@ -122,20 +122,20 @@ class GraphTest {
 			}
 		};
 		arc5.name = "arc5";
-		Todo todo4 = new Todo(Set.of(nodeD), arc4, nodeG);
+		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
 		Node nodeI = new DiscreteNode(Set.of("I"));
-		Todo todo5 = new Todo(Set.of(nodeI), arc5, nodeH);
+		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
 
-		Graph graph4 = new Graph(Set.of(todo4, todo5));
+		Graph graph4 = new Graph(Set.of(link4, link5));
 
 		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2, graph4));
 
 		Graph manualGraph = new Graph(Set.of(
-				new Todo(Set.of(nodeB), arc1, nodeF),
-				new Todo(Set.of(nodeA, nodeB), arc2, nodeC),
-				new Todo(Set.of(nodeC, nodeE), arc3, nodeD),
-				new Todo(Set.of(nodeD), arc4, nodeG),
-				new Todo(Set.of(nodeI), arc5, nodeH)
+				new Link(Set.of(nodeB), arc1, nodeF),
+				new Link(Set.of(nodeA, nodeB), arc2, nodeC),
+				new Link(Set.of(nodeC, nodeE), arc3, nodeD),
+				new Link(Set.of(nodeD), arc4, nodeG),
+				new Link(Set.of(nodeI), arc5, nodeH)
 		));
 
 		// visualize graph3 and manualgraph
@@ -149,10 +149,10 @@ class GraphTest {
 	@Test
 	void congruentTo() {
 		Graph graph = new Graph(Set.of(
-				new Todo(Set.of(matrixNode), arcs.get(2), hfNode),
-				new Todo(Set.of(matrixNode), arcs.get(3), dipoleNode)
+				new Link(Set.of(matrixNode), arcs.get(2), hfNode),
+				new Link(Set.of(matrixNode), arcs.get(3), dipoleNode)
 		));
-		Graph graph3 = new Graph(Set.of(todo4));
+		Graph graph3 = new Graph(Set.of(link4));
 		assertFalse(graph3.congruentTo(graph1));
 		assertFalse(graph.congruentTo(graph1));
 		assertTrue(graph.congruentTo(graph2));
@@ -168,7 +168,7 @@ class GraphTest {
 	void mergeGraphs2() {
 		Graph mergedGraph = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(dipoleNode));
 
-		Graph manualGraph = new Graph(Set.of(todo3));
+		Graph manualGraph = new Graph(Set.of(link3));
 		assertEquals(manualGraph, mergedGraph);
 	}
 
@@ -180,7 +180,7 @@ class GraphTest {
 
 	@Test
 	void mergeGraphs4() {
-		Graph e1 = new Graph(Set.of(todo1, todo4));
+		Graph e1 = new Graph(Set.of(link1, link4));
 		Graph mergedGraph = Graph.mergeGraphs(List.of(e1, graph2), Set.of(hfNode, dipoleNode));
 		assertEquals(e1, mergedGraph);
 	}

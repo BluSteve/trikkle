@@ -2,8 +2,8 @@ package org.trikkle.viz;
 
 import org.trikkle.Arc;
 import org.trikkle.Graph;
+import org.trikkle.Link;
 import org.trikkle.Node;
-import org.trikkle.Todo;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -115,18 +115,18 @@ public class MermaidGraphViz implements IGraphViz {
 
 			int k = 0;
 			List<String> linkLines = new ArrayList<>();
-			for (Todo todo : graph.todos) {
+			for (Link link : graph.links) {
 				k++;
 				String arcId = prefix + "arc" + k;
 
-				Set<String> dependencyIds = todo.getDependencies().stream()
+				Set<String> dependencyIds = link.getDependencies().stream()
 						.map(nodeIdOfNode::get).collect(Collectors.toSet());
-				if (todo.getDependencies().size() > 1) {
-					lines.add(arcToMermaid(todo.getArc(), arcId));
-					linkLines.add(makeLink(dependencyIds, arcId, nodeIdOfNode.get(todo.getOutputNode())));
+				if (link.getDependencies().size() > 1) {
+					lines.add(arcToMermaid(link.getArc(), arcId));
+					linkLines.add(makeLink(dependencyIds, arcId, nodeIdOfNode.get(link.getOutputNode())));
 				} else {
-					String arcName = todo.getArc().name == null ? arcId : todo.getArc().name;
-					linkLines.add(makeLink(dependencyIds, arcName, nodeIdOfNode.get(todo.getOutputNode())));
+					String arcName = link.getArc().name == null ? arcId : link.getArc().name;
+					linkLines.add(makeLink(dependencyIds, arcName, nodeIdOfNode.get(link.getOutputNode())));
 				}
 			}
 

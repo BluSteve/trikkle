@@ -11,7 +11,7 @@ import java.util.concurrent.RecursiveAction;
 
 public class Overseer {
 	private final Graph g;
-	private final MultiMap<IBitmask, Todo> todos = new MultiHashMap<>();
+	private final MultiMap<IBitmask, Link> links = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final List<Node> nodeOfIndex = new ArrayList<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
@@ -43,14 +43,14 @@ public class Overseer {
 		}
 
 
-		// Generate bitmasks for each To do
-		for (Todo todo : g.todos) {
+		// Generate bitmasks for each Link
+		for (Link link : g.links) {
 			IBitmask bitmask = IBitmask.getBitmask(g.nodes.size());
-			for (Node dependency : todo.getDependencies()) {
+			for (Node dependency : link.getDependencies()) {
 				bitmask.set(indexOfNode.get(dependency));
 			}
 
-			todos.putOne(bitmask, todo);
+			links.putOne(bitmask, link);
 		}
 	}
 
@@ -82,34 +82,34 @@ public class Overseer {
 		}
 
 
-		// Get all Todos with idle Arcs that the current state allows to be executed
+		// Get all Links with idle Arcs that the current state allows to be executed
 		IBitmask state = getCurrentState();
-		Set<Todo> todosNow = new HashSet<>();
-		for (Map.Entry<IBitmask, Set<Todo>> todoEntry : todos.entrySet()) {
-			if (state.compareTo(todoEntry.getKey()) >= 0) { // all where requirements are satisfied
-				for (Todo todo : todoEntry.getValue()) {
-					if (todo.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
-						todo.getArc().status = ArcStatus.STAND_BY;
-						todosNow.add(todo);
+		Set<Link> linksNow = new HashSet<>();
+		for (Map.Entry<IBitmask, Set<Link>> linkEntry : links.entrySet()) {
+			if (state.compareTo(linkEntry.getKey()) >= 0) { // all where requirements are satisfied
+				for (Link link : linkEntry.getValue()) {
+					if (link.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
+						link.getArc().status = ArcStatus.STAND_BY;
+						linksNow.add(link);
 					}
 				}
 			}
 		}
 
-		System.out.printf("tick = %d, todosNow.size() = %d%n", tick, todosNow.size());
+		System.out.printf("tick = %d, linksNow.size() = %d%n", tick, linksNow.size());
 
 
-		// Run all todos that can be done now (aka todosNow) in parallel.
-		Todo[] todoArray = todosNow.toArray(new Todo[0]);
+		// Run all links that can be done now (aka linksNow) in parallel.
+		Link[] linkArray = linksNow.toArray(new Link[0]);
 		List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
-		for (int i = 0; i < todoArray.length; i++) {
+		for (int i = 0; i < linkArray.length; i++) {
 			int finalI = i;
 			tasks.add(new RecursiveAction() {
 				@Override
 				protected void compute() {
-					Todo todo = todoArray[finalI];
-					System.out.printf("Started: tick = %d, todo = %s%n", tick, todo);
-					todo.getArc().runWrapper();
+					Link link = linkArray[finalI];
+					System.out.printf("Started: tick = %d, link = %s%n", tick, link);
+					link.getArc().runWrapper();
 				}
 			});
 		}

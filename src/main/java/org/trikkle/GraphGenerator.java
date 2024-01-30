@@ -35,7 +35,7 @@ public class GraphGenerator {
 		List<Node> nodes = generateNodes(numNodes);
 		List<Arc> arcs = generateArcs(numArcs);
 
-		// randomly generate todos
+		// randomly generate links
 		return getGraph(nodes, arcs, random);
 	}
 
@@ -47,7 +47,7 @@ public class GraphGenerator {
 		int numNodes = nodes.size();
 		int numArcs = arcs.size();
 
-		List<Todo> todos = new ArrayList<>();
+		List<Link> links = new ArrayList<>();
 		Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
 		Set<Node> unusedNodes = new HashSet<>(nodes);
 		List<Node> unusedOutputNodes = new ArrayList<>(nodes);
@@ -72,7 +72,7 @@ public class GraphGenerator {
 				return getGraph(nodes, arcs, new Random(random.nextLong()));
 			}
 
-			todos.add(new Todo(dependencies, arcs.get(i), outputNode));
+			links.add(new Link(dependencies, arcs.get(i), outputNode));
 			dependenciesOfNode.put(outputNode, dependencies);
 
 			unusedNodes.remove(outputNode);
@@ -80,12 +80,12 @@ public class GraphGenerator {
 			unusedOutputNodes.remove(outputNode);
 		}
 
-		// add unused nodes to the dependencies of a random to do in to dos
+		// add unused nodes to the dependencies of a random link in links
 		for (Node node : unusedNodes) {
-			todos.get(random.nextInt(numArcs)).getDependencies().add(node);
+			links.get(random.nextInt(numArcs)).getDependencies().add(node);
 		}
 
-		return new Graph(new HashSet<>(todos));
+		return new Graph(new HashSet<>(links));
 	}
 
 	private static String intToExcelColumn(int n) {
