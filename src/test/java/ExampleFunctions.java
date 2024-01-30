@@ -1,5 +1,3 @@
-package test;
-
 import org.trikkle.*;
 import org.trikkle.viz.IGraphViz;
 import org.trikkle.viz.MermaidGraphViz;
