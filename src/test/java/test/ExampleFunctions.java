@@ -1,4 +1,4 @@
-package org.trikkle.test;
+package test;
 
 import org.trikkle.*;
 import org.trikkle.viz.IGraphViz;
@@ -228,7 +228,7 @@ public class ExampleFunctions {
 
 		Graph graph1 = new Graph(Set.of(todo1));
 		Graph graph2 = new Graph(Set.of(todo2, todo3));
-		Graph graph3 = Graph.mergeGraphs(List.of(graph2, graph1), Set.of(hfNode, dipoleNode));
+		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode));
 
 		// visualize all three graphs with the graph variable name printed before the graph
 		System.out.println("graph1");
@@ -353,16 +353,12 @@ public class ExampleFunctions {
 		// concat
 		Graph graph3 = Graph.concatGraphs(List.of(graph1, graph2));
 		// visualize
+
 		System.out.println(new MermaidGraphViz().visualize(graph3));
 	}
 
 	public static void main(String[] args) {
 		// run all test
-		simpleTest();
-		complexTest();
-		streamTest();
 		mergeTest();
-		concatTest();
-		softEqualsTest();
 	}
 }

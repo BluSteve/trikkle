@@ -69,11 +69,6 @@ public class Graph {
 		}
 
 		Map<Node, Integer> graphUsedOfNode = new HashMap<>();
-		// this graph generates which nodes?
-		List<Set<Node>> endingNodesOfGraph = new ArrayList<>(graphs.size());
-		for (int i = 0; i < graphs.size(); i++) {
-			endingNodesOfGraph.add(new HashSet<>());
-		}
 
 		Set<Node> hardDependencies = new HashSet<>();
 		for (Map.Entry<Node, Set<Way>> nodeSetEntry : waysToGetNode.entrySet()) {
@@ -83,7 +78,6 @@ public class Graph {
 				Way way = value.iterator().next();
 				hardDependencies.addAll(way.dependencies);
 				graphUsedOfNode.put(key, way.graphIndex);
-				endingNodesOfGraph.get(way.graphIndex).add(key);
 			}
 		}
 
@@ -97,7 +91,6 @@ public class Graph {
 				for (Way way : ways) {
 					if (hardDependencies.containsAll(way.dependencies)) {
 						graphUsedOfNode.put(endingNode, way.graphIndex);
-						endingNodesOfGraph.get(way.graphIndex).add(endingNode);
 						allHard = true;
 						break;
 					}
@@ -110,23 +103,17 @@ public class Graph {
 						lowestGraphIndex = Math.min(lowestGraphIndex, way.graphIndex);
 					}
 					graphUsedOfNode.put(endingNode, lowestGraphIndex);
-					endingNodesOfGraph.get(lowestGraphIndex).add(endingNode);
 				}
 			}
 		}
 
-
 		Set<Todo> finalTodos = new HashSet<>();
-		for (int i = 0; i < graphs.size(); i++) {
+		for (int i : graphUsedOfNode.values()) {
 			Graph graph = graphs.get(i);
-
-			for (Node node : endingNodesOfGraph.get(i)) {
-				Graph prunedGraph = graph.findPrunedGraphFor(Set.of(node));
-				finalTodos.addAll(prunedGraph.todos);
-			}
+			finalTodos.addAll(graph.todos);
 		}
 
-		return new Graph(finalTodos);
+		return new Graph(finalTodos).findPrunedGraphFor(endingNodes);
 	}
 
 	public static Graph concatGraphs(List<Graph> graphs) {
@@ -148,7 +135,7 @@ public class Graph {
 			if (prunedGraphOfNode == null) {
 				prunedGraphOfNode = new HashMap<>();
 			}
-			if (prunedGraphOfNode.containsKey(targetEndingNodes.iterator().next())) { // cache hit
+			else if (prunedGraphOfNode.containsKey(targetEndingNodes.iterator().next())) { // cache hit
 				return prunedGraphOfNode.get(targetEndingNodes.iterator().next());
 			}
 		}
