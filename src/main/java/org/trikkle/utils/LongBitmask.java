@@ -1,5 +1,7 @@
 package org.trikkle.utils;
 
+import java.util.Objects;
+
 public class LongBitmask implements IBitmask {
 	public final int length;
 	private long bitmask;
@@ -38,15 +40,16 @@ public class LongBitmask implements IBitmask {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) return true;
-		if (!(obj instanceof LongBitmask)) return false;
-		return this.bitmask == ((LongBitmask) obj).bitmask;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		LongBitmask that = (LongBitmask) o;
+		return length == that.length && bitmask == that.bitmask;
 	}
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(bitmask);
+		return Objects.hash(length, bitmask);
 	}
 
 	@Override

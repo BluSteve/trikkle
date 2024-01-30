@@ -172,6 +172,39 @@ public class Graph {
 		return prunedGraph;
 	}
 
+	public boolean congruentTo(Graph graph) {
+		// check that todos are the same size and that all todos are congruent to some to do in graph.todos
+		if (todos.size() != graph.todos.size()) {
+			return false;
+		}
+		for (Todo todo : todos) {
+			boolean found = false;
+			for (Todo graphTodo : graph.todos) {
+				if (todo.congruentTo(graphTodo)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Graph graph = (Graph) o;
+		return Objects.equals(todos, graph.todos);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(todos);
+	}
+
 	private static class Way {
 		public final int graphIndex;
 		public final Set<Node> dependencies;

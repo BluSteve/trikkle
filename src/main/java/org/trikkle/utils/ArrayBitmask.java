@@ -1,6 +1,7 @@
 package org.trikkle.utils;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class ArrayBitmask implements IBitmask {
 	public final int length;
@@ -24,15 +25,18 @@ public class ArrayBitmask implements IBitmask {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) return true;
-		if (!(obj instanceof ArrayBitmask)) return false;
-		return this.hashCode() == obj.hashCode();
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ArrayBitmask that = (ArrayBitmask) o;
+		return length == that.length && Arrays.equals(array, that.array);
 	}
 
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(array);
+		int result = Objects.hash(length);
+		result = 31 * result + Arrays.hashCode(array);
+		return result;
 	}
 
 	@Override

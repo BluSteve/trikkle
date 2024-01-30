@@ -1,5 +1,6 @@
 package org.trikkle;
 
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class Node implements Primable { // Generics are too restricting for this class
@@ -62,16 +63,16 @@ public abstract class Node implements Primable { // Generics are too restricting
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) return true;
-		if (!(obj instanceof Node)) return false;
-		Node node = (Node) obj;
-		return datumNames.equals(node.datumNames);
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Node node = (Node) o;
+		return Objects.equals(datumNames, node.datumNames);
 	}
 
 	@Override
 	public int hashCode() {
-		return datumNames.hashCode();
+		return Objects.hash(datumNames);
 	}
 
 	@Override

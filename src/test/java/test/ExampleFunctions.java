@@ -341,6 +341,7 @@ public class ExampleFunctions {
 		Todo todo1 = new Todo(Set.of(nodeA), arc1, nodeC1);
 		Todo todo2 = new Todo(Set.of(nodeC2), arc2, nodeD);
 
+
 		// generate a graph with todos 1 and 2
 		Graph graph = new Graph(Set.of(todo1, todo2));
 
@@ -355,10 +356,23 @@ public class ExampleFunctions {
 		// visualize
 
 		System.out.println(new MermaidGraphViz().visualize(graph3));
+
+		// make todo1a with the same nodes but a new, different arc from todo1
+		Arc arc1a = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc1a.name = "arc1a";
+		Todo todo1a = new Todo(Set.of(nodeA), arc1a, nodeC1);
+		Graph graph1a = new Graph(Set.of(todo1a, todo2));
+		System.out.println(graph.equals(graph1a));
+		System.out.println(graph.congruentTo(graph1a));
 	}
 
 	public static void main(String[] args) {
 		// run all test
-		mergeTest();
+		softEqualsTest();
 	}
 }

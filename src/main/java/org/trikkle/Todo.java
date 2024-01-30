@@ -1,5 +1,6 @@
 package org.trikkle;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class Todo {
@@ -23,6 +24,24 @@ public class Todo {
 
 	public Node getOutputNode() {
 		return outputNode;
+	}
+
+	public boolean congruentTo(Todo todo) {
+		return dependencies.equals(todo.dependencies) && outputNode.equals(todo.outputNode);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Todo todo = (Todo) o;
+		return Objects.equals(dependencies, todo.dependencies) && Objects.equals(arc, todo.arc) &&
+				Objects.equals(outputNode, todo.outputNode);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dependencies, arc, outputNode);
 	}
 
 	@Override
