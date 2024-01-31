@@ -1,9 +1,9 @@
 package org.trikkle;
 
-import org.trikkle.utils.IBitmask;
-import org.trikkle.utils.MultiHashMap;
-import org.trikkle.utils.MultiMap;
-import org.trikkle.utils.StrictConcurrentHashMap;
+import org.trikkle.structs.IBitmask;
+import org.trikkle.structs.MultiHashMap;
+import org.trikkle.structs.MultiMap;
+import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
 import java.util.concurrent.ForkJoinTask;
@@ -57,7 +57,8 @@ public class Overseer {
 	public void addStartingDatum(String datumName, Object datum) {
 		Node node = nodeOfDatumName.get(datumName);
 		if (!g.startingNodes.contains(node)) {
-			throw new IllegalArgumentException("Node of datumName \"" + datumName + "\" does not belong to a starting node!");
+			throw new IllegalArgumentException(
+					"Node of datumName \"" + datumName + "\" does not belong to a starting node!");
 		}
 
 		node.addDatum(datumName, datum);

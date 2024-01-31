@@ -1,4 +1,4 @@
-package org.trikkle.utils;
+package org.trikkle.structs;
 
 import java.util.Objects;
 

@@ -1,12 +1,14 @@
 package org.trikkle;
 
-import org.trikkle.utils.MultiHashMap;
-import org.trikkle.utils.MultiMap;
+import org.trikkle.structs.MultiHashMap;
+import org.trikkle.structs.MultiMap;
+import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.*;
 
 public class Graph {
 	public static boolean ALLOW_CYCLES = false;
+	private static final MermaidGraphViz viz = new MermaidGraphViz();
 	public final Set<Link> links;
 	public final Set<Arc> arcs;
 	public final Set<Node> nodes = new HashSet<>();
@@ -60,7 +62,7 @@ public class Graph {
 	}
 
 	public Graph(Link... links) {
-		this(Set.of(links));
+		this(new HashSet<>(Arrays.asList(links)));
 	}
 
 	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {
@@ -134,7 +136,7 @@ public class Graph {
 	}
 
 	public static Graph concatGraphs(Graph... graphs) {
-		return concatGraphs(Set.of(graphs));
+		return concatGraphs(new HashSet<>(Arrays.asList(graphs)));
 	}
 
 	public static boolean hasCycle(Map<Node, Set<Node>> dependenciesOfNode) {
@@ -243,6 +245,11 @@ public class Graph {
 	@Override
 	public int hashCode() {
 		return Objects.hash(links);
+	}
+
+	@Override
+	public String toString() {
+		return viz.visualize(this);
 	}
 
 	private static class Way {

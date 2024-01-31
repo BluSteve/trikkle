@@ -1,4 +1,4 @@
-package org.trikkle.utils;
+package org.trikkle.structs;
 
 public interface IBitmask extends Comparable<IBitmask> {
 	static IBitmask getBitmask(int length) {

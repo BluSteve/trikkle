@@ -25,14 +25,14 @@ public class AnnotationTest {
 
 	@Test
 	void arcNameTest() {
-		Link link1 = LinkGenerator.getLinks(AnnotationTest.class).get("square");
-		Link link2 = LinkGenerator.getLinks(AnnotationTest.class).get("asdf");
+		Link link1 = Link.getLinks(AnnotationTest.class).get("square");
+		Link link2 = Link.getLinks(AnnotationTest.class).get("asdf");
 		assertEquals(link1.getArc().name, link2.getArc().name);
 	}
 
 	@Test
 	void test() {
-		Map<String, Link> links = LinkGenerator.getLinks(AnnotationTest.class);
+		Map<String, Link> links = Link.getLinks(AnnotationTest.class);
 
 		assertFalse(links.containsKey("squareInstance"));
 
@@ -66,7 +66,7 @@ public class AnnotationTest {
 
 	@Test
 	void testInstance() {
-		Map<String, Link> links = LinkGenerator.getLinks(new AnnotationTest());
+		Map<String, Link> links = Link.getLinks(new AnnotationTest());
 
 		assertFalse(links.containsKey("square"));
 

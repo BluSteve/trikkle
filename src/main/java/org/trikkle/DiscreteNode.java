@@ -1,8 +1,6 @@
 package org.trikkle;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DiscreteNode extends Node {
 	private final Map<String, Boolean> isDatumDone = new HashMap<>();
@@ -15,7 +13,7 @@ public class DiscreteNode extends Node {
 	}
 
 	public DiscreteNode(String... datumNames) {
-		this(Set.of(datumNames));
+		this(new HashSet<>(Arrays.asList(datumNames)));
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package org.trikkle.utils;
+package org.trikkle.structs;
 
 public class Pair<F, S> {
 	public F fi;
