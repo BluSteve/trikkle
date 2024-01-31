@@ -1,6 +1,7 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
+import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.List;
 import java.util.Set;
@@ -183,5 +184,101 @@ class GraphTest {
 		Graph e1 = new Graph(link1, link4);
 		Graph mergedGraph = Graph.mergeGraphs(List.of(e1, graph2), Set.of(hfNode, dipoleNode));
 		assertEquals(e1, mergedGraph);
+	}
+
+	@Test
+	void softEquals() {
+		// generate 4 nodes, with two having the same datumNames
+		Node nodeA = new DiscreteNode("A");
+		Node nodeC1 = new DiscreteNode("C", "a");
+		Node nodeC2 = new DiscreteNode("a", "C");
+		Node nodeD = new DiscreteNode("D");
+
+		// generate A to C1 and C2 to D arcs and links
+		Arc arc1 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc1.name = "arc1";
+		Arc arc2 = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc2.name = "arc2";
+		Link link1 = new Link(Set.of(nodeA), arc1, nodeC1);
+		Link link2 = new Link(Set.of(nodeC2), arc2, nodeD);
+
+
+		// generate a graph with links 1 and 2
+		Graph graph = new Graph(link1, link2);
+
+		// generate a graph with just link1 and another with just link2
+		Graph graph1 = new Graph(link1);
+		Graph graph2 = new Graph(link2);
+
+		// make link1a with the same nodes but a new, different arc from link1
+		Arc arc1a = new Arc.AutoArc() {
+			@Override
+			public void run() {
+
+			}
+		};
+		arc1a.name = "arc1a";
+		Link link1A = new Link(Set.of(nodeA), arc1a, nodeC1);
+		Graph graph1a = new Graph(link1A, link2);
+
+		assertFalse(graph.equals(graph1a));
+		assertTrue(graph.congruentTo(graph1a));
+	}
+
+	@Test
+	void twoNodesSameName() {
+		// make a new node with the same name as paramNode
+		Node paramNode2 = new DiscreteNode("param", "smth else");
+		// add two different nodes but with the same datum name into a graph. should throw an error
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+			new Graph(Set.of(
+					new Link(Set.of(paramNode), arcs.get(0), magicNode),
+					new Link(Set.of(paramNode2), arcs.get(1), matrixNode)
+			));
+		});
+
+		assertTrue(exception.getMessage().contains("Two Nodes cannot have the same datum name!"));
+	}
+
+	@Test
+	void visualize() {
+		assertEquals(MermaidGraphViz.defaultVisualize(graph1), graph1.toString());
+		assertEquals(MermaidGraphViz.defaultVisualize(graph1, graph2),
+				new MermaidGraphViz().visualize(graph1, graph2));
+		String s = new MermaidGraphViz("ns").visualize(graph1, graph2);
+		System.out.println(s);
+		assertTrue(s.contains("ns_graph1_node1"));
+	}
+
+	@Test
+	void bigTest() {
+		Graph graph = GraphGenerator.generateGraph(100, 1);
+	}
+
+	@Test
+	void prunedGraphs() {
+		Exception e = assertThrows(IllegalArgumentException.class, () -> {
+			graph1.findPrunedGraphFor(Set.of(paramNode));
+		});
+		assertTrue(e.getMessage().contains("Graph must have at least one Link!"));
+
+		Exception e1 = assertThrows(IllegalArgumentException.class, () -> {
+			graph1.findPrunedGraphFor(Set.of(paramNode, matrixNode));
+		});
+		assertTrue(e1.getMessage().contains("targetNodes must be a subset of the Graph's nodes!"));
+
+		Graph graph = graph1.findPrunedGraphFor(Set.of(hfNode));
+		Graph graphcached = graph1.findPrunedGraphFor(Set.of(hfNode));
+		assertSame(graph, graphcached);
 	}
 }

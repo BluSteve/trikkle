@@ -6,9 +6,8 @@ import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.*;
 
-public class Graph {
+public final class Graph {
 	public static boolean ALLOW_CYCLES = false;
-	private static final MermaidGraphViz viz = new MermaidGraphViz();
 	public final Set<Link> links;
 	public final Set<Arc> arcs;
 	public final Set<Node> nodes = new HashSet<>();
@@ -20,6 +19,9 @@ public class Graph {
 	private Map<Node, Graph> prunedGraphOfNode;
 
 	public Graph(Set<Link> links) {
+		if (links == null || links.isEmpty()) {
+			throw new IllegalArgumentException("Graph must have at least one Link!");
+		}
 		this.links = links;
 
 		Set<Node> dependencies = new HashSet<>();
@@ -41,6 +43,17 @@ public class Graph {
 			dependencies.addAll(link.getDependencies());
 		}
 		arcs = arcMap.keySet();
+
+		// throw an error if two nodes have any datum names in common
+		Set<String> datumNames = new HashSet<>();
+		for (Node node : nodes) {
+			for (String datumName : node.datumNames) {
+				if (datumNames.contains(datumName)) {
+					throw new IllegalArgumentException("Two Nodes cannot have the same datum name!");
+				}
+			}
+			datumNames.addAll(node.datumNames);
+		}
 
 		// find ending nodes
 		for (Node node : nodes) {
@@ -167,7 +180,7 @@ public class Graph {
 	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {
 		// Note: targetEndingNodes may not be in endingNodes. It's merely the targetEndingNodes of the PRUNED graph.
 		if (!nodes.containsAll(targetEndingNodes)) {
-			throw new IllegalArgumentException("targetEndingNodes must be a subset of nodes!");
+			throw new IllegalArgumentException("targetNodes must be a subset of the Graph's nodes!");
 		}
 
 		if (targetEndingNodes.size() == 1) {
@@ -249,7 +262,7 @@ public class Graph {
 
 	@Override
 	public String toString() {
-		return viz.visualize(this);
+		return MermaidGraphViz.defaultVisualize(this);
 	}
 
 	private static class Way {

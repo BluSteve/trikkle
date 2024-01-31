@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public abstract class Node implements Primable { // Generics are too restricting for this class
-	public Set<String> datumNames;
+	public Set<String> datumNames; // unique identifies a node
 	protected Overseer overseer;
 	protected boolean usable; // can be true then false
 	private double progress; // monotonically increasing
@@ -73,14 +73,5 @@ public abstract class Node implements Primable { // Generics are too restricting
 	@Override
 	public int hashCode() {
 		return Objects.hash(datumNames);
-	}
-
-	@Override
-	public String toString() {
-		return "Node{" +
-				"datumNames=" + datumNames +
-				", usable=" + usable +
-				", progress=" + progress +
-				'}';
 	}
 }

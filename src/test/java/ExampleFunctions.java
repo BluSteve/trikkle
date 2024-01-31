@@ -136,7 +136,7 @@ public class ExampleFunctions {
 				outputNode.setProgress(1);
 			}
 		};
-		Node streamNode = new StreamNode(Set.of("stream1"));
+		Node streamNode = new StreamNode("stream1");
 		Link link = new Link(Set.of(), inputArc, streamNode);
 
 		Arc consumerArc = new Arc() {

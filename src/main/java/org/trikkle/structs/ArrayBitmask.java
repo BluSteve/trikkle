@@ -27,7 +27,11 @@ class ArrayBitmask implements IBitmask {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (o == null) return false;
+		if (!(o instanceof ArrayBitmask)) {
+			if (o instanceof IBitmask) return this.toString().equals(o.toString());
+			else return false;
+		}
 		ArrayBitmask that = (ArrayBitmask) o;
 		return length == that.length && Arrays.equals(array, that.array);
 	}
@@ -54,7 +58,7 @@ class ArrayBitmask implements IBitmask {
 
 		ArrayBitmask ab = (ArrayBitmask) o;
 		if (length != ab.length) {
-			throw new IllegalArgumentException("ArrayBitmasks not of the same length!");
+			throw new IllegalArgumentException("Bitmask lengths do not match!");
 		} else {
 			boolean allSame = true;
 			for (int i = 0; i < array.length; i++) {

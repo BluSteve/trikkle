@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MermaidGraphViz implements IGraphViz {
+	private static final MermaidGraphViz mermaidGraphViz = new MermaidGraphViz();
 	public final String namespace;
 
 	public MermaidGraphViz() {
@@ -17,6 +18,10 @@ public class MermaidGraphViz implements IGraphViz {
 
 	public MermaidGraphViz(String namespace) {
 		this.namespace = namespace + "_";
+	}
+
+	public static String defaultVisualize(Graph... graphs) {
+		return mermaidGraphViz.visualize(graphs);
 	}
 
 	private static String nodeToMermaid(Node node, String nodeId, NodeType nodeType) {

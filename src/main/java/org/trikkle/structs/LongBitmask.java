@@ -15,18 +15,6 @@ class LongBitmask implements IBitmask {
 		this.bitmask = 0;
 	}
 
-	public static void main(String[] args) {
-		IBitmask lb1 = new ArrayBitmask(64);
-		lb1.set(2);
-		lb1.set(3);
-		System.out.println("lb1 = " + lb1);
-
-		IBitmask lb2 = new ArrayBitmask(64);
-		System.out.println("lb2 = " + lb2);
-
-		System.out.println(lb1.compareTo(lb2));
-	}
-
 	@Override
 	public void set(int index) {
 		if (index >= length) throw new IllegalArgumentException("Index out of range!");
@@ -42,7 +30,11 @@ class LongBitmask implements IBitmask {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (o == null) return false;
+		if (!(o instanceof LongBitmask)) {
+			if (o instanceof IBitmask) return this.toString().equals(o.toString());
+			else return false;
+		}
 		LongBitmask that = (LongBitmask) o;
 		return length == that.length && bitmask == that.bitmask;
 	}
@@ -61,6 +53,7 @@ class LongBitmask implements IBitmask {
 				s.insert(0, "0");
 			}
 		}
+		s.reverse();
 		return s.toString();
 	}
 
@@ -70,7 +63,7 @@ class LongBitmask implements IBitmask {
 
 		LongBitmask lb = (LongBitmask) o;
 		if (length != lb.length) {
-			throw new IllegalArgumentException("LongBitmasks not of the same length!");
+			throw new IllegalArgumentException("Bitmask lengths do not match!");
 		} else {
 			if (bitmask == lb.bitmask) {
 				return 0;

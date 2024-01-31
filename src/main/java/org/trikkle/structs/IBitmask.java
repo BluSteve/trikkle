@@ -12,6 +12,9 @@ public interface IBitmask extends Comparable<IBitmask> {
 	void unset(int index);
 
 	@Override
+	String toString();
+
+	@Override
 	boolean equals(Object o);
 
 	@Override

@@ -1,16 +1,13 @@
 package org.trikkle;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StreamNode extends Node {
-	public StreamNode(Set<String> datumNames) {
-		super(datumNames);
-		if (datumNames.size() != 1) {
-			throw new IllegalArgumentException("StreamNode must have exactly one datum name!");
-		}
+	public StreamNode(String datumName) {
+		super(Collections.singleton(datumName));
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})

@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
-public class Overseer {
+public final class Overseer {
 	private final Graph g;
 	private final MultiMap<IBitmask, Link> links = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
@@ -54,13 +54,20 @@ public class Overseer {
 		}
 	}
 
+	public Set<String> getStartingDatumNames() {
+		Set<String> startingDatumNames = new HashSet<>();
+		for (Node startingNode : g.startingNodes) {
+			startingDatumNames.addAll(startingNode.datumNames);
+		}
+		return startingDatumNames;
+	}
+
 	public void addStartingDatum(String datumName, Object datum) {
 		Node node = nodeOfDatumName.get(datumName);
 		if (!g.startingNodes.contains(node)) {
 			throw new IllegalArgumentException(
 					"Node of datumName \"" + datumName + "\" does not belong to a starting node!");
 		}
-
 		node.addDatum(datumName, datum);
 	}
 
@@ -138,7 +145,6 @@ public class Overseer {
 				resultCache.put(datumName, datum);
 			}
 		}
-
 		return resultCache;
 	}
 
@@ -170,7 +176,6 @@ public class Overseer {
 				return false;
 			}
 		}
-
 		return true;
 	}
 

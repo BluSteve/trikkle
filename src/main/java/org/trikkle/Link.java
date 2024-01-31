@@ -6,7 +6,7 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Link {
+public final class Link {
 	private final Set<Node> dependencies;
 	private final Arc arc;
 	private final Node outputNode;

@@ -12,8 +12,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OverseerTest {
 	@Test
+	void nodeTest() {
+		Node node = new DiscreteNode("toSquare");
+		node.setProgress(1);
+
+		Exception e = assertThrows(IllegalArgumentException.class, () -> node.addDatum("toSquare2", 3.0));
+		assertTrue(e.getMessage().contains("Datum \"toSquare2\" was not declared by this Node!"));
+
+		Exception e1= assertThrows(IllegalArgumentException.class, () -> node.setProgress(2));
+		assertTrue(e1.getMessage().contains("Progress not between 0 and 1!"));
+
+		Exception e2 = assertThrows(IllegalArgumentException.class, () -> node.setProgress(0.5));
+		assertTrue(e2.getMessage().contains("Progress cannot decrease!"));
+	}
+
+	@Test
 	void simpleTest() {
 		Node inputNode = new DiscreteNode("toSquare");
+
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -29,11 +45,13 @@ class OverseerTest {
 		Graph graph = new Graph(link);
 		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
+		assertSame(graph, overseer.getGraph());
 
 		inputNode.addDatum("toSquare", 2.0);
 		overseer.start();
 
-
+		assertEquals(overseer.getCacheCopy(), overseer.getCache());
+		assertNotSame(overseer.getCacheCopy(), overseer.getCache());
 		Map<String, Object> results = overseer.getResultCache();
 		assertEquals(4.0, results.get("squared"));
 	}
@@ -82,35 +100,12 @@ class OverseerTest {
 		Node node4 = new DiscreteNode("result2");
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
-
-		Arc phantomArc1 = new Arc.AutoArc() {
-			@Override
-			public void run() {
-				returnDatum("toSquare", 2.0);
-			}
-		};
-		phantomArc1.name = "phantomArc1";
-		Link phantomLink1 = new Link(Set.of(), phantomArc1, inputNode);
-
-		Arc phantomArc2 = new Arc.AutoArc() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				returnDatum("finalMultiplier", 3.0);
-				returnDatum("finalExponent", 1.2);
-			}
-		};
-		phantomArc2.name = "phantomArc2";
-		Link phantomLink2 = new Link(Set.of(), phantomArc2, inputNode2);
-
 		Graph graph = new Graph(link, link2, link3);
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
+
+		assertEquals(overseer.getStartingDatumNames(), Set.of("toSquare", "finalMultiplier", "finalExponent"));
 
 		overseer.addStartingDatum("toSquare", 2.0);
 		overseer.addStartingDatum("finalMultiplier", 3.0);
@@ -124,6 +119,11 @@ class OverseerTest {
 		overseer.addStartingDatum("finalExponent", 1.2);
 
 		overseer.start();
+
+		// check that all arcs in the graph are finished
+		for (Link link1 : graph.links) {
+			assertEquals(ArcStatus.FINISHED, link1.getArc().getStatus());
+		}
 
 		Map<String, Object> results = overseer.getResultCache();
 		assertEquals(38.60674203230342, results.get("result2"));
@@ -142,7 +142,7 @@ class OverseerTest {
 				outputNode.setProgress(1);
 			}
 		};
-		Node streamNode = new StreamNode(Set.of("stream1"));
+		Node streamNode = new StreamNode("stream1");
 		Link link = new Link(Set.of(), inputArc, streamNode);
 
 		Arc consumerArc = new Arc() {
@@ -173,8 +173,7 @@ class OverseerTest {
 					stream1Node.setUsable(false);
 					this.status = ArcStatus.FINISHED;
 					returnDatum("result1", total); // this must be the last line as it's a recursive call
-				}
-				else this.status = ArcStatus.IDLE;
+				} else this.status = ArcStatus.IDLE;
 			}
 		};
 		Node outputNode = new DiscreteNode("result1");
