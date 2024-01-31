@@ -2,7 +2,6 @@ package org.trikkle;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,28 +12,31 @@ public class AnnotationTest {
 		return toSquare * toSquare;
 	}
 
-	@TrikkleLink(outputDatumName = "squared", inputDatumNames = {"toSquare"})
-	public double squareInstance(double toSquare) {
-		return toSquare * toSquare;
-	}
-
 	@TrikkleLink(outputDatumName = "squared", arcName = "square", inputDatumNames = {"toSquare"})
 	public static double asdf(double toSquare) {
 		return toSquare * toSquare;
 	}
 
+	@TrikkleLink(outputDatumName = "squared", inputDatumNames = {"toSquare"})
+	public double squareInstance(double toSquare) {
+		return toSquare * toSquare;
+	}
+
 	@Test
 	void arcNameTest() {
-		Link link1 = Link.getLinks(AnnotationTest.class).get("square");
-		Link link2 = Link.getLinks(AnnotationTest.class).get("asdf");
+		LinkProcessor linkProcessor = new LinkProcessor();
+		linkProcessor.addLinks(AnnotationTest.class);
+		Link link1 = linkProcessor.links.get("square");
+		Link link2 = linkProcessor.links.get("asdf");
 		assertEquals(link1.getArc().name, link2.getArc().name);
 	}
 
 	@Test
 	void test() {
-		Map<String, Link> links = Link.getLinks(AnnotationTest.class);
+		LinkProcessor linkProcessor = new LinkProcessor();
+		linkProcessor.addLinks(AnnotationTest.class);
 
-		assertFalse(links.containsKey("squareInstance"));
+		assertFalse(linkProcessor.links.containsKey("squareInstance"));
 
 		Node inputNode = new DiscreteNode("toSquare");
 		Node outputNode = new DiscreteNode("squared");
@@ -49,9 +51,9 @@ public class AnnotationTest {
 		arc.name = "square";
 		Link manualLink = new Link(Set.of(inputNode), arc, outputNode);
 
-		assertTrue(manualLink.congruentTo(links.get("square")));
+		assertTrue(manualLink.congruentTo(linkProcessor.links.get("square")));
 
-		Graph graph = new Graph(links.get("square"));
+		Graph graph = new Graph(linkProcessor.links.get("square"));
 		Overseer overseer = new Overseer(graph);
 		overseer.addStartingDatum("toSquare", 2.0);
 		overseer.start();
@@ -66,9 +68,10 @@ public class AnnotationTest {
 
 	@Test
 	void testInstance() {
-		Map<String, Link> links = Link.getLinks(new AnnotationTest());
+		LinkProcessor linkProcessor = new LinkProcessor();
+		linkProcessor.addLinks(new AnnotationTest());
 
-		assertFalse(links.containsKey("square"));
+		assertFalse(linkProcessor.links.containsKey("square"));
 
 		Node inputNode = new DiscreteNode("toSquare");
 		Node outputNode = new DiscreteNode("squared");
@@ -83,9 +86,9 @@ public class AnnotationTest {
 		arc.name = "square";
 		Link manualLink = new Link(Set.of(inputNode), arc, outputNode);
 
-		assertTrue(manualLink.congruentTo(links.get("squareInstance")));
+		assertTrue(manualLink.congruentTo(linkProcessor.links.get("squareInstance")));
 
-		Graph graph = new Graph(links.get("squareInstance"));
+		Graph graph = new Graph(linkProcessor.links.get("squareInstance"));
 		Overseer overseer = new Overseer(graph);
 		overseer.addStartingDatum("toSquare", 2.0);
 		overseer.start();

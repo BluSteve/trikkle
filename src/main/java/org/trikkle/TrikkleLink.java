@@ -12,5 +12,8 @@ public @interface TrikkleLink {
 
 	String arcName() default "";
 
+	// if two links have the same nodeId, they will be used to make one outputNode with all their outputDatumNames
+	String nodeId() default "";
+
 	String outputDatumName();
 }
