@@ -8,7 +8,7 @@ public class GraphGenerator {
 	public static List<Node> generateNodes(int numNodes) {
 		List<Node> nodes = new ArrayList<>();
 		for (int i = 0; i < numNodes; i++) {
-			nodes.add(new DiscreteNode(Collections.singleton(intToExcelColumn(i + 1))));
+			nodes.add(new DiscreteNode(intToExcelColumn(i + 1)));
 		}
 		return nodes;
 	}

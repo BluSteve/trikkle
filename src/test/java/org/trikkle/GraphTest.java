@@ -9,17 +9,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("ALL")
 class GraphTest {
-	static Node paramNode = new DiscreteNode(Set.of("param"));
-	static Node magicNode = new DiscreteNode(Set.of("magic"));
-	static Node hfNode = new DiscreteNode(Set.of("hf"));
-	static Node matrixNode = new DiscreteNode(Set.of("matrix"));
-	static Node dipoleNode = new DiscreteNode(Set.of("dipole"));
+	static Node paramNode = new DiscreteNode("param");
+	static Node magicNode = new DiscreteNode("magic");
+	static Node hfNode = new DiscreteNode("hf");
+	static Node matrixNode = new DiscreteNode("matrix");
+	static Node dipoleNode = new DiscreteNode("dipole");
 	static List<Arc> arcs = GraphGenerator.generateArcs(4);
 	static Link link1 = new Link(Set.of(magicNode, paramNode), arcs.get(0), hfNode);
-	static Graph graph1 = new Graph(Set.of(link1));
+	static Graph graph1 = new Graph(link1);
 	static Link link2 = new Link(Set.of(matrixNode), arcs.get(1), hfNode);
 	static Link link3 = new Link(Set.of(matrixNode), arcs.get(2), dipoleNode);
-	static Graph graph2 = new Graph(Set.of(link2, link3));
+	static Graph graph2 = new Graph(link2, link3);
 	static Link link4 = new Link(Set.of(paramNode), arcs.get(3), dipoleNode);
 
 	// learn from ExampleFunctions.java
@@ -61,12 +61,12 @@ class GraphTest {
 	@Test
 	void concatGraphs() {
 		// make nodes with datumNames A to F
-		Node nodeA = new DiscreteNode(Set.of("A"));
-		Node nodeB = new DiscreteNode(Set.of("B"));
-		Node nodeC = new DiscreteNode(Set.of("C"));
-		Node nodeD = new DiscreteNode(Set.of("D"));
-		Node nodeE = new DiscreteNode(Set.of("E"));
-		Node nodeF = new DiscreteNode(Set.of("F"));
+		Node nodeA = new DiscreteNode("A");
+		Node nodeB = new DiscreteNode("B");
+		Node nodeC = new DiscreteNode("C");
+		Node nodeD = new DiscreteNode("D");
+		Node nodeE = new DiscreteNode("E");
+		Node nodeF = new DiscreteNode("F");
 
 		// make three empty arcs and set arc.name to their variable names
 		Arc arc1 = new Arc.AutoArc() {
@@ -102,12 +102,12 @@ class GraphTest {
 		Link link3 = new Link(Set.of(nodeC, nodeE), arc3, nodeD);
 
 		// make a graph with links 1 and 2
-		Graph graph1 = new Graph(Set.of(link1, link2));
+		Graph graph1 = new Graph(link1, link2);
 		// make a graph with link3
-		Graph graph2 = new Graph(Set.of(link3));
+		Graph graph2 = new Graph(link3);
 
-		Node nodeG = new DiscreteNode(Set.of("G"));
-		Node nodeH = new DiscreteNode(Set.of("H"));
+		Node nodeG = new DiscreteNode("G");
+		Node nodeH = new DiscreteNode("H");
 		Arc arc4 = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -123,12 +123,12 @@ class GraphTest {
 		};
 		arc5.name = "arc5";
 		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
-		Node nodeI = new DiscreteNode(Set.of("I"));
+		Node nodeI = new DiscreteNode("I");
 		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
 
-		Graph graph4 = new Graph(Set.of(link4, link5));
+		Graph graph4 = new Graph(link4, link5);
 
-		Graph graph3 = Graph.concatGraphs(Set.of(graph1, graph2, graph4));
+		Graph graph3 = Graph.concatGraphs(graph1, graph2, graph4);
 
 		Graph manualGraph = new Graph(Set.of(
 				new Link(Set.of(nodeB), arc1, nodeF),
@@ -152,7 +152,7 @@ class GraphTest {
 				new Link(Set.of(matrixNode), arcs.get(2), hfNode),
 				new Link(Set.of(matrixNode), arcs.get(3), dipoleNode)
 		));
-		Graph graph3 = new Graph(Set.of(link4));
+		Graph graph3 = new Graph(link4);
 		assertFalse(graph3.congruentTo(graph1));
 		assertFalse(graph.congruentTo(graph1));
 		assertTrue(graph.congruentTo(graph2));
@@ -168,7 +168,7 @@ class GraphTest {
 	void mergeGraphs2() {
 		Graph mergedGraph = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(dipoleNode));
 
-		Graph manualGraph = new Graph(Set.of(link3));
+		Graph manualGraph = new Graph(link3);
 		assertEquals(manualGraph, mergedGraph);
 	}
 
@@ -180,7 +180,7 @@ class GraphTest {
 
 	@Test
 	void mergeGraphs4() {
-		Graph e1 = new Graph(Set.of(link1, link4));
+		Graph e1 = new Graph(link1, link4);
 		Graph mergedGraph = Graph.mergeGraphs(List.of(e1, graph2), Set.of(hfNode, dipoleNode));
 		assertEquals(e1, mergedGraph);
 	}

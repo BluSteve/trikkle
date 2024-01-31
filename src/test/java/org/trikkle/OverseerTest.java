@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class OverseerTest {
 	@Test
 	void simpleTest() {
-		Node inputNode = new DiscreteNode(Set.of("toSquare"));
+		Node inputNode = new DiscreteNode("toSquare");
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -22,11 +22,11 @@ class OverseerTest {
 				returnDatum("squared", squared);
 			}
 		};
-		Node outputNode = new DiscreteNode(Set.of("squared"));
+		Node outputNode = new DiscreteNode("squared");
 		Link link = new Link(Set.of(inputNode), arc, outputNode);
 
 
-		Graph graph = new Graph(Set.of(link));
+		Graph graph = new Graph(link);
 		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
 
@@ -40,8 +40,8 @@ class OverseerTest {
 
 	@Test
 	void complexTest() {
-		Node inputNode2 = new DiscreteNode(Set.of("finalMultiplier", "finalExponent"));
-		Node inputNode = new DiscreteNode(Set.of("toSquare"));
+		Node inputNode2 = new DiscreteNode("finalMultiplier", "finalExponent");
+		Node inputNode = new DiscreteNode("toSquare");
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -51,7 +51,7 @@ class OverseerTest {
 			}
 		};
 		arc.name = "squarer";
-		Node node2 = new DiscreteNode(Set.of("squared"));
+		Node node2 = new DiscreteNode("squared");
 		Link link = new Link(Set.of(inputNode), arc, node2);
 
 
@@ -66,7 +66,7 @@ class OverseerTest {
 			}
 		};
 		arc2.name = "process 1";
-		Node node3 = new DiscreteNode(Set.of("result1"));
+		Node node3 = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
 		Arc arc3 = new Arc.AutoArc() {
@@ -79,7 +79,7 @@ class OverseerTest {
 			}
 		};
 		arc3.name = "aggregator";
-		Node node4 = new DiscreteNode(Set.of("result2"));
+		Node node4 = new DiscreteNode("result2");
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
 
@@ -107,7 +107,7 @@ class OverseerTest {
 		phantomArc2.name = "phantomArc2";
 		Link phantomLink2 = new Link(Set.of(), phantomArc2, inputNode2);
 
-		Graph graph = new Graph(Set.of(link, link2, link3));
+		Graph graph = new Graph(link, link2, link3);
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
@@ -177,10 +177,10 @@ class OverseerTest {
 				else this.status = ArcStatus.IDLE;
 			}
 		};
-		Node outputNode = new DiscreteNode(Set.of("result1"));
+		Node outputNode = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
 
-		Graph graph = new Graph(Set.of(link, link2));
+		Graph graph = new Graph(link, link2);
 		Overseer overseer = new Overseer(graph);
 		overseer.start();
 

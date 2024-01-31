@@ -59,6 +59,10 @@ public class Graph {
 		}
 	}
 
+	public Graph(Link... links) {
+		this(Set.of(links));
+	}
+
 	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {
 		MultiMap<Node, Way> waysToGetNode = new MultiHashMap<>();
 		for (Node endingNode : endingNodes) {
@@ -127,6 +131,10 @@ public class Graph {
 		}
 
 		return new Graph(finalLinks);
+	}
+
+	public static Graph concatGraphs(Graph... graphs) {
+		return concatGraphs(Set.of(graphs));
 	}
 
 	public static boolean hasCycle(Map<Node, Set<Node>> dependenciesOfNode) {

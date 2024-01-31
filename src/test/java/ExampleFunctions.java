@@ -13,7 +13,7 @@ public class ExampleFunctions {
 	}
 
 	static void simpleTest() {
-		Node inputNode = new DiscreteNode(Set.of("toSquare"));
+		Node inputNode = new DiscreteNode("toSquare");
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -22,11 +22,11 @@ public class ExampleFunctions {
 				returnDatum("squared", squared);
 			}
 		};
-		Node outputNode = new DiscreteNode(Set.of("squared"));
+		Node outputNode = new DiscreteNode("squared");
 		Link link = new Link(Set.of(inputNode), arc, outputNode);
 
 
-		Graph graph = new Graph(Set.of(link));
+		Graph graph = new Graph(link);
 		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
 
@@ -39,8 +39,8 @@ public class ExampleFunctions {
 	}
 
 	static void complexTest() {
-		Node inputNode2 = new DiscreteNode(Set.of("finalMultiplier", "finalExponent"));
-		Node inputNode = new DiscreteNode(Set.of("toSquare"));
+		Node inputNode2 = new DiscreteNode("finalMultiplier", "finalExponent");
+		Node inputNode = new DiscreteNode("toSquare");
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -50,7 +50,7 @@ public class ExampleFunctions {
 			}
 		};
 		arc.name = "squarer";
-		Node node2 = new DiscreteNode(Set.of("squared"));
+		Node node2 = new DiscreteNode("squared");
 		Link link = new Link(Set.of(inputNode), arc, node2);
 
 
@@ -65,7 +65,7 @@ public class ExampleFunctions {
 			}
 		};
 		arc2.name = "process 1";
-		Node node3 = new DiscreteNode(Set.of("result1"));
+		Node node3 = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
 		Arc arc3 = new Arc.AutoArc() {
@@ -78,7 +78,7 @@ public class ExampleFunctions {
 			}
 		};
 		arc3.name = "aggregator";
-		Node node4 = new DiscreteNode(Set.of("result2"));
+		Node node4 = new DiscreteNode("result2");
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
 
@@ -108,7 +108,7 @@ public class ExampleFunctions {
 
 //		inputNode.setUsable(true);
 //		inputNode2.setUsable(true);
-		Graph graph = new Graph(Set.of(link, link2, link3));
+		Graph graph = new Graph(link, link2, link3);
 		IGraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
@@ -171,10 +171,10 @@ public class ExampleFunctions {
 				else this.status = ArcStatus.IDLE;
 			}
 		};
-		Node outputNode = new DiscreteNode(Set.of("result1"));
+		Node outputNode = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
 
-		Graph graph = new Graph(Set.of(link, link2));
+		Graph graph = new Graph(link, link2);
 		Overseer overseer = new Overseer(graph);
 		overseer.start();
 
@@ -183,11 +183,11 @@ public class ExampleFunctions {
 	}
 
 	static void mergeTest() {
-		Node paramNode = new DiscreteNode(Set.of("param"));
-		Node magicNode = new DiscreteNode(Set.of("magic"));
-		Node hfNode = new DiscreteNode(Set.of("hf"));
-		Node matrixNode = new DiscreteNode(Set.of("matrix"));
-		Node dipoleNode = new DiscreteNode(Set.of("dipole"));
+		Node paramNode = new DiscreteNode("param");
+		Node magicNode = new DiscreteNode("magic");
+		Node hfNode = new DiscreteNode("hf");
+		Node matrixNode = new DiscreteNode("matrix");
+		Node dipoleNode = new DiscreteNode("dipole");
 
 		Arc arc1 = new Arc.AutoArc() {
 			@Override
@@ -224,8 +224,8 @@ public class ExampleFunctions {
 		Link link2 = new Link(Set.of(matrixNode), arc2, hfNode);
 		Link link3 = new Link(Set.of(matrixNode), arc3, dipoleNode);
 
-		Graph graph1 = new Graph(Set.of(link1));
-		Graph graph2 = new Graph(Set.of(link2, link3));
+		Graph graph1 = new Graph(link1);
+		Graph graph2 = new Graph(link2, link3);
 		Graph graph3 = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
 
 		// visualize all three graphs with the graph variable name printed before the graph
@@ -235,12 +235,12 @@ public class ExampleFunctions {
 
 	static void concatTest() {
 		// make nodes with datumNames A to F
-		Node nodeA = new DiscreteNode(Set.of("A"));
-		Node nodeB = new DiscreteNode(Set.of("B"));
-		Node nodeC = new DiscreteNode(Set.of("C"));
-		Node nodeD = new DiscreteNode(Set.of("D"));
-		Node nodeE = new DiscreteNode(Set.of("E"));
-		Node nodeF = new DiscreteNode(Set.of("F"));
+		Node nodeA = new DiscreteNode("A");
+		Node nodeB = new DiscreteNode("B");
+		Node nodeC = new DiscreteNode("C");
+		Node nodeD = new DiscreteNode("D");
+		Node nodeE = new DiscreteNode("E");
+		Node nodeF = new DiscreteNode("F");
 
 		// make three empty arcs and set arc.name to their variable names
 		Arc arc1 = new Arc.AutoArc() {
@@ -276,12 +276,12 @@ public class ExampleFunctions {
 		Link link3 = new Link(Set.of(nodeC, nodeE), arc3, nodeD);
 
 		// make a graph with links 1 and 2
-		Graph graph1 = new Graph(Set.of(link1, link2));
+		Graph graph1 = new Graph(link1, link2);
 		// make a graph with link3
-		Graph graph2 = new Graph(Set.of(link3));
+		Graph graph2 = new Graph(link3);
 
-		Node nodeG = new DiscreteNode(Set.of("G"));
-		Node nodeH = new DiscreteNode(Set.of("H"));
+		Node nodeG = new DiscreteNode("G");
+		Node nodeH = new DiscreteNode("H");
 		Arc arc4 = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -297,25 +297,25 @@ public class ExampleFunctions {
 		};
 		arc5.name = "arc5";
 		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
-		Node nodeI = new DiscreteNode(Set.of("I"));
+		Node nodeI = new DiscreteNode("I");
 		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
 
-		Graph graph4 = new Graph(Set.of(link4, link5));
+		Graph graph4 = new Graph(link4, link5);
 
 		// display graph 1, 2, 4 with labels printed for each and namespace set to the labels
 		System.out.println(new MermaidGraphViz().visualize(graph1, graph2, graph4));
 
-		Graph graph3 = Graph.concatGraphs(Set.of(graph1, graph2, graph4)).findPrunedGraphFor(Set.of(nodeG));
+		Graph graph3 = Graph.concatGraphs(graph1, graph2, graph4).findPrunedGraphFor(Set.of(nodeG));
 		System.out.println("graph3");
 		System.out.println(new MermaidGraphViz("graph3").visualize(graph3));
 	}
 
 	static void softEqualsTest() {
 		// generate 4 nodes, with two having the same datumNames
-		Node nodeA = new DiscreteNode(Set.of("A"));
-		Node nodeC1 = new DiscreteNode(Set.of("C", "a"));
-		Node nodeC2 = new DiscreteNode(Set.of("a", "C"));
-		Node nodeD = new DiscreteNode(Set.of("D"));
+		Node nodeA = new DiscreteNode("A");
+		Node nodeC1 = new DiscreteNode("C", "a");
+		Node nodeC2 = new DiscreteNode("a", "C");
+		Node nodeD = new DiscreteNode("D");
 
 		// generate A to C1 and C2 to D arcs and links
 		Arc arc1 = new Arc.AutoArc() {
@@ -337,16 +337,16 @@ public class ExampleFunctions {
 
 
 		// generate a graph with links 1 and 2
-		Graph graph = new Graph(Set.of(link1, link2));
+		Graph graph = new Graph(link1, link2);
 
 		// visualize
 		System.out.println(new MermaidGraphViz().visualize(graph));
 
 		// generate a graph with just link1 and another with just link2
-		Graph graph1 = new Graph(Set.of(link1));
-		Graph graph2 = new Graph(Set.of(link2));
+		Graph graph1 = new Graph(link1);
+		Graph graph2 = new Graph(link2);
 		// concat
-		Graph graph3 = Graph.concatGraphs(Set.of(graph1, graph2));
+		Graph graph3 = Graph.concatGraphs(graph1, graph2);
 		// visualize
 
 		System.out.println(new MermaidGraphViz().visualize(graph3));
@@ -361,7 +361,7 @@ public class ExampleFunctions {
 		};
 		arc1a.name = "arc1a";
 		Link link1A = new Link(Set.of(nodeA), arc1a, nodeC1);
-		Graph graph1a = new Graph(Set.of(link1A, link2));
+		Graph graph1a = new Graph(link1A, link2);
 		System.out.println(graph.equals(graph1a));
 		System.out.println(graph.congruentTo(graph1a));
 	}

@@ -14,6 +14,10 @@ public class DiscreteNode extends Node {
 		}
 	}
 
+	public DiscreteNode(String... datumNames) {
+		this(Set.of(datumNames));
+	}
+
 	@Override
 	protected void uncheckedAddDatum(String datumName, Object datum) {
 		Map<String, Object> cache = overseer.getCache();
