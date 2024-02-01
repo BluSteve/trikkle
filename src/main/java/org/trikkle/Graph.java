@@ -22,25 +22,34 @@ public final class Graph {
 		if (links == null || links.isEmpty()) {
 			throw new IllegalArgumentException("Graph must have at least one Link!");
 		}
-		this.links = links;
 
+		this.links = new HashSet<>();
 		Set<Node> dependencies = new HashSet<>();
 		for (Link link : links) {
 			Set<Node> existingOutputNodes = outputNodeMap.keySet();
-			if (existingOutputNodes.contains(link.getOutputNode())) {
-				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
+			for (Node existingOutputNode : existingOutputNodes) {
+				if (existingOutputNode.datumNames.equals(link.getOutputNode().datumNames)) {
+					throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
+				}
 			}
 			if (arcMap.containsKey(link.getArc())) {
 				throw new IllegalArgumentException("The same Arc cannot be used for two Links!");
 			}
 
-			nodes.addAll(link.getDependencies());
-			nodes.add(link.getOutputNode());
-			arcMap.put(link.getArc(), link);
-			outputNodeMap.put(link.getOutputNode(), link);
-			dependenciesOfNode.put(link.getOutputNode(), link.getDependencies());
+			Set<Node> safeDependencies = new HashSet<>();
+			for (Node dependency : link.getDependencies()) {
+				Node safeDependency = addNode(dependency);
+				safeDependencies.add(safeDependency);
+			}
+			Node safeOutputNode = addNode(link.getOutputNode());
 
-			dependencies.addAll(link.getDependencies());
+			Link safeLink = new Link(safeDependencies, link.getArc(), safeOutputNode);
+			arcMap.put(safeLink.getArc(), safeLink);
+			outputNodeMap.put(safeOutputNode, safeLink);
+			dependenciesOfNode.put(safeOutputNode, safeDependencies);
+			this.links.add(safeLink);
+
+			dependencies.addAll(safeDependencies);
 		}
 		arcs = arcMap.keySet();
 
@@ -72,6 +81,16 @@ public final class Graph {
 		if (hasCycle() && !ALLOW_CYCLES) {
 			throw new IllegalArgumentException("Graph has a cycle!");
 		}
+	}
+
+	private Node addNode(Node node) {
+		for (Node node1 : nodes) {
+			if (node1.datumNames.equals(node.datumNames)) {
+				return node1;
+			}
+		}
+		nodes.add(node);
+		return node;
 	}
 
 	public Graph(Link... links) {

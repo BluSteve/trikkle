@@ -2,6 +2,7 @@ package org.trikkle;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class Link {
 	private final Set<Node> dependencies;
@@ -27,7 +28,11 @@ public final class Link {
 	}
 
 	public boolean congruentTo(Link link) {
-		return dependencies.equals(link.dependencies) && outputNode.equals(link.outputNode);
+		Set<Set<String>> datumNamess =
+				dependencies.stream().map((node) -> node.datumNames).collect(Collectors.toSet());
+		Set<Set<String>> linkDatumNamess =
+				link.dependencies.stream().map((node) -> node.datumNames).collect(Collectors.toSet());
+		return datumNamess.equals(linkDatumNamess) && outputNode.congruentTo(link.outputNode);
 	}
 
 	@Override
