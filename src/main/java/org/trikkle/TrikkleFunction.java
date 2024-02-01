@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Repeatable(TrikkleFunctionGroup.class)
 public @interface TrikkleFunction {
-	String[] inputDatumNames();
+	String[] inputs();
 
 	String arcName() default "";
 
@@ -14,5 +14,5 @@ public @interface TrikkleFunction {
 	// 1:1 correspondence with Link
 	String linkId();
 
-	String outputDatumName();
+	String output();
 }

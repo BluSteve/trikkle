@@ -7,17 +7,17 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AnnotationTest {
-	@TrikkleFunction(outputDatumName = "squared", inputDatumNames = {"toSquare"}, linkId = "node1")
+	@TrikkleFunction(output = "squared", inputs = {"toSquare"}, linkId = "node1")
 	public static double square(double toSquare) {
 		return toSquare * toSquare;
 	}
 
-	@TrikkleFunction(outputDatumName = "squared", arcName = "square", inputDatumNames = {"toSquare"}, linkId = "node2")
+	@TrikkleFunction(output = "squared", arcName = "square", inputs = {"toSquare"}, linkId = "node2")
 	public static double asdf(double toSquare) {
 		return toSquare * toSquare;
 	}
 
-	@TrikkleFunction(outputDatumName = "squared", inputDatumNames = {"toSquare"}, linkId = "node3")
+	@TrikkleFunction(output = "squared", inputs = {"toSquare"}, linkId = "node3")
 	public double squareInstance(double toSquare) {
 		return toSquare * toSquare;
 	}

@@ -67,6 +67,6 @@ public abstract class Node implements Primable { // Generics are too restricting
 
 	@Override
 	public String toString() {
-		return datumNames.toString();
+		return "Node" + datumNames.toString();
 	}
 }

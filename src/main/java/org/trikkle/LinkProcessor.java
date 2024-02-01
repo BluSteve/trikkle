@@ -53,6 +53,17 @@ public class LinkProcessor {
 				}
 
 				for (Map.Entry<String, Set<TrikkleFunction>> entry : tfOfLinkId.entrySet()) {
+					// check that all functions in the group have the same outputDatumName
+					String outputDatumName = null;
+					for (TrikkleFunction tf : entry.getValue()) {
+						if (outputDatumName == null) {
+							outputDatumName = tf.output();
+						} else if (!outputDatumName.equals(tf.output())) {
+							throw new IllegalArgumentException(
+									"All TrikkleFunctions with the same linkId must have the same output!");
+						}
+					}
+
 					Function function = new Function(method, object, entry.getValue().toArray(new TrikkleFunction[0]));
 					functionsOfLinkId.putOne(entry.getKey(), function);
 				}
@@ -82,17 +93,17 @@ public class LinkProcessor {
 				Map<String, List<String>> mm = new HashMap<>();
 
 				for (TrikkleFunction tf : function.annotations) {
-					Node dependency = new DiscreteNode(tf.inputDatumNames());
+					Node dependency = new DiscreteNode(tf.inputs());
 					localDependencies.add(dependency);
 
-					if (!mm.containsKey(tf.outputDatumName())) {
-						mm.put(tf.outputDatumName(), new ArrayList<>());
+					if (!mm.containsKey(tf.output())) {
+						mm.put(tf.output(), new ArrayList<>());
 					}
-					for (String inputDatumName : tf.inputDatumNames()) {
-						mm.get(tf.outputDatumName()).add(inputDatumName);
+					for (String inputDatumName : tf.inputs()) {
+						mm.get(tf.output()).add(inputDatumName);
 					}
 
-					outputDatumNames.add(tf.outputDatumName());
+					outputDatumNames.add(tf.output());
 				}
 				inputsOfOutput.put(function, mm);
 				dependencies.addAll(localDependencies);

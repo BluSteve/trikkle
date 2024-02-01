@@ -25,6 +25,15 @@ public abstract class Arc implements Primable {
 		return status;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		if (name.isEmpty()) this.name = null;
+		else this.name = name;
+	}
+
 	@Override
 	public void primeWith(Overseer overseer) {
 		this.overseer = overseer;
@@ -33,15 +42,6 @@ public abstract class Arc implements Primable {
 	@Override
 	public Overseer getOverseer() {
 		return overseer;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		if (name.isEmpty()) this.name = null;
-		else this.name = name;
 	}
 
 	public static abstract class AutoArc extends Arc {

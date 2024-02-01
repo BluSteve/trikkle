@@ -36,6 +36,7 @@ public final class Graph {
 				throw new IllegalArgumentException("The same Arc cannot be used for two Links!");
 			}
 
+			// ensures you do not have two Nodes with the same datum names
 			Set<Node> safeDependencies = new HashSet<>();
 			for (Node dependency : link.getDependencies()) {
 				Node safeDependency = addNode(dependency);
@@ -83,6 +84,10 @@ public final class Graph {
 		}
 	}
 
+	public Graph(Link... links) {
+		this(new HashSet<>(Arrays.asList(links)));
+	}
+
 	private Node addNode(Node node) {
 		for (Node node1 : nodes) {
 			if (node1.datumNames.equals(node.datumNames)) {
@@ -91,10 +96,6 @@ public final class Graph {
 		}
 		nodes.add(node);
 		return node;
-	}
-
-	public Graph(Link... links) {
-		this(new HashSet<>(Arrays.asList(links)));
 	}
 
 	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {

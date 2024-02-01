@@ -2,15 +2,15 @@ package org.trikkle;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TrikkleFunctionGroupTest {
-	@TrikkleFunction(outputDatumName = "sum", inputDatumNames = {"a", "b"}, linkId = "sqdiff")
+	@TrikkleFunction(output = "sum", inputs = {"a", "b"}, linkId = "sqdiff")
 	public static double add(double a, double b) {
 		return a + b;
 	}
 
-	@TrikkleFunction(outputDatumName = "difference", inputDatumNames = {"a", "b"}, linkId = "sqdiff")
+	@TrikkleFunction(output = "difference", inputs = {"a", "b"}, linkId = "sqdiff")
 	public static double difference(double a, double b) {
 		return Math.abs(a - b);
 	}
@@ -36,8 +36,8 @@ public class TrikkleFunctionGroupTest {
 		assertEquals(2.0, resultCache.get("difference"));
 	}
 
-	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"a"}, linkId = "pow")
-	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"b"}, linkId = "pow")
+	@TrikkleFunction(output = "power", inputs = {"a"}, linkId = "pow")
+	@TrikkleFunction(output = "power", inputs = {"b"}, linkId = "pow")
 	public static double pow(double a, double b) {
 		return Math.pow(a, b);
 	}
@@ -63,8 +63,8 @@ public class TrikkleFunctionGroupTest {
 	}
 
 	// test two trikklefunctions with different linkid. it should throw an error
-	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"a"}, linkId = "asdf")
-	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"b"}, linkId = "asdf2")
+	@TrikkleFunction(output = "power", inputs = {"a"}, linkId = "asdf")
+	@TrikkleFunction(output = "power2", inputs = {"b"}, linkId = "asdf")
 	public double pow2(double a, double b) {
 		return Math.pow(a, b);
 	}
@@ -72,26 +72,26 @@ public class TrikkleFunctionGroupTest {
 	@Test
 	void test3() {
 		LinkProcessor linkProcessor = new LinkProcessor();
-		try {
+		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			linkProcessor.addFunctionsOf(new TrikkleFunctionGroupTest());
-		} catch (IllegalArgumentException e) {
-			assertEquals("All TrikkleFunctions in a group must have the same linkId!", e.getMessage());
-		}
+		});
+		assertTrue(exception.getMessage()
+				.contains("All TrikkleFunctions with the same linkId must have the same output!"));
 	}
 
-	@TrikkleFunction(inputDatumNames = {"X", "Y"}, outputDatumName = "abc", linkId = "somelink")
-	@TrikkleFunction(inputDatumNames = {"Z"}, outputDatumName = "abc", linkId = "somelink")
-	@TrikkleFunction(inputDatumNames = {"sum", "sum", "sum"}, outputDatumName = "result", linkId = "finallink")
+	@TrikkleFunction(inputs = {"X", "Y"}, output = "abc", linkId = "somelink")
+	@TrikkleFunction(inputs = {"Z"}, output = "abc", linkId = "somelink")
+	@TrikkleFunction(inputs = {"sum", "sum", "sum"}, output = "result", linkId = "finallink")
 	public static double func1(double a, double b, double c) {
 		return a * b / c;
 	}
 
-	@TrikkleFunction(inputDatumNames = {"Z"}, outputDatumName = "aa2", linkId = "somelink")
+	@TrikkleFunction(inputs = {"Z"}, output = "aa2", linkId = "somelink")
 	public static double func2(double a) {
 		return a * a / 2;
 	}
 
-	@TrikkleFunction(inputDatumNames = {"abc", "aa2"}, outputDatumName = "sum", linkId = "middlelink")
+	@TrikkleFunction(inputs = {"abc", "aa2"}, output = "sum", linkId = "middlelink")
 	public static double sum(double a, double b) {
 		return a + b;
 	}
