@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface TrikkleLinkGroup {
+public @interface TrikkleFunctionGroup {
 	// use this class to either take in datums from multiple nodes
 	// or use the same arc for multiple links
-	TrikkleLink[] value();
+	TrikkleFunction[] value();
 }
