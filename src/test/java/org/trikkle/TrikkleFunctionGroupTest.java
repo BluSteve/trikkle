@@ -61,4 +61,61 @@ public class TrikkleFunctionGroupTest {
 		var resultCache = overseer.getResultCache();
 		assertEquals(125.0, resultCache.get("power"));
 	}
+
+	// test two trikklefunctions with different linkid. it should throw an error
+	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"a"}, linkId = "asdf")
+	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"b"}, linkId = "asdf2")
+	public double pow2(double a, double b) {
+		return Math.pow(a, b);
+	}
+
+	@Test
+	void test3() {
+		LinkProcessor linkProcessor = new LinkProcessor();
+		try {
+			linkProcessor.addFunctionsOf(new TrikkleFunctionGroupTest());
+		} catch (IllegalArgumentException e) {
+			assertEquals("All TrikkleFunctions in a group must have the same linkId!", e.getMessage());
+		}
+	}
+
+	@TrikkleFunction(inputDatumNames = {"X", "Y"}, outputDatumName = "abc", linkId = "somelink")
+	@TrikkleFunction(inputDatumNames = {"Z"}, outputDatumName = "abc", linkId = "somelink")
+	@TrikkleFunction(inputDatumNames = {"sum", "sum", "sum"}, outputDatumName = "result", linkId = "finallink")
+	public static double func1(double a, double b, double c) {
+		return a * b / c;
+	}
+
+	@TrikkleFunction(inputDatumNames = {"Z"}, outputDatumName = "aa2", linkId = "somelink")
+	public static double func2(double a) {
+		return a * a / 2;
+	}
+
+	@TrikkleFunction(inputDatumNames = {"abc", "aa2"}, outputDatumName = "sum", linkId = "middlelink")
+	public static double sum(double a, double b) {
+		return a + b;
+	}
+
+	@Test
+	void test4() {
+		LinkProcessor linkProcessor = new LinkProcessor();
+		linkProcessor.addFunctionsOf(TrikkleFunctionGroupTest.class);
+		linkProcessor.refreshLinks("somelink", "middlelink", "finallink");
+		assertEquals(3, linkProcessor.getLinks().size());
+
+		Graph graph = linkProcessor.getGraph();
+		System.out.println(graph);
+		Overseer overseer = new Overseer(graph);
+
+		assertEquals(2, graph.startingNodes.size());
+
+		System.out.println(overseer.getStartingDatumNames());
+		overseer.addStartingDatum("X", 5);
+		overseer.addStartingDatum("Y", 3);
+		overseer.addStartingDatum("Z", 2);
+		overseer.start();
+
+		var resultCache = overseer.getResultCache();
+		assertEquals(9.5, resultCache.get("result"));
+	}
 }

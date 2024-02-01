@@ -47,16 +47,15 @@ public class LinkProcessor {
 				functionsOfLinkId.putOne(trikkleFunction.linkId(), function);
 			} else if (method.isAnnotationPresent(TrikkleFunctionGroup.class)) {
 				TrikkleFunction[] trikkleFunctions = method.getAnnotation(TrikkleFunctionGroup.class).value();
-				// check that all trikkleFunctions have the same linkId
+				MultiMap<String, TrikkleFunction> tfOfLinkId = new MultiHashMap<>();
 				for (TrikkleFunction trikkleFunction : trikkleFunctions) {
-					if (!trikkleFunction.linkId().equals(trikkleFunctions[0].linkId())) {
-						throw new IllegalArgumentException(
-								"All TrikkleFunctions in a group must have the same linkId!");
-					}
+					tfOfLinkId.putOne(trikkleFunction.linkId(), trikkleFunction);
 				}
 
-				Function function = new Function(method, object, trikkleFunctions);
-				functionsOfLinkId.putOne(trikkleFunctions[0].linkId(), function);
+				for (Map.Entry<String, Set<TrikkleFunction>> entry : tfOfLinkId.entrySet()) {
+					Function function = new Function(method, object, entry.getValue().toArray(new TrikkleFunction[0]));
+					functionsOfLinkId.putOne(entry.getKey(), function);
+				}
 			}
 		}
 	}
@@ -75,19 +74,22 @@ public class LinkProcessor {
 			Set<Function> functions = functionsOfLinkId.get(linkId);
 
 			Set<Node> dependencies = new HashSet<>();
-			Map<Function, MultiMap<String, String>> inputsOfOutput = new HashMap<>();
+			Map<Function, Map<String, List<String>>> inputsOfOutput = new HashMap<>();
 			Set<String> outputDatumNames = new HashSet<>();
 
 			for (Function function : functions) {
 				Set<Node> localDependencies = new HashSet<>();
-				MultiMap<String, String> mm = new MultiHashMap<>();
+				Map<String, List<String>> mm = new HashMap<>();
 
 				for (TrikkleFunction tf : function.annotations) {
 					Node dependency = new DiscreteNode(tf.inputDatumNames());
 					localDependencies.add(dependency);
 
-					for (String s : tf.inputDatumNames()) {
-						mm.putOne(tf.outputDatumName(), s);
+					if (!mm.containsKey(tf.outputDatumName())) {
+						mm.put(tf.outputDatumName(), new ArrayList<>());
+					}
+					for (String inputDatumName : tf.inputDatumNames()) {
+						mm.get(tf.outputDatumName()).add(inputDatumName);
 					}
 
 					outputDatumNames.add(tf.outputDatumName());
@@ -103,9 +105,9 @@ public class LinkProcessor {
 				public void run() {
 					try {
 						for (LinkProcessor.Function function : functions) {
-							MultiMap<String, String> mm = inputsOfOutput.get(function);
-							for (Map.Entry<String, Set<String>> stringSetEntry : mm.entrySet()) {
-								Set<String> inputNames = stringSetEntry.getValue();
+							Map<String, List<String>> mm = inputsOfOutput.get(function);
+							for (Map.Entry<String, List<String>> stringSetEntry : mm.entrySet()) {
+								List<String> inputNames = stringSetEntry.getValue();
 
 								Object[] datums = new Object[inputNames.size()];
 								int i = 0;
