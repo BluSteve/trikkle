@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface TrikkleFunction {
-	String[] inputDatumNames() default {}; // WARNING: this default requires some compiler options to be enabled
+	String[] inputDatumNames();
 
 	String arcName() default "";
 
