@@ -13,7 +13,8 @@ public @interface TrikkleFunction {
 	String arcName() default "";
 
 	// if two functions have the same nodeId, they will be used to make one outputNode with all their outputDatumNames
-	String outputNodeId();
+	// 1:1 correspondence with Link
+	String linkId();
 
 	String outputDatumName();
 }

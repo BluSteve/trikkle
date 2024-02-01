@@ -76,21 +76,21 @@ class GraphTest {
 
 			}
 		};
-		arc1.name = "arc1";
+		arc1.setName("arc1");
 		Arc arc2 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc2.name = "arc2";
+		arc2.setName("arc2");
 		Arc arc3 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc3.name = "arc3";
+		arc3.setName("arc3");
 
 
 		// make a link connecting nodeB to nodeF with arc1
@@ -115,14 +115,14 @@ class GraphTest {
 
 			}
 		};
-		arc4.name = "arc4";
+		arc4.setName("arc4");
 		Arc arc5 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc5.name = "arc5";
+		arc5.setName("arc5");
 		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
 		Node nodeI = new DiscreteNode("I");
 		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
@@ -201,14 +201,14 @@ class GraphTest {
 
 			}
 		};
-		arc1.name = "arc1";
+		arc1.setName("arc1");
 		Arc arc2 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc2.name = "arc2";
+		arc2.setName("arc2");
 		Link link1 = new Link(Set.of(nodeA), arc1, nodeC1);
 		Link link2 = new Link(Set.of(nodeC2), arc2, nodeD);
 
@@ -227,7 +227,7 @@ class GraphTest {
 
 			}
 		};
-		arc1a.name = "arc1a";
+		arc1a.setName("arc1a");
 		Link link1A = new Link(Set.of(nodeA), arc1a, nodeC1);
 		Graph graph1a = new Graph(link1A, link2);
 

@@ -21,13 +21,13 @@ class GraphGeneratorTest {
 			public void run() {
 			}
 		};
-		arc1.name = "1";
+		arc1.setName("1");
 		Arc arc2 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 			}
 		};
-		arc2.name = "2";
+		arc2.setName("2");
 
 		Graph manualGraph = new Graph(Set.of(
 				new Link(Set.of(node2, node3), arc1, node1),

@@ -21,7 +21,7 @@ public class GraphGenerator {
 				public void run() {
 				}
 			};
-			arc.name = String.valueOf(i + 1);
+			arc.setName(String.valueOf(i + 1));
 			arcs.add(arc);
 		}
 		return arcs;

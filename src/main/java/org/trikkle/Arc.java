@@ -1,10 +1,10 @@
 package org.trikkle;
 
 public abstract class Arc implements Primable {
-	public String name;
 	protected Overseer overseer;
 	protected ArcStatus status = ArcStatus.IDLE;
 	protected Node outputNode;
+	private String name;
 
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
@@ -33,6 +33,15 @@ public abstract class Arc implements Primable {
 	@Override
 	public Overseer getOverseer() {
 		return overseer;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		if (name.isEmpty()) this.name = null;
+		else this.name = name;
 	}
 
 	public static abstract class AutoArc extends Arc {

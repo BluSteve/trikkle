@@ -53,7 +53,7 @@ public class MermaidGraphViz implements IGraphViz {
 	}
 
 	private static String arcToMermaid(Arc arc, String arcId) {
-		return arcId + "{" + (arc.name == null ? arcId : arc.name) + "}";
+		return arcId + "{" + (arc.getName() == null ? arcId : arc.getName()) + "}";
 	}
 
 	private static String makeLink(Set<String> dependencyIds, String arcId, String outputNodeId) {
@@ -130,7 +130,7 @@ public class MermaidGraphViz implements IGraphViz {
 					lines.add(arcToMermaid(link.getArc(), arcId));
 					linkLines.add(makeLink(dependencyIds, arcId, nodeIdOfNode.get(link.getOutputNode())));
 				} else {
-					String arcName = link.getArc().name == null ? arcId : link.getArc().name;
+					String arcName = link.getArc().getName() == null ? arcId : link.getArc().getName();
 					linkLines.add(makeLink(dependencyIds, arcName, nodeIdOfNode.get(link.getOutputNode())));
 				}
 			}

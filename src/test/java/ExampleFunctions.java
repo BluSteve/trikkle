@@ -49,7 +49,7 @@ public class ExampleFunctions {
 				returnDatum("squared", squared);
 			}
 		};
-		arc.name = "squarer";
+		arc.setName("squarer");
 		Node node2 = new DiscreteNode("squared");
 		Link link = new Link(Set.of(inputNode), arc, node2);
 
@@ -64,7 +64,7 @@ public class ExampleFunctions {
 				returnDatum("result1", result);
 			}
 		};
-		arc2.name = "process 1";
+		arc2.setName("process 1");
 		Node node3 = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
@@ -77,7 +77,7 @@ public class ExampleFunctions {
 				returnDatum("result2", Math.pow(result1 * finalMultiplier, finalExponent));
 			}
 		};
-		arc3.name = "aggregator";
+		arc3.setName("aggregator");
 		Node node4 = new DiscreteNode("result2");
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
@@ -88,7 +88,7 @@ public class ExampleFunctions {
 				returnDatum("toSquare", 2.0);
 			}
 		};
-		phantomArc1.name = "phantomArc1";
+		phantomArc1.setName("phantomArc1");
 		Link phantomLink1 = new Link(Set.of(), phantomArc1, inputNode);
 
 		Arc phantomArc2 = new Arc.AutoArc() {
@@ -103,7 +103,7 @@ public class ExampleFunctions {
 				returnDatum("finalExponent", 1.2);
 			}
 		};
-		phantomArc2.name = "phantomArc2";
+		phantomArc2.setName("phantomArc2");
 		Link phantomLink2 = new Link(Set.of(), phantomArc2, inputNode2);
 
 //		inputNode.setUsable(true);
@@ -214,10 +214,10 @@ public class ExampleFunctions {
 			}
 		};
 
-		arc1.name = "arc1";
-		arc2.name = "arc2";
-		arc3.name = "arc3";
-		arc4.name = "arc4";
+		arc1.setName("arc1");
+		arc2.setName("arc2");
+		arc3.setName("arc3");
+		arc4.setName("arc4");
 
 		Link link1 = new Link(Set.of(magicNode, paramNode), arc1, hfNode);
 		Link link4 = new Link(Set.of(paramNode), arc4, dipoleNode);
@@ -249,21 +249,21 @@ public class ExampleFunctions {
 
 			}
 		};
-		arc1.name = "arc1";
+		arc1.setName("arc1");
 		Arc arc2 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc2.name = "arc2";
+		arc2.setName("arc2");
 		Arc arc3 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc3.name = "arc3";
+		arc3.setName("arc3");
 
 
 		// make a link connecting nodeB to nodeF with arc1
@@ -288,14 +288,14 @@ public class ExampleFunctions {
 
 			}
 		};
-		arc4.name = "arc4";
+		arc4.setName("arc4");
 		Arc arc5 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc5.name = "arc5";
+		arc5.setName("arc5");
 		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
 		Node nodeI = new DiscreteNode("I");
 		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
@@ -324,14 +324,14 @@ public class ExampleFunctions {
 
 			}
 		};
-		arc1.name = "arc1";
+		arc1.setName("arc1");
 		Arc arc2 = new Arc.AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
-		arc2.name = "arc2";
+		arc2.setName("arc2");
 		Link link1 = new Link(Set.of(nodeA), arc1, nodeC1);
 		Link link2 = new Link(Set.of(nodeC2), arc2, nodeD);
 
@@ -359,7 +359,7 @@ public class ExampleFunctions {
 
 			}
 		};
-		arc1a.name = "arc1a";
+		arc1a.setName("arc1a");
 		Link link1A = new Link(Set.of(nodeA), arc1a, nodeC1);
 		Graph graph1a = new Graph(link1A, link2);
 		System.out.println(graph.equals(graph1a));

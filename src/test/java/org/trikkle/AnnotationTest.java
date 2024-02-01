@@ -7,17 +7,17 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AnnotationTest {
-	@TrikkleFunction(outputDatumName = "squared", inputDatumNames = {"toSquare"}, outputNodeId = "node1")
+	@TrikkleFunction(outputDatumName = "squared", inputDatumNames = {"toSquare"}, linkId = "node1")
 	public static double square(double toSquare) {
 		return toSquare * toSquare;
 	}
 
-	@TrikkleFunction(outputDatumName = "squared", arcName = "square", inputDatumNames = {"toSquare"}, outputNodeId = "node2")
+	@TrikkleFunction(outputDatumName = "squared", arcName = "square", inputDatumNames = {"toSquare"}, linkId = "node2")
 	public static double asdf(double toSquare) {
 		return toSquare * toSquare;
 	}
 
-	@TrikkleFunction(outputDatumName = "squared", inputDatumNames = {"toSquare"}, outputNodeId = "node3")
+	@TrikkleFunction(outputDatumName = "squared", inputDatumNames = {"toSquare"}, linkId = "node3")
 	public double squareInstance(double toSquare) {
 		return toSquare * toSquare;
 	}
@@ -29,7 +29,7 @@ public class AnnotationTest {
 		linkProcessor.refreshLinks();
 		Link link1 = linkProcessor.getLinks().get("node1");
 		Link link2 = linkProcessor.getLinks().get("node2");
-		assertEquals(link1.getArc().name, link2.getArc().name);
+		assertEquals(link1.getArc().getName(), link2.getArc().getName());
 	}
 
 	@Test
@@ -50,7 +50,7 @@ public class AnnotationTest {
 				returnDatum("squared", squared);
 			}
 		};
-		arc.name = "square";
+		arc.setName("square");
 		Link manualLink = new Link(Set.of(inputNode), arc, outputNode);
 
 		assertTrue(manualLink.congruentTo(linkProcessor.getLinks().get("node2")));
@@ -86,7 +86,7 @@ public class AnnotationTest {
 				returnDatum("squared", squared);
 			}
 		};
-		arc.name = "square";
+		arc.setName("square");
 		Link manualLink = new Link(Set.of(inputNode), arc, outputNode);
 
 		assertTrue(manualLink.congruentTo(linkProcessor.getLinks().get("node3")));

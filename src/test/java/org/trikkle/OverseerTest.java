@@ -68,7 +68,7 @@ class OverseerTest {
 				returnDatum("squared", squared);
 			}
 		};
-		arc.name = "squarer";
+		arc.setName("squarer");
 		Node node2 = new DiscreteNode("squared");
 		Link link = new Link(Set.of(inputNode), arc, node2);
 
@@ -83,7 +83,7 @@ class OverseerTest {
 				returnDatum("result1", result);
 			}
 		};
-		arc2.name = "process 1";
+		arc2.setName("process 1");
 		Node node3 = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
@@ -96,7 +96,7 @@ class OverseerTest {
 				returnDatum("result2", Math.pow(result1 * finalMultiplier, finalExponent));
 			}
 		};
-		arc3.name = "aggregator";
+		arc3.setName("aggregator");
 		Node node4 = new DiscreteNode("result2");
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 

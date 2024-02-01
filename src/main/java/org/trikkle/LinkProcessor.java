@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class LinkProcessor {
-	private final MultiMap<String, Function> functionsOfOutputNodeId = new MultiHashMap<>();
+	private final MultiMap<String, Function> functionsOflinkId = new MultiHashMap<>();
 	private final Map<Function, String> outputDatumNameOfFunction = new HashMap<>();
 	private Map<String, Link> links;
 
@@ -49,24 +49,28 @@ public class LinkProcessor {
 				continue;
 			}
 
-			Function function = new Function(method, object);
 			if (method.isAnnotationPresent(TrikkleFunction.class)) {
 				TrikkleFunction trikkleFunction = method.getAnnotation(TrikkleFunction.class);
-				functionsOfOutputNodeId.putOne(trikkleFunction.outputNodeId(), function);
+				Function function = new Function(method, object, trikkleFunction);
+				functionsOflinkId.putOne(trikkleFunction.linkId(), function);
 				outputDatumNameOfFunction.put(function, trikkleFunction.outputDatumName());
 			} else if (method.isAnnotationPresent(TrikkleFunctionGroup.class)) {
 				TrikkleFunction[] trikkleFunctions = method.getAnnotation(TrikkleFunctionGroup.class).value();
 				for (TrikkleFunction trikkleFunction : trikkleFunctions) {
-					functionsOfOutputNodeId.putOne(trikkleFunction.outputNodeId(), function);
+					Function function = new Function(method, object, trikkleFunction);
+					functionsOflinkId.putOne(trikkleFunction.linkId(), function);
 					outputDatumNameOfFunction.put(function, trikkleFunction.outputDatumName());
 				}
 			}
 		}
 	}
 
-	public void refreshLinks() {
+	public void refreshLinks(String... linkIds) {
 		links = new HashMap<>();
-		for (Map.Entry<String, Set<Function>> functionEntry : functionsOfOutputNodeId.entrySet()) {
+		for (Map.Entry<String, Set<Function>> functionEntry : functionsOflinkId.entrySet()) {
+			if (linkIds.length > 0 && Stream.of(linkIds).noneMatch(linkId -> linkId.equals(functionEntry.getKey()))) {
+				continue;
+			}
 			Set<Node> inputNodes = new HashSet<>();
 			Map<Function, String[]> inputDatumNamesOfFunction = new HashMap<>();
 			Set<String> outputDatumNames = new HashSet<>();
@@ -74,22 +78,20 @@ public class LinkProcessor {
 			String arcName = null;
 			for (Function function : functionEntry.getValue()) {
 				Method method = function.method;
-				TrikkleFunction annotation = method.getAnnotation(TrikkleFunction.class);
+				TrikkleFunction annotation = function.annotation;
 
-				String larcName = !annotation.arcName().isEmpty() ? annotation.arcName() : method.getName();
+				// if more than one function for this link, then arcName will go to "" instead of method name
+				String larcName = !annotation.arcName().isEmpty() || functionEntry.getValue().size() > 1 ?
+						annotation.arcName() : method.getName();
 				if (arcName == null) {
 					arcName = larcName;
 				} else if (!arcName.equals(larcName)) {
 					throw new IllegalArgumentException(
-							"All functions with the same outputNodeId must have the same arcName");
+							"All functions with the same linkId must have the same arcName");
 				}
 
 				String[] datumNames;
 				if (annotation.inputDatumNames().length > 0) {
-					if (annotation.inputDatumNames().length != method.getParameters().length) {
-						throw new IllegalArgumentException(
-								"inputDatumNames must have the same length as the method's parameters");
-					}
 					datumNames = annotation.inputDatumNames();
 				} else {
 					datumNames = Stream.of(method.getParameters()).map(Parameter::getName).toArray(String[]::new);
@@ -119,7 +121,7 @@ public class LinkProcessor {
 					}
 				}
 			};
-			arc.name = arcName;
+			arc.setName(arcName);
 
 			Node outputNode = new DiscreteNode(outputDatumNames);
 			Link link = new Link(inputNodes, arc, outputNode);
@@ -138,10 +140,12 @@ public class LinkProcessor {
 	private static class Function {
 		private final Method method;
 		private final Object object;
+		private final TrikkleFunction annotation;
 
-		public Function(Method method, Object object) {
+		public Function(Method method, Object object, TrikkleFunction annotation) {
 			this.method = method;
 			this.object = object;
+			this.annotation = annotation;
 		}
 	}
 }
