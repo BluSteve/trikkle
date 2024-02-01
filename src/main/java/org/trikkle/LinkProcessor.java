@@ -47,7 +47,14 @@ public class LinkProcessor {
 				functionsOfLinkId.putOne(trikkleFunction.linkId(), function);
 			} else if (method.isAnnotationPresent(TrikkleFunctionGroup.class)) {
 				TrikkleFunction[] trikkleFunctions = method.getAnnotation(TrikkleFunctionGroup.class).value();
-				// todo check that all trikkle functions have the same linkId
+				// check that all trikkleFunctions have the same linkId
+				for (TrikkleFunction trikkleFunction : trikkleFunctions) {
+					if (!trikkleFunction.linkId().equals(trikkleFunctions[0].linkId())) {
+						throw new IllegalArgumentException(
+								"All TrikkleFunctions in a group must have the same linkId!");
+					}
+				}
+
 				Function function = new Function(method, object, trikkleFunctions);
 				functionsOfLinkId.putOne(trikkleFunctions[0].linkId(), function);
 			}

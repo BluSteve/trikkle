@@ -36,10 +36,8 @@ public class TrikkleFunctionGroupTest {
 		assertEquals(2.0, resultCache.get("difference"));
 	}
 
-	@TrikkleFunctionGroup({
-			@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"a"}, linkId = "pow"),
-			@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"b"}, linkId = "pow")
-	})
+	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"a"}, linkId = "pow")
+	@TrikkleFunction(outputDatumName = "power", inputDatumNames = {"b"}, linkId = "pow")
 	public static double pow(double a, double b) {
 		return Math.pow(a, b);
 	}
