@@ -5,16 +5,10 @@ import org.trikkle.structs.MultiMap;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.*;
 
 public class LinkProcessor {
-	private final MultiMap<String, Function> functionsOflinkId = new MultiHashMap<>();
-	private final Map<Function, String> outputDatumNameOfFunction = new HashMap<>();
+	private final MultiMap<String, Function> functionsOfLinkId = new MultiHashMap<>();
 	private Map<String, Link> links;
 
 	/**
@@ -23,7 +17,6 @@ public class LinkProcessor {
 	 * their method names to their corresponding {@link Link}s.
 	 *
 	 * @param clazz Class to detect methods from.
-	 * @return A map of method names to {@link Link}s.
 	 */
 	public void addFunctionsOf(Class<?> clazz) {
 		addFunctions(clazz.getMethods(), null);
@@ -35,7 +28,6 @@ public class LinkProcessor {
 	 * of their method names to their corresponding {@link Link}s.
 	 *
 	 * @param object Instance methods will be called using this object.
-	 * @return A map of method names to {@link Link}s.
 	 */
 	public void addFunctionsOf(Object object) {
 		addFunctions(object.getClass().getMethods(), object);
@@ -51,81 +43,83 @@ public class LinkProcessor {
 
 			if (method.isAnnotationPresent(TrikkleFunction.class)) {
 				TrikkleFunction trikkleFunction = method.getAnnotation(TrikkleFunction.class);
-				Function function = new Function(method, object, trikkleFunction);
-				functionsOflinkId.putOne(trikkleFunction.linkId(), function);
-				outputDatumNameOfFunction.put(function, trikkleFunction.outputDatumName());
+				Function function = new Function(method, object, new TrikkleFunction[]{trikkleFunction});
+				functionsOfLinkId.putOne(trikkleFunction.linkId(), function);
 			} else if (method.isAnnotationPresent(TrikkleFunctionGroup.class)) {
 				TrikkleFunction[] trikkleFunctions = method.getAnnotation(TrikkleFunctionGroup.class).value();
-				for (TrikkleFunction trikkleFunction : trikkleFunctions) {
-					Function function = new Function(method, object, trikkleFunction);
-					functionsOflinkId.putOne(trikkleFunction.linkId(), function);
-					outputDatumNameOfFunction.put(function, trikkleFunction.outputDatumName());
-				}
+				// todo check that all trikkle functions have the same linkId
+				Function function = new Function(method, object, trikkleFunctions);
+				functionsOfLinkId.putOne(trikkleFunctions[0].linkId(), function);
 			}
 		}
 	}
 
 	public void refreshLinks(String... linkIds) {
 		links = new HashMap<>();
-		for (Map.Entry<String, Set<Function>> functionEntry : functionsOflinkId.entrySet()) {
-			if (linkIds.length > 0 && Stream.of(linkIds).noneMatch(linkId -> linkId.equals(functionEntry.getKey()))) {
-				continue;
-			}
-			Set<Node> inputNodes = new HashSet<>();
-			Map<Function, String[]> inputDatumNamesOfFunction = new HashMap<>();
+		// for each link, for each function in link, for each annotation on function.
+
+		// this has to be for each function, then for each annotation on the function
+		// then the inputDatumNames on the annotations on one function must add up to the total number of parameters
+		// of the function.
+
+		Set<String> linkIds2 = linkIds.length == 0 ? functionsOfLinkId.keySet() :
+				new HashSet<>(Arrays.asList(linkIds));
+		for (String linkId : linkIds2) {
+			Set<Function> functions = functionsOfLinkId.get(linkId);
+
+			Set<Node> dependencies = new HashSet<>();
+			Map<Function, MultiMap<String, String>> inputsOfOutput = new HashMap<>();
 			Set<String> outputDatumNames = new HashSet<>();
 
-			String arcName = null;
-			for (Function function : functionEntry.getValue()) {
-				Method method = function.method;
-				TrikkleFunction annotation = function.annotation;
+			for (Function function : functions) {
+				Set<Node> localDependencies = new HashSet<>();
+				MultiMap<String, String> mm = new MultiHashMap<>();
 
-				// if more than one function for this link, then arcName will go to "" instead of method name
-				String larcName = !annotation.arcName().isEmpty() || functionEntry.getValue().size() > 1 ?
-						annotation.arcName() : method.getName();
-				if (arcName == null) {
-					arcName = larcName;
-				} else if (!arcName.equals(larcName)) {
-					throw new IllegalArgumentException(
-							"All functions with the same linkId must have the same arcName");
+				for (TrikkleFunction tf : function.annotations) {
+					Node dependency = new DiscreteNode(tf.inputDatumNames());
+					localDependencies.add(dependency);
+
+					for (String s : tf.inputDatumNames()) {
+						mm.putOne(tf.outputDatumName(), s);
+					}
+
+					outputDatumNames.add(tf.outputDatumName());
 				}
-
-				String[] datumNames;
-				if (annotation.inputDatumNames().length > 0) {
-					datumNames = annotation.inputDatumNames();
-				} else {
-					datumNames = Stream.of(method.getParameters()).map(Parameter::getName).toArray(String[]::new);
-				}
-
-				inputDatumNamesOfFunction.put(function, datumNames);
-				inputNodes.add(new DiscreteNode(datumNames));
-				outputDatumNames.add(outputDatumNameOfFunction.get(function));
+				inputsOfOutput.put(function, mm);
+				dependencies.addAll(localDependencies);
 			}
+
+			Node outputNode = new DiscreteNode(outputDatumNames);
 
 			Arc arc = new Arc.AutoArc() {
 				@Override
 				public void run() {
 					try {
-						for (Map.Entry<Function, String[]> entry : inputDatumNamesOfFunction.entrySet()) {
-							Function function = entry.getKey();
-							String[] datumNames = entry.getValue();
-							Object[] datums = new Object[datumNames.length];
-							for (int i = 0; i < datumNames.length; i++) {
-								datums[i] = getDatum(datumNames[i]);
+						for (LinkProcessor.Function function : functions) {
+							MultiMap<String, String> mm = inputsOfOutput.get(function);
+							for (Map.Entry<String, Set<String>> stringSetEntry : mm.entrySet()) {
+								Set<String> inputNames = stringSetEntry.getValue();
+
+								Object[] datums = new Object[inputNames.size()];
+								int i = 0;
+								for (String inputName : inputNames) {
+									datums[i] = getDatum(inputName);
+									i++;
+								}
+
+								Object outputDatum = function.method.invoke(function.object, datums);
+								String outputName = stringSetEntry.getKey();
+								returnDatum(outputName, outputDatum);
 							}
-							Object outputDatum = function.method.invoke(function.object, datums);
-							returnDatum(outputDatumNameOfFunction.get(function), outputDatum);
 						}
 					} catch (ReflectiveOperationException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			};
-			arc.setName(arcName);
 
-			Node outputNode = new DiscreteNode(outputDatumNames);
-			Link link = new Link(inputNodes, arc, outputNode);
-			links.put(functionEntry.getKey(), link);
+			Link link = new Link(dependencies, arc, outputNode);
+			links.put(linkId, link);
 		}
 	}
 
@@ -140,12 +134,12 @@ public class LinkProcessor {
 	private static class Function {
 		private final Method method;
 		private final Object object;
-		private final TrikkleFunction annotation;
+		private final TrikkleFunction[] annotations;
 
-		public Function(Method method, Object object, TrikkleFunction annotation) {
+		public Function(Method method, Object object, TrikkleFunction[] annotations) {
 			this.method = method;
 			this.object = object;
-			this.annotation = annotation;
+			this.annotations = annotations;
 		}
 	}
 }
