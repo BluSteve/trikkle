@@ -1,16 +1,13 @@
 import org.junit.jupiter.api.Test;
-import org.trikkle.DiscreteNode;
-import org.trikkle.Graph;
-import org.trikkle.LinkProcessor;
-import org.trikkle.TrikkleFunction;
+import org.trikkle.*;
+import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.List;
 import java.util.Set;
 
-public class IntegratedTests {
-	public record Omelette(int chivesCount, int eggsCount) {
-	}
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+public class IntegratedTests {
 	@TrikkleFunction(output = "omelette", inputs = {"chivesCount"}, linkId = "makeOmelette")
 	@TrikkleFunction(output = "omelette", inputs = {"eggsCount"}, linkId = "makeOmelette")
 	public static Omelette makeOmelette(int chivesCount, int eggsCount) {
@@ -38,14 +35,24 @@ public class IntegratedTests {
 		linkProcessor.addFunctionsOf(IntegratedTests.class);
 		linkProcessor.refreshLinks("makeOmelette", "serveOmelette");
 		Graph graphA = linkProcessor.getGraph();
-		System.out.println(graphA);
 
-		linkProcessor.refreshLinks("expressOmelette1", "expressOmelette2", "serveExpressOmelette", "serveExpressOmelette2");
+		linkProcessor.refreshLinks("expressOmelette1", "expressOmelette2", "serveExpressOmelette",
+				"serveExpressOmelette2");
 		Graph graphB = linkProcessor.getGraph();
-		System.out.println(graphB);
+		System.out.println(MermaidGraphViz.defaultVisualize(graphA, graphB));
 
 
-		Graph graphC = Graph.mergeGraphs(List.of(graphA, graphB), Set.of(new DiscreteNode("customerHappy")));
+		Graph graphC = Graph.mergeGraphs(List.of(graphA, graphB),
+				Set.of(DiscreteNode.of("customerHappy"), DiscreteNode.of("customer2Happy")));
 		System.out.println(graphC);
+
+		Overseer overseer = new Overseer(graphA);
+		overseer.addStartingDatum("chivesCount", 2);
+		overseer.addStartingDatum("eggsCount", 3);
+		overseer.start();
+		assertTrue((boolean) overseer.getResultCache().get("customerHappy"));
+	}
+
+	public record Omelette(int chivesCount, int eggsCount) {
 	}
 }

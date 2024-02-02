@@ -22,6 +22,11 @@ public final class Overseer {
 	public Overseer(Graph graph) {
 		this.g = graph;
 
+		// undoes previous Overseer's changes
+		for (Node node : g.nodes) {
+			node.reset();
+		}
+
 		// Prime Nodes and Arcs with this Overseer
 		for (Primable primable : g.nodes) {
 			primable.primeWith(this);

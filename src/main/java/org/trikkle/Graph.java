@@ -22,35 +22,25 @@ public final class Graph {
 		if (links == null || links.isEmpty()) {
 			throw new IllegalArgumentException("Graph must have at least one Link!");
 		}
+		this.links = links;
 
-		this.links = new HashSet<>();
 		Set<Node> dependencies = new HashSet<>();
 		for (Link link : links) {
 			Set<Node> existingOutputNodes = outputNodeMap.keySet();
-			for (Node existingOutputNode : existingOutputNodes) {
-				if (existingOutputNode.datumNames.equals(link.getOutputNode().datumNames)) {
-					throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
-				}
+			if (existingOutputNodes.contains(link.getOutputNode())) {
+				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
 			}
 			if (arcMap.containsKey(link.getArc())) {
 				throw new IllegalArgumentException("The same Arc cannot be used for two Links!");
 			}
 
-			// ensures you do not have two Nodes with the same datum names
-			Set<Node> safeDependencies = new HashSet<>();
-			for (Node dependency : link.getDependencies()) {
-				Node safeDependency = addNode(dependency);
-				safeDependencies.add(safeDependency);
-			}
-			Node safeOutputNode = addNode(link.getOutputNode());
+			nodes.addAll(link.getDependencies());
+			nodes.add(link.getOutputNode());
+			arcMap.put(link.getArc(), link);
+			outputNodeMap.put(link.getOutputNode(), link);
+			dependenciesOfNode.put(link.getOutputNode(), link.getDependencies());
 
-			Link safeLink = new Link(safeDependencies, link.getArc(), safeOutputNode);
-			arcMap.put(safeLink.getArc(), safeLink);
-			outputNodeMap.put(safeOutputNode, safeLink);
-			dependenciesOfNode.put(safeOutputNode, safeDependencies);
-			this.links.add(safeLink);
-
-			dependencies.addAll(safeDependencies);
+			dependencies.addAll(link.getDependencies());
 		}
 		arcs = arcMap.keySet();
 
@@ -88,16 +78,6 @@ public final class Graph {
 		this(new HashSet<>(Arrays.asList(links)));
 	}
 
-	private Node addNode(Node node) {
-		for (Node node1 : nodes) {
-			if (node1.datumNames.equals(node.datumNames)) {
-				return node1;
-			}
-		}
-		nodes.add(node);
-		return node;
-	}
-
 	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {
 		MultiMap<Node, Way> waysToGetNode = new MultiHashMap<>();
 		for (Node endingNode : endingNodes) {
@@ -128,6 +108,9 @@ public final class Graph {
 			// if not already resolved through hard dependency
 			if (!graphUsedOfNode.containsKey(endingNode)) {
 				Set<Way> ways = waysToGetNode.get(endingNode);
+				if (ways == null) {
+					throw new IllegalArgumentException("No way to get to ending Node " + endingNode + "!");
+				}
 
 				// if subsumed under a hard dependency
 				boolean allHard = false;
@@ -151,12 +134,14 @@ public final class Graph {
 		}
 
 		Set<Link> finalLinks = new HashSet<>();
-		for (int i : graphUsedOfNode.values()) {
-			Graph graph = graphs.get(i);
+		for (Map.Entry<Node, Integer> nodeIntegerEntry : graphUsedOfNode.entrySet()) {
+			Node node = nodeIntegerEntry.getKey();
+			int i = nodeIntegerEntry.getValue();
+			Graph graph = graphs.get(i).findPrunedGraphFor(Collections.singleton(node));
 			finalLinks.addAll(graph.links);
 		}
 
-		return new Graph(finalLinks).findPrunedGraphFor(endingNodes);
+		return new Graph(finalLinks);
 	}
 
 	public static Graph concatGraphs(Set<Graph> graphs) {

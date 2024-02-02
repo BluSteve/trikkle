@@ -40,8 +40,8 @@ public class AnnotationTest {
 
 		assertFalse(linkProcessor.getLinks().containsKey("squareInstance"));
 
-		Node inputNode = new DiscreteNode("toSquare");
-		Node outputNode = new DiscreteNode("squared");
+		Node inputNode = DiscreteNode.of("toSquare");
+		Node outputNode = DiscreteNode.of("squared");
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -76,8 +76,8 @@ public class AnnotationTest {
 
 		assertFalse(linkProcessor.getLinks().containsKey("square"));
 
-		Node inputNode = new DiscreteNode("toSquare");
-		Node outputNode = new DiscreteNode("squared");
+		Node inputNode = DiscreteNode.of("toSquare");
+		Node outputNode = DiscreteNode.of("squared");
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {

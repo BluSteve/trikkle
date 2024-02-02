@@ -28,11 +28,7 @@ public final class Link {
 	}
 
 	public boolean congruentTo(Link link) {
-		Set<Set<String>> datumNamess =
-				dependencies.stream().map((node) -> node.datumNames).collect(Collectors.toSet());
-		Set<Set<String>> linkDatumNamess =
-				link.dependencies.stream().map((node) -> node.datumNames).collect(Collectors.toSet());
-		return datumNamess.equals(linkDatumNamess) && outputNode.congruentTo(link.outputNode);
+		return dependencies.equals(link.dependencies) && outputNode.equals(link.outputNode);
 	}
 
 	@Override

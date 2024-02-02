@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("ALL")
 class GraphTest {
-	static Node paramNode = new DiscreteNode("param");
-	static Node magicNode = new DiscreteNode("magic");
-	static Node hfNode = new DiscreteNode("hf");
-	static Node matrixNode = new DiscreteNode("matrix");
-	static Node dipoleNode = new DiscreteNode("dipole");
+	static Node paramNode = DiscreteNode.of("param");
+	static Node magicNode = DiscreteNode.of("magic");
+	static Node hfNode = DiscreteNode.of("hf");
+	static Node matrixNode = DiscreteNode.of("matrix");
+	static Node dipoleNode = DiscreteNode.of("dipole");
 	static List<Arc> arcs = GraphGenerator.generateArcs(4);
 	static Link link1 = new Link(Set.of(magicNode, paramNode), arcs.get(0), hfNode);
 	static Graph graph1 = new Graph(link1);
@@ -62,12 +62,12 @@ class GraphTest {
 	@Test
 	void concatGraphs() {
 		// make nodes with datumNames A to F
-		Node nodeA = new DiscreteNode("A");
-		Node nodeB = new DiscreteNode("B");
-		Node nodeC = new DiscreteNode("C");
-		Node nodeD = new DiscreteNode("D");
-		Node nodeE = new DiscreteNode("E");
-		Node nodeF = new DiscreteNode("F");
+		Node nodeA = DiscreteNode.of("A");
+		Node nodeB = DiscreteNode.of("B");
+		Node nodeC = DiscreteNode.of("C");
+		Node nodeD = DiscreteNode.of("D");
+		Node nodeE = DiscreteNode.of("E");
+		Node nodeF = DiscreteNode.of("F");
 
 		// make three empty arcs and set arc.name to their variable names
 		Arc arc1 = new Arc.AutoArc() {
@@ -107,8 +107,8 @@ class GraphTest {
 		// make a graph with link3
 		Graph graph2 = new Graph(link3);
 
-		Node nodeG = new DiscreteNode("G");
-		Node nodeH = new DiscreteNode("H");
+		Node nodeG = DiscreteNode.of("G");
+		Node nodeH = DiscreteNode.of("H");
 		Arc arc4 = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -124,7 +124,7 @@ class GraphTest {
 		};
 		arc5.setName("arc5");
 		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
-		Node nodeI = new DiscreteNode("I");
+		Node nodeI = DiscreteNode.of("I");
 		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
 
 		Graph graph4 = new Graph(link4, link5);
@@ -189,10 +189,10 @@ class GraphTest {
 	@Test
 	void softEquals() {
 		// generate 4 nodes, with two having the same datumNames
-		Node nodeA = new DiscreteNode("A");
-		Node nodeC1 = new DiscreteNode("C", "a");
-		Node nodeC2 = new DiscreteNode("a", "C");
-		Node nodeD = new DiscreteNode("D");
+		Node nodeA = DiscreteNode.of("A");
+		Node nodeC1 = DiscreteNode.of("C", "a");
+		Node nodeC2 = DiscreteNode.of("a", "C");
+		Node nodeD = DiscreteNode.of("D");
 
 		// generate A to C1 and C2 to D arcs and links
 		Arc arc1 = new Arc.AutoArc() {
@@ -238,7 +238,7 @@ class GraphTest {
 	@Test
 	void twoNodesSameName() {
 		// make a new node with the same name as paramNode
-		Node paramNode2 = new DiscreteNode("param", "smth else");
+		Node paramNode2 = DiscreteNode.of("param", "smth else");
 		// add two different nodes but with the same datum name into a graph. should throw an error
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(Set.of(

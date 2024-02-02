@@ -12,9 +12,9 @@ class GraphGeneratorTest {
 	void generateGraph() {
 		Graph graph = GraphGenerator.generateGraph(3, 2);
 
-		Node node1 = new DiscreteNode("A");
-		Node node2 = new DiscreteNode("B");
-		Node node3 = new DiscreteNode("C");
+		Node node1 = DiscreteNode.of("A");
+		Node node2 = DiscreteNode.of("B");
+		Node node3 = DiscreteNode.of("C");
 
 		Arc arc1 = new Arc.AutoArc() {
 			@Override

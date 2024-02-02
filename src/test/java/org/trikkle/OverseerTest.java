@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class OverseerTest {
 	@Test
 	void nodeTest() {
-		Node node = new DiscreteNode("toSquare");
+		Node node = DiscreteNode.of("toSquare");
 		node.setProgress(1);
 
 		Exception e = assertThrows(IllegalArgumentException.class, () -> node.addDatum("toSquare2", 3.0));
@@ -28,7 +28,7 @@ class OverseerTest {
 
 	@Test
 	void simpleTest() {
-		Node inputNode = new DiscreteNode("toSquare");
+		Node inputNode = DiscreteNode.of("toSquare");
 
 		Arc arc = new Arc.AutoArc() {
 			@Override
@@ -38,7 +38,7 @@ class OverseerTest {
 				returnDatum("squared", squared);
 			}
 		};
-		Node outputNode = new DiscreteNode("squared");
+		Node outputNode = DiscreteNode.of("squared");
 		Link link = new Link(Set.of(inputNode), arc, outputNode);
 
 
@@ -58,8 +58,8 @@ class OverseerTest {
 
 	@Test
 	void complexTest() {
-		Node inputNode2 = new DiscreteNode("finalMultiplier", "finalExponent");
-		Node inputNode = new DiscreteNode("toSquare");
+		Node inputNode2 = DiscreteNode.of("finalMultiplier", "finalExponent");
+		Node inputNode = DiscreteNode.of("toSquare");
 		Arc arc = new Arc.AutoArc() {
 			@Override
 			public void run() {
@@ -69,7 +69,7 @@ class OverseerTest {
 			}
 		};
 		arc.setName("squarer");
-		Node node2 = new DiscreteNode("squared");
+		Node node2 = DiscreteNode.of("squared");
 		Link link = new Link(Set.of(inputNode), arc, node2);
 
 
@@ -84,7 +84,7 @@ class OverseerTest {
 			}
 		};
 		arc2.setName("process 1");
-		Node node3 = new DiscreteNode("result1");
+		Node node3 = DiscreteNode.of("result1");
 		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
 		Arc arc3 = new Arc.AutoArc() {
@@ -97,7 +97,7 @@ class OverseerTest {
 			}
 		};
 		arc3.setName("aggregator");
-		Node node4 = new DiscreteNode("result2");
+		Node node4 = DiscreteNode.of("result2");
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
 		Graph graph = new Graph(link, link2, link3);
@@ -142,7 +142,7 @@ class OverseerTest {
 				outputNode.setProgress(1);
 			}
 		};
-		Node streamNode = new StreamNode("stream1");
+		Node streamNode = StreamNode.of("stream1");
 		Link link = new Link(Set.of(), inputArc, streamNode);
 
 		Arc consumerArc = new Arc() {
@@ -176,7 +176,7 @@ class OverseerTest {
 				} else this.status = ArcStatus.IDLE;
 			}
 		};
-		Node outputNode = new DiscreteNode("result1");
+		Node outputNode = DiscreteNode.of("result1");
 		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
 
 		Graph graph = new Graph(link, link2);

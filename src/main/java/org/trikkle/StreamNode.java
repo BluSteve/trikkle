@@ -3,11 +3,23 @@ package org.trikkle;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StreamNode extends Node {
-	public StreamNode(String datumName) {
+	private StreamNode(String datumName) {
 		super(Collections.singleton(datumName));
+	}
+
+	public static StreamNode of(String datumName) {
+		Set<String> singleton = Collections.singleton(datumName);
+		if (Node.nodeCache.containsKey(singleton)) {
+			return (StreamNode) Node.nodeCache.get(singleton);
+		} else {
+			StreamNode node = new StreamNode(datumName);
+			Node.nodeCache.put(node.datumNames, node);
+			return node;
+		}
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
