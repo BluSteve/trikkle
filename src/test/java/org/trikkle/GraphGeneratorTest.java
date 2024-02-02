@@ -16,13 +16,13 @@ class GraphGeneratorTest {
 		Node node2 = DiscreteNode.of("B");
 		Node node3 = DiscreteNode.of("C");
 
-		Arc arc1 = new Arc.AutoArc() {
+		Arc arc1 = new AutoArc() {
 			@Override
 			public void run() {
 			}
 		};
 		arc1.setName("1");
-		Arc arc2 = new Arc.AutoArc() {
+		Arc arc2 = new AutoArc() {
 			@Override
 			public void run() {
 			}

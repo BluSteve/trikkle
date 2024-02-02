@@ -32,7 +32,7 @@ public class AnnotationTest {
 
 		Node inputNode = DiscreteNode.of("toSquare");
 		Node outputNode = DiscreteNode.of("squared");
-		Arc arc = new Arc.AutoArc() {
+		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");
@@ -68,7 +68,7 @@ public class AnnotationTest {
 
 		Node inputNode = DiscreteNode.of("toSquare");
 		Node outputNode = DiscreteNode.of("squared");
-		Arc arc = new Arc.AutoArc() {
+		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");

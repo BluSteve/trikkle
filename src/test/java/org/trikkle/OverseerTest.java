@@ -30,7 +30,7 @@ class OverseerTest {
 	void simpleTest() {
 		Node inputNode = DiscreteNode.of("toSquare");
 
-		Arc arc = new Arc.AutoArc() {
+		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");
@@ -60,7 +60,7 @@ class OverseerTest {
 	void complexTest() {
 		Node inputNode2 = DiscreteNode.of("finalMultiplier", "finalExponent");
 		Node inputNode = DiscreteNode.of("toSquare");
-		Arc arc = new Arc.AutoArc() {
+		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
 				double toSquare = (double) getDatum("toSquare");
@@ -73,7 +73,7 @@ class OverseerTest {
 		Link link = new Link(Set.of(inputNode), arc, node2);
 
 
-		Arc arc2 = new Arc.AutoArc() {
+		Arc arc2 = new AutoArc() {
 			@Override
 			public void run() {
 				double squared = (double) getDatum("squared");
@@ -87,7 +87,7 @@ class OverseerTest {
 		Node node3 = DiscreteNode.of("result1");
 		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
-		Arc arc3 = new Arc.AutoArc() {
+		Arc arc3 = new AutoArc() {
 			@Override
 			public void run() {
 				double result1 = (double) getDatum("result1");
@@ -131,7 +131,7 @@ class OverseerTest {
 
 	@Test
 	void streamTest() {
-		Arc inputArc = new Arc.AutoArc() {
+		Arc inputArc = new AutoArc() {
 			@Override
 			public void run() {
 				for (int i = 1; i < 10; i++) {
@@ -156,7 +156,6 @@ class OverseerTest {
 				double sum = 0;
 				synchronized (queue) {
 					if (queue.size() >= 3) {
-						this.status = ArcStatus.IN_PROGRESS;
 						while (!queue.isEmpty()) {
 							sum += queue.poll();
 						}

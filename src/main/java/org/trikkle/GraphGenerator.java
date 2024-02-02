@@ -16,7 +16,7 @@ public class GraphGenerator {
 	public static List<Arc> generateArcs(int numArcs) {
 		List<Arc> arcs = new ArrayList<>();
 		for (int i = 0; i < numArcs; i++) {
-			Arc arc = new Arc.AutoArc() {
+			Arc arc = new AutoArc() {
 				@Override
 				public void run() {
 				}

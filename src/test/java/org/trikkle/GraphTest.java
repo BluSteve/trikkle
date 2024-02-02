@@ -70,21 +70,21 @@ class GraphTest {
 		Node nodeF = DiscreteNode.of("F");
 
 		// make three empty arcs and set arc.name to their variable names
-		Arc arc1 = new Arc.AutoArc() {
+		Arc arc1 = new AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
 		arc1.setName("arc1");
-		Arc arc2 = new Arc.AutoArc() {
+		Arc arc2 = new AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
 		arc2.setName("arc2");
-		Arc arc3 = new Arc.AutoArc() {
+		Arc arc3 = new AutoArc() {
 			@Override
 			public void run() {
 
@@ -109,14 +109,14 @@ class GraphTest {
 
 		Node nodeG = DiscreteNode.of("G");
 		Node nodeH = DiscreteNode.of("H");
-		Arc arc4 = new Arc.AutoArc() {
+		Arc arc4 = new AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
 		arc4.setName("arc4");
-		Arc arc5 = new Arc.AutoArc() {
+		Arc arc5 = new AutoArc() {
 			@Override
 			public void run() {
 
@@ -195,14 +195,14 @@ class GraphTest {
 		Node nodeD = DiscreteNode.of("D");
 
 		// generate A to C1 and C2 to D arcs and links
-		Arc arc1 = new Arc.AutoArc() {
+		Arc arc1 = new AutoArc() {
 			@Override
 			public void run() {
 
 			}
 		};
 		arc1.setName("arc1");
-		Arc arc2 = new Arc.AutoArc() {
+		Arc arc2 = new AutoArc() {
 			@Override
 			public void run() {
 
@@ -221,7 +221,7 @@ class GraphTest {
 		Graph graph2 = new Graph(link2);
 
 		// make link1a with the same nodes but a new, different arc from link1
-		Arc arc1a = new Arc.AutoArc() {
+		Arc arc1a = new AutoArc() {
 			@Override
 			public void run() {
 

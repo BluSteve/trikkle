@@ -2,7 +2,6 @@ package org.trikkle;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class Link {
 	private final Set<Node> dependencies;
@@ -10,6 +9,11 @@ public final class Link {
 	private final Node outputNode;
 
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
+		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
+		boolean autoArc = arc instanceof AutoArc;
+		if (hasStreamNode && autoArc) {
+			throw new IllegalArgumentException("StreamNode cannot be the input of an AutoArc. Use Arc instead.");
+		}
 		this.dependencies = dependencies;
 		this.arc = arc;
 		this.outputNode = outputNode;

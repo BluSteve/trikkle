@@ -10,6 +10,7 @@ public abstract class Arc implements Primable {
 
 	void runWrapper() {
 		outputNode = overseer.getOutputNodeOfArc(this);
+		status = ArcStatus.IN_PROGRESS;
 		run();
 	}
 
@@ -42,15 +43,5 @@ public abstract class Arc implements Primable {
 	@Override
 	public Overseer getOverseer() {
 		return overseer;
-	}
-
-	public static abstract class AutoArc extends Arc {
-		@Override
-		void runWrapper() {
-			outputNode = overseer.getOutputNodeOfArc(this);
-			status = ArcStatus.IN_PROGRESS;
-			run();
-			status = ArcStatus.FINISHED;
-		}
 	}
 }

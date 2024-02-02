@@ -115,7 +115,7 @@ public class LinkProcessor {
 
 			Node outputNode = DiscreteNode.of(outputDatumNames);
 
-			Arc arc = new Arc.AutoArc() {
+			Arc arc = new AutoArc() {
 				@Override
 				public void run() {
 					try {

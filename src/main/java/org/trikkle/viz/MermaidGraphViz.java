@@ -1,9 +1,6 @@
 package org.trikkle.viz;
 
-import org.trikkle.Arc;
-import org.trikkle.Graph;
-import org.trikkle.Link;
-import org.trikkle.Node;
+import org.trikkle.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +32,11 @@ public class MermaidGraphViz implements IGraphViz {
 				sb.append("[");
 				break;
 			case MIDDLE:
-				sb.append("((");
+				if (node instanceof DiscreteNode) {
+					sb.append("((");
+				} else if (node instanceof StreamNode) {
+					sb.append("(((");
+				}
 				break;
 		}
 		sb.append(nodeText);
@@ -45,13 +46,18 @@ public class MermaidGraphViz implements IGraphViz {
 				sb.append("]");
 				break;
 			case MIDDLE:
-				sb.append("))");
+				if (node instanceof DiscreteNode) {
+					sb.append("))");
+				} else if (node instanceof StreamNode) {
+					sb.append(")))");
+				}
 				break;
 		}
 
 		return sb.toString();
 	}
 
+	// todo settle spaces
 	private static String arcToMermaid(Arc arc, String arcId) {
 		return arcId + "{" + (arc.getName() == null ? arcId : arc.getName()) + "}";
 	}
