@@ -29,6 +29,11 @@ public class IntegratedTests {
 		return omelettes[index];
 	}
 
+	@TrikkleFunction(output = "customerVeryHappy", inputs = {"omelette", "coffee"}, linkId = "serveOmeletteAndCoffee")
+	public static boolean serveOmeletteAndCoffee(Omelette omelette, Coffee coffee) {
+		return omelette != null;
+	}
+
 	@Test
 	void cafe() {
 		LinkProcessor linkProcessor = new LinkProcessor();
@@ -41,10 +46,11 @@ public class IntegratedTests {
 		Graph graphB = linkProcessor.getGraph();
 		System.out.println(MermaidGraphViz.defaultVisualize(graphA, graphB));
 
-
 		Graph graphC = Graph.mergeGraphs(List.of(graphA, graphB),
 				Set.of(DiscreteNode.of("customerHappy"), DiscreteNode.of("customer2Happy")));
 		System.out.println(graphC);
+
+
 
 		Overseer overseer = new Overseer(graphA);
 		overseer.addStartingDatum("chivesCount", 2);
@@ -54,5 +60,8 @@ public class IntegratedTests {
 	}
 
 	public record Omelette(int chivesCount, int eggsCount) {
+	}
+
+	public record Coffee(double volume) {
 	}
 }

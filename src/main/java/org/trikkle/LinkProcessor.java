@@ -47,12 +47,16 @@ public class LinkProcessor {
 				functionsOfLinkId.putOne(trikkleFunction.linkId(), function);
 			} else if (method.isAnnotationPresent(TrikkleFunctionGroup.class)) {
 				TrikkleFunction[] trikkleFunctions = method.getAnnotation(TrikkleFunctionGroup.class).value();
-				MultiMap<String, TrikkleFunction> tfOfLinkId = new MultiHashMap<>();
+				Map<String, List<TrikkleFunction>> tfOfLinkId = new HashMap<>();
 				for (TrikkleFunction trikkleFunction : trikkleFunctions) {
-					tfOfLinkId.putOne(trikkleFunction.linkId(), trikkleFunction);
+					if (!tfOfLinkId.containsKey(trikkleFunction.linkId())) {
+						tfOfLinkId.put(trikkleFunction.linkId(), new ArrayList<>());
+					}
+
+					tfOfLinkId.get(trikkleFunction.linkId()).add(trikkleFunction);
 				}
 
-				for (Map.Entry<String, Set<TrikkleFunction>> entry : tfOfLinkId.entrySet()) {
+				for (Map.Entry<String, List<TrikkleFunction>> entry : tfOfLinkId.entrySet()) {
 					// check that all functions in the group have the same outputDatumName
 					String outputDatumName = null;
 					for (TrikkleFunction tf : entry.getValue()) {
@@ -137,6 +141,7 @@ public class LinkProcessor {
 					}
 				}
 			};
+			arc.setName(linkId);
 
 			Link link = new Link(dependencies, arc, outputNode);
 			links.put(linkId, link);

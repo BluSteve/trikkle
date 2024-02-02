@@ -12,7 +12,7 @@ public class AnnotationTest {
 		return toSquare * toSquare;
 	}
 
-	@TrikkleFunction(output = "squared", arcName = "square", inputs = {"toSquare"}, linkId = "node2")
+	@TrikkleFunction(output = "squared", inputs = {"toSquare"}, linkId = "node2")
 	public static double asdf(double toSquare) {
 		return toSquare * toSquare;
 	}
@@ -20,16 +20,6 @@ public class AnnotationTest {
 	@TrikkleFunction(output = "squared", inputs = {"toSquare"}, linkId = "node3")
 	public double squareInstance(double toSquare) {
 		return toSquare * toSquare;
-	}
-
-	@Test
-	void arcNameTest() {
-		LinkProcessor linkProcessor = new LinkProcessor();
-		linkProcessor.addFunctionsOf(AnnotationTest.class);
-		linkProcessor.refreshLinks();
-		Link link1 = linkProcessor.getLinks().get("node1");
-		Link link2 = linkProcessor.getLinks().get("node2");
-		assertEquals(link1.getArc().getName(), link2.getArc().getName());
 	}
 
 	@Test
