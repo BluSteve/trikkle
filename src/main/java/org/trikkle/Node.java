@@ -12,6 +12,8 @@ public abstract class Node implements Primable { // Generics are too restricting
 		this.datumNames = datumNames;
 	}
 
+	// todo no two nodes can exist with the same datum names!! then remove the congruentTo method and put back the
+	//  overrided equals and hashcode methods
 	public void addDatum(String datumName, Object datum) {
 		if (!datumNames.contains(datumName)) {
 			throw new IllegalArgumentException("Datum \"" + datumName + "\" was not declared by this Node!");
