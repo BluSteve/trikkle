@@ -57,7 +57,6 @@ public class MermaidGraphViz implements IGraphViz {
 		return sb.toString();
 	}
 
-	// todo settle spaces
 	private static String arcToMermaid(Arc arc, String arcId) {
 		return arcId + "{" + (arc.getName() == null ? arcId : arc.getName()) + "}";
 	}
@@ -66,7 +65,7 @@ public class MermaidGraphViz implements IGraphViz {
 		StringBuilder sb = new StringBuilder();
 
 		String dependencyStr =
-				dependencyIds.isEmpty() ? "NULL" + arcId + ":::hidden" : String.join(" & ", dependencyIds);
+				dependencyIds.isEmpty() ? "NULL" + UUID.randomUUID() + ":::hidden" : String.join(" & ", dependencyIds);
 		sb.append(dependencyStr);
 
 		if (dependencyIds.size() > 1) {

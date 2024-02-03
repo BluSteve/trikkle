@@ -43,7 +43,6 @@ public class IntegratedTests {
 		linkProcessor.refreshLinks("expressOmelette1", "expressOmelette2", "serveExpressOmelette",
 				"serveExpressOmelette2");
 		Graph graphB = linkProcessor.getGraph();
-		System.out.println(MermaidGraphViz.defaultVisualize(graphA, graphB));
 
 		Graph graphC = Graph.mergeGraphs(List.of(graphA, graphB),
 				Set.of(DiscreteNode.of("customerHappy"), DiscreteNode.of("customer2Happy")));
@@ -63,7 +62,7 @@ public class IntegratedTests {
 				}
 			}
 		};
-		brewerArc.setName("brewcoffee");
+		brewerArc.setName("brew coffee");
 		Node brewerNode = StreamNode.of("brewer");
 		Link brewerLink = new Link(Set.of(), brewerArc, brewerNode);
 		Arc coffeeArc = new Arc() {
@@ -107,8 +106,8 @@ public class IntegratedTests {
 
 
 		Graph graphD = new Graph(brewerLink, coffeeLink, serveBothLink);
-
-		System.out.println(Graph.concatGraphs(graphA, graphD));
+		graphA = Graph.concatGraphs(graphA, graphD);
+		System.out.println(MermaidGraphViz.defaultVisualize(graphA, graphB));
 
 		Overseer overseer = new Overseer(Graph.concatGraphs(graphA, graphD));
 		overseer.addStartingDatum("chivesCount", 2);

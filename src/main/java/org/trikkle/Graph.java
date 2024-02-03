@@ -78,6 +78,12 @@ public final class Graph {
 		this(new HashSet<>(Arrays.asList(links)));
 	}
 
+	/**
+	 * Merges the Graphs into one optimized Graph, using the endingNodes as the ending Nodes of the merged Graph.
+	 * @param graphs Graphs to merge in descending order of priority
+	 * @param endingNodes the ending Nodes of the merged Graph
+	 * @return the merged Graph
+	 */
 	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {
 		MultiMap<Node, Way> waysToGetNode = new MultiHashMap<>();
 		for (Node endingNode : endingNodes) {
@@ -144,6 +150,11 @@ public final class Graph {
 		return new Graph(finalLinks);
 	}
 
+	/**
+	 * Combines all links from multiple Graphs into one Graph.
+	 * @param graphs the Graphs to concatenate
+	 * @return the combined Graph
+	 */
 	public static Graph concatGraphs(Set<Graph> graphs) {
 		Set<Link> finalLinks = new HashSet<>();
 		for (Graph graph : graphs) {
