@@ -25,7 +25,7 @@ public class AnnotationTest {
 	@Test
 	void test() {
 		LinkProcessor linkProcessor = new LinkProcessor();
-		linkProcessor.addFunctionsOf(AnnotationTest.class);
+		linkProcessor.addMethodsOf(AnnotationTest.class);
 		linkProcessor.refreshLinks();
 
 		assertFalse(linkProcessor.getLinks().containsKey("squareInstance"));
@@ -61,7 +61,7 @@ public class AnnotationTest {
 	@Test
 	void testInstance() {
 		LinkProcessor linkProcessor = new LinkProcessor();
-		linkProcessor.addFunctionsOf(new AnnotationTest());
+		linkProcessor.addMethodsOf(new AnnotationTest());
 		linkProcessor.refreshLinks();
 
 		assertFalse(linkProcessor.getLinks().containsKey("square"));

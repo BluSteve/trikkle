@@ -3,12 +3,11 @@ package org.trikkle;
 import org.trikkle.structs.MultiHashMap;
 import org.trikkle.structs.MultiMap;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class LinkProcessor {
-	private final MultiMap<String, Function> functionsOfLinkId = new MultiHashMap<>();
+	private final MultiMap<String, Method> methodsOfLinkId = new MultiHashMap<>();
 	private Map<String, Link> links;
 
 	/**
@@ -18,8 +17,8 @@ public class LinkProcessor {
 	 *
 	 * @param clazz Class to detect methods from.
 	 */
-	public void addFunctionsOf(Class<?> clazz) {
-		addFunctions(clazz.getMethods(), null);
+	public void addMethodsOf(Class<?> clazz) {
+		addMethods(clazz.getMethods(), null);
 	}
 
 	/**
@@ -29,24 +28,24 @@ public class LinkProcessor {
 	 *
 	 * @param object Instance methods will be called using this object.
 	 */
-	public void addFunctionsOf(Object object) {
-		addFunctions(object.getClass().getMethods(), object);
+	public void addMethodsOf(Object object) {
+		addMethods(object.getClass().getMethods(), object);
 	}
 
-	private void addFunctions(Method[] methods, Object object) {
-		for (Method method : methods) {
-			if (object == null && !Modifier.isStatic(method.getModifiers())) {
+	private void addMethods(java.lang.reflect.Method[] jmethods, Object object) {
+		for (java.lang.reflect.Method jmethod : jmethods) {
+			if (object == null && !Modifier.isStatic(jmethod.getModifiers())) {
 				continue;
-			} else if (object != null && Modifier.isStatic(method.getModifiers())) {
+			} else if (object != null && Modifier.isStatic(jmethod.getModifiers())) {
 				continue;
 			}
 
-			if (method.isAnnotationPresent(TrikkleFunction.class)) {
-				TrikkleFunction trikkleFunction = method.getAnnotation(TrikkleFunction.class);
-				Function function = new Function(method, object, new TrikkleFunction[]{trikkleFunction});
-				functionsOfLinkId.putOne(trikkleFunction.linkId(), function);
-			} else if (method.isAnnotationPresent(TrikkleFunctionGroup.class)) {
-				TrikkleFunction[] trikkleFunctions = method.getAnnotation(TrikkleFunctionGroup.class).value();
+			if (jmethod.isAnnotationPresent(TrikkleFunction.class)) {
+				TrikkleFunction trikkleFunction = jmethod.getAnnotation(TrikkleFunction.class);
+				Method method = new Method(jmethod, object, new TrikkleFunction[]{trikkleFunction});
+				methodsOfLinkId.putOne(trikkleFunction.linkId(), method);
+			} else if (jmethod.isAnnotationPresent(TrikkleFunctionGroup.class)) {
+				TrikkleFunction[] trikkleFunctions = jmethod.getAnnotation(TrikkleFunctionGroup.class).value();
 				Map<String, List<TrikkleFunction>> tfOfLinkId = new HashMap<>();
 				for (TrikkleFunction trikkleFunction : trikkleFunctions) {
 					if (!tfOfLinkId.containsKey(trikkleFunction.linkId())) {
@@ -57,7 +56,7 @@ public class LinkProcessor {
 				}
 
 				for (Map.Entry<String, List<TrikkleFunction>> entry : tfOfLinkId.entrySet()) {
-					// check that all functions in the group have the same outputDatumName
+					// check that all tfs in the group have the same outputDatumName
 					String outputDatumName = null;
 					for (TrikkleFunction tf : entry.getValue()) {
 						if (outputDatumName == null) {
@@ -68,8 +67,8 @@ public class LinkProcessor {
 						}
 					}
 
-					Function function = new Function(method, object, entry.getValue().toArray(new TrikkleFunction[0]));
-					functionsOfLinkId.putOne(entry.getKey(), function);
+					Method method = new Method(jmethod, object, entry.getValue().toArray(new TrikkleFunction[0]));
+					methodsOfLinkId.putOne(entry.getKey(), method);
 				}
 			}
 		}
@@ -77,26 +76,26 @@ public class LinkProcessor {
 
 	public void refreshLinks(String... linkIds) {
 		links = new HashMap<>();
-		// for each link, for each function in link, for each annotation on function.
+		// for each link, for each method in link, for each annotation on method.
 
-		// this has to be for each function, then for each annotation on the function
-		// then the inputDatumNames on the annotations on one function must add up to the total number of parameters
-		// of the function.
+		// this has to be for each method, then for each annotation on the method
+		// then the inputDatumNames on the annotations on one method must add up to the total number of parameters
+		// of the method.
 
-		Set<String> linkIds2 = linkIds.length == 0 ? functionsOfLinkId.keySet() :
+		Set<String> linkIds2 = linkIds.length == 0 ? methodsOfLinkId.keySet() :
 				new HashSet<>(Arrays.asList(linkIds));
 		for (String linkId : linkIds2) {
-			Set<Function> functions = functionsOfLinkId.get(linkId);
+			Set<Method> methods = methodsOfLinkId.get(linkId);
 
 			Set<Node> dependencies = new HashSet<>();
-			Map<Function, Map<String, List<String>>> inputsOfOutput = new HashMap<>();
+			Map<Method, Map<String, List<String>>> inputsOfOutput = new HashMap<>();
 			Set<String> outputDatumNames = new HashSet<>();
 
-			for (Function function : functions) {
+			for (Method method : methods) {
 				Set<Node> localDependencies = new HashSet<>();
 				Map<String, List<String>> mm = new HashMap<>();
 
-				for (TrikkleFunction tf : function.annotations) {
+				for (TrikkleFunction tf : method.annotations) {
 					Node dependency = DiscreteNode.of(tf.inputs());
 					localDependencies.add(dependency);
 
@@ -109,7 +108,7 @@ public class LinkProcessor {
 
 					outputDatumNames.add(tf.output());
 				}
-				inputsOfOutput.put(function, mm);
+				inputsOfOutput.put(method, mm);
 				dependencies.addAll(localDependencies);
 			}
 
@@ -119,8 +118,8 @@ public class LinkProcessor {
 				@Override
 				public void run() {
 					try {
-						for (LinkProcessor.Function function : functions) {
-							Map<String, List<String>> mm = inputsOfOutput.get(function);
+						for (Method method : methods) {
+							Map<String, List<String>> mm = inputsOfOutput.get(method);
 							for (Map.Entry<String, List<String>> stringSetEntry : mm.entrySet()) {
 								List<String> inputNames = stringSetEntry.getValue();
 
@@ -131,7 +130,7 @@ public class LinkProcessor {
 									i++;
 								}
 
-								Object outputDatum = function.method.invoke(function.object, datums);
+								Object outputDatum = method.jmethod.invoke(method.object, datums);
 								String outputName = stringSetEntry.getKey();
 								returnDatum(outputName, outputDatum);
 							}
@@ -156,13 +155,13 @@ public class LinkProcessor {
 		return new Graph(new HashSet<>(getLinks().values()));
 	}
 
-	private static class Function {
-		private final Method method;
+	private static class Method {
+		private final java.lang.reflect.Method jmethod;
 		private final Object object;
 		private final TrikkleFunction[] annotations;
 
-		public Function(Method method, Object object, TrikkleFunction[] annotations) {
-			this.method = method;
+		public Method(java.lang.reflect.Method jmethod, Object object, TrikkleFunction[] annotations) {
+			this.jmethod = jmethod;
 			this.object = object;
 			this.annotations = annotations;
 		}

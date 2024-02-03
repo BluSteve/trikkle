@@ -36,7 +36,7 @@ public class IntegratedTests {
 	@Test
 	void cafe() {
 		LinkProcessor linkProcessor = new LinkProcessor();
-		linkProcessor.addFunctionsOf(IntegratedTests.class);
+		linkProcessor.addMethodsOf(IntegratedTests.class);
 		linkProcessor.refreshLinks("makeOmelette", "serveOmelette");
 		Graph graphA = linkProcessor.getGraph();
 

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TrikkleFunctionGroupTest {
+public class TrikkleMethodGroupTest {
 	@TrikkleFunction(output = "sum", inputs = {"a", "b"}, linkId = "sqdiff")
 	public static double add(double a, double b) {
 		return a + b;
@@ -19,7 +19,7 @@ public class TrikkleFunctionGroupTest {
 	void test1() {
 		// one inputnode with two datums -> two functions -> two outputdatums (two functions)
 		LinkProcessor linkProcessor = new LinkProcessor();
-		linkProcessor.addFunctionsOf(TrikkleFunctionGroupTest.class);
+		linkProcessor.addMethodsOf(TrikkleMethodGroupTest.class);
 		linkProcessor.refreshLinks("sqdiff");
 		assertEquals(1, linkProcessor.getLinks().size());
 
@@ -46,7 +46,7 @@ public class TrikkleFunctionGroupTest {
 	void test2() {
 		// two inputnodes with one datum each -> one function -> one outputdatum (one function)
 		LinkProcessor linkProcessor = new LinkProcessor();
-		linkProcessor.addFunctionsOf(TrikkleFunctionGroupTest.class);
+		linkProcessor.addMethodsOf(TrikkleMethodGroupTest.class);
 		linkProcessor.refreshLinks("pow");
 		assertEquals(1, linkProcessor.getLinks().size());
 
@@ -73,7 +73,7 @@ public class TrikkleFunctionGroupTest {
 	void test3() {
 		LinkProcessor linkProcessor = new LinkProcessor();
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			linkProcessor.addFunctionsOf(new TrikkleFunctionGroupTest());
+			linkProcessor.addMethodsOf(new TrikkleMethodGroupTest());
 		});
 		assertTrue(exception.getMessage()
 				.contains("All TrikkleFunctions with the same linkId must have the same output!"));
@@ -99,7 +99,7 @@ public class TrikkleFunctionGroupTest {
 	@Test
 	void test4() {
 		LinkProcessor linkProcessor = new LinkProcessor();
-		linkProcessor.addFunctionsOf(TrikkleFunctionGroupTest.class);
+		linkProcessor.addMethodsOf(TrikkleMethodGroupTest.class);
 		linkProcessor.refreshLinks("somelink", "middlelink", "finallink");
 		assertEquals(3, linkProcessor.getLinks().size());
 
