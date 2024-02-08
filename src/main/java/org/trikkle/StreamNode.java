@@ -12,12 +12,17 @@ public class StreamNode extends Node {
 	}
 
 	public static StreamNode of(String datumName) {
+		return of(Nodespace.instance, datumName);
+	}
+
+	static StreamNode of(Nodespace nodespace, String datumName) {
 		Set<String> singleton = Collections.singleton(datumName);
-		if (Node.nodeCache.containsKey(singleton)) {
-			return (StreamNode) Node.nodeCache.get(singleton);
+		Map<Set<String>, Node> nodeCache = nodespace.nodeCache;
+		if (nodeCache.containsKey(singleton)) {
+			return (StreamNode) nodeCache.get(singleton);
 		} else {
 			StreamNode node = new StreamNode(datumName);
-			Node.nodeCache.put(node.datumNames, node);
+			nodeCache.put(node.datumNames, node);
 			return node;
 		}
 	}

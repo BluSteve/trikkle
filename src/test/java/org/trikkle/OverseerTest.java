@@ -28,7 +28,10 @@ class OverseerTest {
 
 	@Test
 	void simpleTest() {
-		Node inputNode = DiscreteNode.of("toSquare");
+		Nodespace ns = new Nodespace();
+		Node inputNode = ns.discreteOf("toSquare");
+		assertNotSame(inputNode, DiscreteNode.of("toSquare"));
+		assertEquals(inputNode, DiscreteNode.of("toSquare"));
 
 		Arc arc = new AutoArc() {
 			@Override
@@ -38,7 +41,7 @@ class OverseerTest {
 				returnDatum("squared", squared);
 			}
 		};
-		Node outputNode = DiscreteNode.of("squared");
+		Node outputNode = ns.discreteOf("squared");
 		Link link = new Link(Set.of(inputNode), arc, outputNode);
 
 

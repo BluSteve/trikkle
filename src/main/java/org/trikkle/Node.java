@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Set;
 
 public abstract class Node implements Primable { // Generics are too restricting for this class
-	protected static final Map<Set<String>, Node> nodeCache = new HashMap<>();
 	public final Set<String> datumNames; // unique identifies a node
 	protected Overseer overseer;
 	protected boolean usable = false; // can be true then false
