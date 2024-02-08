@@ -5,7 +5,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.function.Function;
 
-public class RaceArc extends Arc {
+public final class RaceArc extends AutoArc {
 	public final Set<Function<Map<String, Object>, Map<String, Object>>> subArcs;
 	private final Notifier notifier = new Notifier();
 
