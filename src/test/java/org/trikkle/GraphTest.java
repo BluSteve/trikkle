@@ -1,7 +1,6 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.annotation.Testable;
 import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.List;

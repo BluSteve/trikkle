@@ -2,7 +2,10 @@ import org.junit.jupiter.api.Test;
 import org.trikkle.*;
 import org.trikkle.viz.MermaidGraphViz;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,8 +77,7 @@ public class IntegratedTests {
 				if (sum >= 500) {
 					this.status = ArcStatus.FINISHED;
 					returnDatum("coffee", new Coffee(sum));
-				}
-				else this.status = ArcStatus.IDLE;
+				} else this.status = ArcStatus.IDLE;
 			}
 		};
 		coffeeArc.setName("make coffee");

@@ -19,7 +19,7 @@ class OverseerTest {
 		Exception e = assertThrows(IllegalArgumentException.class, () -> node.addDatum("toSquare2", 3.0));
 		assertTrue(e.getMessage().contains("Datum \"toSquare2\" was not declared by this Node!"));
 
-		Exception e1= assertThrows(IllegalArgumentException.class, () -> node.setProgress(2));
+		Exception e1 = assertThrows(IllegalArgumentException.class, () -> node.setProgress(2));
 		assertTrue(e1.getMessage().contains("Progress not between 0 and 1!"));
 
 		Exception e2 = assertThrows(IllegalArgumentException.class, () -> node.setProgress(0.5));

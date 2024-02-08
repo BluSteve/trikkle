@@ -39,9 +39,4 @@ public abstract class Arc implements Primable {
 	public void primeWith(Overseer overseer) {
 		this.overseer = overseer;
 	}
-
-	@Override
-	public Overseer getOverseer() {
-		return overseer;
-	}
 }

@@ -67,17 +67,13 @@ public abstract class Node implements Primable { // Generics are too restricting
 	}
 
 	@Override
-	public Overseer getOverseer() {
-		return overseer;
-	}
-
-	@Override
 	public String toString() {
 		return "Node" + datumNames.toString();
 	}
 
 	/**
 	 * Two nodes are equal if they have the same datumNames.
+	 *
 	 * @param o the object to compare to
 	 * @return true if the objects are equal
 	 */

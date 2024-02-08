@@ -80,7 +80,8 @@ public final class Graph {
 
 	/**
 	 * Merges the Graphs into one optimized Graph, using the endingNodes as the ending Nodes of the merged Graph.
-	 * @param graphs Graphs to merge in descending order of priority
+	 *
+	 * @param graphs      Graphs to merge in descending order of priority
 	 * @param endingNodes the ending Nodes of the merged Graph
 	 * @return the merged Graph
 	 */
