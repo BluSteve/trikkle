@@ -1,6 +1,6 @@
 package org.trikkle.structs;
 
-public interface IBitmask extends Comparable<IBitmask> {
+public interface IBitmask {
 	static IBitmask getBitmask(int length) {
 		if (length < 0) throw new IllegalArgumentException("Length cannot be < 0!");
 		if (length > 64) return new ArrayBitmask(length);
@@ -10,6 +10,8 @@ public interface IBitmask extends Comparable<IBitmask> {
 	void set(int index);
 
 	void unset(int index);
+
+	boolean supersetOf(IBitmask o);
 
 	@Override
 	String toString();

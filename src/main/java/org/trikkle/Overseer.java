@@ -108,7 +108,7 @@ public final class Overseer {
 		IBitmask state = getCurrentState();
 		Set<Link> linksNow = new HashSet<>();
 		for (Map.Entry<IBitmask, Set<Link>> linkEntry : links.entrySet()) {
-			if (state.compareTo(linkEntry.getKey()) >= 0) { // all where requirements are satisfied
+			if (state.supersetOf(linkEntry.getKey())) { // all where requirements are satisfied
 				for (Link link : linkEntry.getValue()) {
 					if (link.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
 						link.getArc().status = ArcStatus.STAND_BY;

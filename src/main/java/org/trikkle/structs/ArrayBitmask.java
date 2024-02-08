@@ -53,24 +53,19 @@ class ArrayBitmask implements IBitmask {
 	}
 
 	@Override
-	public int compareTo(IBitmask o) {
-		if (this == o) return 0;
+	public boolean supersetOf(IBitmask o) {
+		if (this == o) return true;
 
 		ArrayBitmask ab = (ArrayBitmask) o;
 		if (length != ab.length) {
 			throw new IllegalArgumentException("Bitmask lengths do not match!");
 		} else {
-			boolean allSame = true;
 			for (int i = 0; i < array.length; i++) {
-				if (ab.array[i] != array[i]) {
-					allSame = false;
-				}
 				if (ab.array[i] && !array[i]) {
-					return -1;
+					return false;
 				}
 			}
-			if (allSame) return 0;
-			return 1;
+			return true;
 		}
 	}
 }

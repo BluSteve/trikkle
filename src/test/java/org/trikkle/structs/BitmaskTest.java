@@ -16,12 +16,12 @@ class BitmaskTest {
 		lb2.set(3);
 		lb2.unset(3);
 
-		assertTrue(lb1.compareTo(lb2) > 0);
-		assertTrue(lb2.compareTo(lb1) < 0);
+		assertTrue(lb1.supersetOf(lb2));
+		assertFalse(lb2.supersetOf(lb1));
 
 		IBitmask lb = new LongBitmask(63);
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			lb.compareTo(lb2);
+			lb.supersetOf(lb2);
 		});
 		assertTrue(exception.getMessage().contains("Bitmask lengths do not match!"));
 	}
@@ -37,11 +37,11 @@ class BitmaskTest {
 		lb2.set(3);
 		lb2.unset(3);
 
-		assertTrue(lb1.compareTo(lb2) > 0);
-		assertTrue(lb2.compareTo(lb1) < 0);
+		assertTrue(lb1.supersetOf(lb2));
+		assertFalse(lb2.supersetOf(lb1));
 		IBitmask lb = new ArrayBitmask(63);
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			lb.compareTo(lb2);
+			lb.supersetOf(lb2);
 		});
 		assertTrue(exception.getMessage().contains("Bitmask lengths do not match!"));
 	}

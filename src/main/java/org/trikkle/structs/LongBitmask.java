@@ -58,18 +58,14 @@ class LongBitmask implements IBitmask {
 	}
 
 	@Override
-	public int compareTo(IBitmask o) {
-		if (this == o) return 0;
+	public boolean supersetOf(IBitmask o) {
+		if (this == o) return true;
 
 		LongBitmask lb = (LongBitmask) o;
 		if (length != lb.length) {
 			throw new IllegalArgumentException("Bitmask lengths do not match!");
 		} else {
-			if (bitmask == lb.bitmask) {
-				return 0;
-			} else if (bitmask == (bitmask | lb.bitmask)) {
-				return 1;
-			} else return -1;
+			return bitmask == lb.bitmask || bitmask == (bitmask | lb.bitmask);
 		}
 	}
 }
