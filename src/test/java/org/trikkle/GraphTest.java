@@ -1,6 +1,7 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.annotation.Testable;
 import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.List;
@@ -184,6 +185,16 @@ class GraphTest {
 		Graph e1 = new Graph(link1, link4);
 		Graph mergedGraph = Graph.mergeGraphs(List.of(e1, graph2), Set.of(hfNode, dipoleNode));
 		assertEquals(e1, mergedGraph);
+	}
+
+	@Test
+	void mergeGraphs5() {
+		Node ieNode = DiscreteNode.of("ie");
+		Arc arc = GraphGenerator.generateArcs(1).get(0);
+		Link link = new Link(Set.of(dipoleNode), arc, ieNode);
+		Graph e1 = new Graph(link2, link3, link);
+		Graph mergedGraph = Graph.mergeGraphs(List.of(graph1, e1), Set.of(hfNode, ieNode));
+		assertEquals(mergedGraph, e1);
 	}
 
 	@Test

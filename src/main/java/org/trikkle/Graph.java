@@ -91,7 +91,7 @@ public final class Graph {
 				Graph graph = graphs.get(i);
 
 				if (graph.nodes.contains(endingNode)) { // if this Graph offers a path to obtain this ending Node
-					Way way = new Way(i, graph.outputNodeMap.get(endingNode).getDependencies());
+					Way way = new Way(i, graph.getAllDependenciesOfNode(endingNode));
 					waysToGetNode.putOne(endingNode, way);
 				}
 			}
@@ -130,6 +130,7 @@ public final class Graph {
 
 				// if not subsumed under a hard dependency
 				if (!allHard) {
+					// todo this could be faster with an ordered list
 					int lowestGraphIndex = Integer.MAX_VALUE;
 					for (Way way : ways) {
 						lowestGraphIndex = Math.min(lowestGraphIndex, way.graphIndex);
@@ -152,6 +153,7 @@ public final class Graph {
 
 	/**
 	 * Combines all links from multiple Graphs into one Graph.
+	 *
 	 * @param graphs the Graphs to concatenate
 	 * @return the combined Graph
 	 */
@@ -191,6 +193,27 @@ public final class Graph {
 		}
 
 		return false;
+	}
+
+	public Set<Node> getAllDependenciesOfNode(Node node) {
+		if (!nodes.contains(node)) {
+			throw new IllegalArgumentException("Node must be in the Graph!");
+		}
+
+		Set<Node> dependencies = new HashSet<>();
+		Stack<Node> nodeStack = new Stack<>();
+		nodeStack.push(node);
+		while (!nodeStack.empty()) {
+			Node popped = nodeStack.pop();
+			if (dependencies.contains(popped)) continue;
+			dependencies.add(popped);
+			Set<Node> nodeDependencies = dependenciesOfNode.get(popped);
+			if (nodeDependencies != null) {
+				nodeStack.addAll(nodeDependencies);
+			}
+		}
+		dependencies.remove(node);
+		return dependencies;
 	}
 
 	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {
