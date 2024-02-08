@@ -142,6 +142,10 @@ public final class Overseer {
 		return cache;
 	}
 
+	public Object getDatum(String datumName) {
+		return cache.get(datumName);
+	}
+
 	public Map<String, Object> getResultCache() {
 		Map<String, Object> resultCache = new HashMap<>();
 		for (Node endingNode : g.endingNodes) {

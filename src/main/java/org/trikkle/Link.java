@@ -9,11 +9,16 @@ public final class Link {
 	private final Node outputNode;
 
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
+		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
+		if (arc == null) throw new NullPointerException("Arc cannot be null!");
+		if (outputNode == null) throw new NullPointerException("Output Node cannot be null!");
+
 		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
 		boolean autoArc = arc instanceof AutoArc;
 		if (hasStreamNode && autoArc) {
 			throw new IllegalArgumentException("StreamNode cannot be the input of an AutoArc. Use Arc instead.");
 		}
+
 		this.dependencies = dependencies;
 		this.arc = arc;
 		this.outputNode = outputNode;

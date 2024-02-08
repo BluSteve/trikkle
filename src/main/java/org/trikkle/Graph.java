@@ -239,6 +239,10 @@ public final class Graph {
 		return prunedGraph;
 	}
 
+	public Graph findPrunedGraphFor(Node... targetEndingNodes) {
+		return findPrunedGraphFor(new HashSet<>(Arrays.asList(targetEndingNodes)));
+	}
+
 	public boolean hasCycle() {
 		return hasCycle(dependenciesOfNode);
 	}
