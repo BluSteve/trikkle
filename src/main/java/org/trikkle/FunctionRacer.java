@@ -5,21 +5,21 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.function.Function;
 
-public final class RaceArc extends AutoArc {
-	public final Set<Function<Map<String, Object>, Map<String, Object>>> subArcs;
+public final class FunctionRacer {
+	public final Set<Function<Map<String, Object>, Map<String, Object>>> functions;
 	private final Notifier notifier = new Notifier();
+	private Map<String, Object> result = null;
 
-	public RaceArc(Set<Function<Map<String, Object>, Map<String, Object>>> subArcs) {
-		this.subArcs = subArcs;
+	public FunctionRacer(Set<Function<Map<String, Object>, Map<String, Object>>> functions) {
+		this.functions = functions;
 	}
 
-	@Override
-	public void run() {
+	public Map<String, Object> apply(Map<String, Object> cache) {
 		List<RecursiveAction> tasks = new ArrayList<>();
 
-		for (Function<Map<String, Object>, Map<String, Object>> arc : subArcs) {
+		for (Function<Map<String, Object>, Map<String, Object>> function : functions) {
 			// Wrapping in Thread is necessary for it to be interruptible
-			Thread thread = new Thread(() -> returnResult(arc.apply(overseer.getCache())));
+			Thread thread = new Thread(() -> returnResult(function.apply(cache)));
 			notifier.addListener(thread::interrupt);
 
 			RecursiveAction task = new RecursiveAction() {
@@ -36,11 +36,16 @@ public final class RaceArc extends AutoArc {
 			tasks.add(task);
 		}
 		ForkJoinTask.invokeAll(tasks);
+
+		if (!notifier.wasCalled()) {
+			throw new IllegalStateException("No functions were called!");
+		}
+		return result;
 	}
 
 	private synchronized void returnResult(Map<String, Object> map) {
 		if (!notifier.wasCalled()) {
-			overseer.getCache().putAll(map);
+			result = map;
 			notifier.call();
 		}
 	}

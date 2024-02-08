@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class RaceArcTest {
+class FunctionRacerTest {
 	private static int sumUntil(int n) {
 		int sum = 0;
 		for (int i = 0; i <= n; i++) {
@@ -28,7 +28,7 @@ class RaceArcTest {
 
 	@Test
 	void raceTest() {
-		RaceArc raceArc = new RaceArc(
+		FunctionRacer functionRacer = new FunctionRacer(
 				Set.of(datumMap -> {
 					Map<String, Object> resultMap = new HashMap<>();
 					resultMap.put("sum", sumUntil((int) datumMap.get("n")));
@@ -40,9 +40,19 @@ class RaceArcTest {
 				})
 		);
 
+		Arc arc = new AutoArc() {
+			@Override
+			public void run() {
+				Map<String, Object> resultMap = functionRacer.apply(overseer.getCache());
+				for (Map.Entry<String, Object> entry : resultMap.entrySet()) {
+					returnDatum(entry.getKey(), entry.getValue());
+				}
+			}
+		};
+
 		Node inputNode = DiscreteNode.of("n");
 		Node outputNode = DiscreteNode.of("sum");
-		Link link = new Link(Set.of(inputNode), raceArc, outputNode);
+		Link link = new Link(Set.of(inputNode), arc, outputNode);
 		Graph graph = new Graph(link);
 		Overseer overseer = new Overseer(graph);
 
