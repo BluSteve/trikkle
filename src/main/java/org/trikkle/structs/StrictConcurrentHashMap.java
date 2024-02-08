@@ -1,5 +1,6 @@
 package org.trikkle.structs;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class StrictConcurrentHashMap<K, V> extends ConcurrentHashMap<K, V> {
@@ -10,6 +11,16 @@ public class StrictConcurrentHashMap<K, V> extends ConcurrentHashMap<K, V> {
 			throw new IllegalArgumentException("Key \"" + key + "\" already present in map!");
 		}
 		return null;
+	}
+
+	@Override
+	public void putAll(Map<? extends K, ? extends V> m) {
+		for (K key : m.keySet()) {
+			if (containsKey(key)) {
+				throw new IllegalArgumentException("Key \"" + key + "\" already present in map!");
+			}
+		}
+		super.putAll(m);
 	}
 
 	@Override
