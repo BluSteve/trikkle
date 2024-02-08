@@ -3,7 +3,7 @@ package org.trikkle;
 import java.util.Objects;
 import java.util.Set;
 
-public final class Link {
+public final class Link implements Congruent<Link> {
 	private final Set<Node> dependencies;
 	private final Arc arc;
 	private final Node outputNode;
@@ -36,8 +36,9 @@ public final class Link {
 		return outputNode;
 	}
 
+	@Override
 	public boolean congruentTo(Link link) {
-		return dependencies.equals(link.dependencies) && outputNode.equals(link.outputNode);
+		return Congruent.setsCongruent(dependencies, link.dependencies) && outputNode.congruentTo(link.outputNode);
 	}
 
 	@Override

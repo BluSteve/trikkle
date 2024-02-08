@@ -31,7 +31,8 @@ class OverseerTest {
 		Nodespace ns = new Nodespace();
 		Node inputNode = ns.discreteOf("toSquare");
 		assertNotSame(inputNode, DiscreteNode.of("toSquare"));
-		assertEquals(inputNode, DiscreteNode.of("toSquare"));
+		assertNotEquals(inputNode, DiscreteNode.of("toSquare"));
+		assertTrue(inputNode.congruentTo(DiscreteNode.of("toSquare")));
 
 		Arc arc = new AutoArc() {
 			@Override

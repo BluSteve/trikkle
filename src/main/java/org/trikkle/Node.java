@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public abstract class Node implements Primable { // Generics are too restricting for this class
+public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class
 	public final Set<String> datumNames; // unique identifies a node
 	protected Overseer overseer;
 	protected boolean usable = false; // can be true then false
@@ -61,6 +61,11 @@ public abstract class Node implements Primable { // Generics are too restricting
 	}
 
 	@Override
+	public boolean congruentTo(Node node) {
+		return datumNames.equals(node.datumNames);
+	}
+
+	@Override
 	public void primeWith(Overseer overseer) {
 		this.overseer = overseer;
 	}
@@ -68,24 +73,5 @@ public abstract class Node implements Primable { // Generics are too restricting
 	@Override
 	public String toString() {
 		return "Node" + datumNames.toString();
-	}
-
-	/**
-	 * Two nodes are equal if they have the same datumNames.
-	 *
-	 * @param o the object to compare to
-	 * @return true if the objects are equal
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Node node = (Node) o;
-		return Objects.equals(datumNames, node.datumNames);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(datumNames);
 	}
 }

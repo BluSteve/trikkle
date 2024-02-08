@@ -6,7 +6,7 @@ import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.*;
 
-public final class Graph {
+public final class Graph implements Congruent<Graph> {
 	public static boolean ALLOW_CYCLES = false;
 	public final Set<Link> links;
 	public final Set<Arc> arcs;
@@ -271,24 +271,9 @@ public final class Graph {
 		return hasCycle(dependenciesOfNode);
 	}
 
+	@Override
 	public boolean congruentTo(Graph graph) {
-		// check that links are the same size and that all links are congruent to some link in graph.links
-		if (links.size() != graph.links.size()) {
-			return false;
-		}
-		for (Link link : links) {
-			boolean found = false;
-			for (Link graphLink : graph.links) {
-				if (link.congruentTo(graphLink)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				return false;
-			}
-		}
-		return true;
+		return Congruent.setsCongruent(links, graph.links);
 	}
 
 	@Override
