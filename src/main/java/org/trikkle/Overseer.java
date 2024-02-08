@@ -91,16 +91,16 @@ public final class Overseer {
 	void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
 		if (!started) return; // for adding datums manually
 		tick++;
-		System.out.println("\ntick = " + tick);
+		//System.out.println("\ntick = " + tick);
 		if (hasEnded()) {
 			onEnd();
 			return;
 		}
 
 		if (outputNode != null) {
-			System.out.printf("tick = %d, just filled %s%n", tick, outputNode.datumNames);
+			//System.out.printf("tick = %d, just filled %s%n", tick, outputNode.datumNames);
 		} else {
-			System.out.printf("tick = %d, outputNode not passed%n", tick);
+			//System.out.printf("tick = %d, outputNode not passed%n", tick);
 		}
 
 
@@ -118,7 +118,7 @@ public final class Overseer {
 			}
 		}
 
-		System.out.printf("tick = %d, linksNow.size() = %d%n", tick, linksNow.size());
+		//System.out.printf("tick = %d, linksNow.size() = %d%n", tick, linksNow.size());
 
 
 		// Run all links that can be done now (aka linksNow) in parallel.
@@ -130,7 +130,7 @@ public final class Overseer {
 				@Override
 				protected void compute() {
 					Link link = linkArray[finalI];
-					System.out.printf("Started: tick = %d, link = %s%n", tick, link);
+					//System.out.printf("Started: tick = %d, link = %s%n", tick, link);
 					link.getArc().runWrapper();
 				}
 			});
@@ -185,7 +185,7 @@ public final class Overseer {
 	}
 
 	private void onEnd() {
-		System.out.println("Overseer finished!");
+		//System.out.println("Overseer finished!");
 	}
 
 	public Graph getGraph() {
