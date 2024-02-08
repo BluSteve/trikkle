@@ -92,7 +92,7 @@ public final class Graph implements Congruent<Graph> {
 				Graph graph = graphs.get(i);
 
 				if (graph.nodes.contains(endingNode)) { // if this Graph offers a path to obtain this ending Node
-					Way way = new Way(i, graph.getAllDependenciesOfNode(endingNode));
+					Way way = new Way(i, graph.findAllDependencies(endingNode));
 					waysToGetNode.putOne(endingNode, way);
 				}
 			}
@@ -196,7 +196,7 @@ public final class Graph implements Congruent<Graph> {
 		return false;
 	}
 
-	public Set<Node> getAllDependenciesOfNode(Node node) {
+	public Set<Node> findAllDependencies(Node node) {
 		if (!nodes.contains(node)) {
 			throw new IllegalArgumentException("Node must be in the Graph!");
 		}
