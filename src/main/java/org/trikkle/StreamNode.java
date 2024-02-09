@@ -36,9 +36,6 @@ public final class StreamNode extends Node {
 	// Assumes that all datums of a particular name are of the same type
 	protected void uncheckedAddDatum(String datumName, Object datum) {
 		((Queue) overseer.getCache().get(datumName)).add(datum);
-		if (getProgress() == 1) {
-			throw new IllegalStateException("StreamNode is already full!");
-		}
 
 		setUsable(true);
 		if (limit != -1) {
@@ -62,6 +59,12 @@ public final class StreamNode extends Node {
 	public void primeWith(Overseer overseer) {
 		super.primeWith(overseer);
 		overseer.getCache().put(datumNames.iterator().next(), new ConcurrentLinkedQueue<>());
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		count.set(0);
 	}
 
 	@Override

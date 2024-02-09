@@ -1,14 +1,12 @@
 package org.trikkle;
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class
 	public final Set<String> datumNames; // unique identifies a node
 	protected Overseer overseer;
-	private final AtomicBoolean usable = new AtomicBoolean(false); // can be true then false
-	private final AtomicLong progress = new AtomicLong(0); // monotonically increasing
+	private boolean usable = false; // can be true then false
+	private double progress = 0; // monotonically increasing
 
 	protected Node(Set<String> datumNames) {
 		this.datumNames = datumNames;
@@ -27,28 +25,28 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	}
 
 	public boolean isUsable() {
-		return usable.get();
+		return usable;
 	}
 
 	public void setUsable(boolean usable) {
-		this.usable.set(usable);
+		this.usable = usable;
 	}
 
 	public double getProgress() {
-		return Double.longBitsToDouble(progress.get());
+		return progress;
 	}
 
 	public void setProgress(double progress) {
 		if (progress < 0 || progress > 1) {
-			throw new IllegalArgumentException("Progress not between 0 and 1!");
+			throw new IllegalArgumentException("Progress " + progress + " not between 0 and 1!");
 		}
-		if (progress < Double.longBitsToDouble(this.progress.get())) {
+		if (progress < this.progress) {
 			throw new IllegalArgumentException("Progress cannot decrease!");
 		}
 
-		this.progress.set(Double.doubleToLongBits(progress));
+		this.progress = progress;
 		if (progress == 1) {
-			this.setUsable(true); // usable declares that this node is ready to be used
+			setUsable(true);
 			onDone();
 		}
 	}
@@ -65,8 +63,8 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 	@Override
 	public void reset() {
-		usable.set(false);
-		progress.set(0);
+		usable = false;
+		progress = 0;
 		overseer = null;
 	}
 
