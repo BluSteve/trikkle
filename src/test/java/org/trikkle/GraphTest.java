@@ -164,7 +164,9 @@ class GraphTest {
 	@Test
 	void mergeGraphs3() {
 		Graph mergedGraph = Graph.mergeGraphs(List.of(graph1, graph2), Set.of(hfNode, dipoleNode));
-		assertEquals(graph2, mergedGraph);
+		assertEquals(new Graph(link1, link3), mergedGraph);
+		mergedGraph = Graph.mergeGraphs(List.of(graph2, graph1), Set.of(hfNode, dipoleNode));
+		assertEquals(new Graph(link2, link3), mergedGraph);
 	}
 
 	@Test
@@ -181,7 +183,7 @@ class GraphTest {
 		Link link = new Link(Set.of(dipoleNode), arc, ieNode);
 		Graph e1 = new Graph(link2, link3, link);
 		Graph mergedGraph = Graph.mergeGraphs(List.of(graph1, e1), Set.of(hfNode, ieNode));
-		assertEquals(mergedGraph, e1);
+		assertEquals(mergedGraph, new Graph(link1, link3, link));
 	}
 
 	@Test

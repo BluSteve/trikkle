@@ -84,66 +84,20 @@ public final class Graph implements Congruent<Graph> {
 	 * @return the merged Graph
 	 */
 	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {
-		MultiMap<Node, Way> waysToGetNode = new MultiHashMap<>();
+		Map<Node, Graph> graphUsedOfNode = new HashMap<>();
 		for (Node endingNode : endingNodes) {
-			for (int i = 0; i < graphs.size(); i++) {
-				Graph graph = graphs.get(i);
-
+			for (Graph graph : graphs) {
 				if (graph.nodes.contains(endingNode)) { // if this Graph offers a path to obtain this ending Node
-					Way way = new Way(i, graph.findAllDependencies(endingNode));
-					waysToGetNode.putOne(endingNode, way);
-				}
-			}
-		}
-
-		Map<Node, Integer> graphUsedOfNode = new HashMap<>();
-
-		Set<Node> hardDependencies = new HashSet<>();
-		for (Map.Entry<Node, Set<Way>> nodeSetEntry : waysToGetNode.entrySet()) {
-			Node key = nodeSetEntry.getKey();
-			Set<Way> value = nodeSetEntry.getValue();
-			if (value.size() == 1) { // if there's only one way to get this Node
-				Way way = value.iterator().next();
-				hardDependencies.addAll(way.dependencies);
-				graphUsedOfNode.put(key, way.graphIndex);
-			}
-		}
-
-		for (Node endingNode : endingNodes) {
-			// if not already resolved through hard dependency
-			if (!graphUsedOfNode.containsKey(endingNode)) {
-				Set<Way> ways = waysToGetNode.get(endingNode);
-				if (ways == null) {
-					throw new IllegalArgumentException("No way to get to ending Node " + endingNode + "!");
-				}
-
-				// if subsumed under a hard dependency
-				boolean allHard = false;
-				for (Way way : ways) {
-					if (hardDependencies.containsAll(way.dependencies)) {
-						graphUsedOfNode.put(endingNode, way.graphIndex);
-						allHard = true;
-						break;
-					}
-				}
-
-				// if not subsumed under a hard dependency
-				if (!allHard) {
-					// todo this could be faster with an ordered list
-					int lowestGraphIndex = Integer.MAX_VALUE;
-					for (Way way : ways) {
-						lowestGraphIndex = Math.min(lowestGraphIndex, way.graphIndex);
-					}
-					graphUsedOfNode.put(endingNode, lowestGraphIndex);
+					graphUsedOfNode.put(endingNode, graph);
+					break;
 				}
 			}
 		}
 
 		Set<Link> finalLinks = new HashSet<>();
-		for (Map.Entry<Node, Integer> nodeIntegerEntry : graphUsedOfNode.entrySet()) {
-			Node node = nodeIntegerEntry.getKey();
-			int i = nodeIntegerEntry.getValue();
-			Graph graph = graphs.get(i).findPrunedGraphFor(Collections.singleton(node));
+		for (Map.Entry<Node, Graph> nodeGraphEntry : graphUsedOfNode.entrySet()) {
+			Node node = nodeGraphEntry.getKey();
+			Graph graph = nodeGraphEntry.getValue().findPrunedGraphFor(Collections.singleton(node));
 			finalLinks.addAll(graph.links);
 		}
 
