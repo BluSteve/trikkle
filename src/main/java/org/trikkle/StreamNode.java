@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public final class StreamNode extends Node {
-	private final AtomicInteger count = new AtomicInteger(0);
+	private final Object LOCK = new Object();
 	private int limit = -1;
+	private int count = 0;
 
 	private StreamNode(String datumName) {
 		super(Collections.singleton(datumName));
@@ -36,10 +36,16 @@ public final class StreamNode extends Node {
 	// Assumes that all datums of a particular name are of the same type
 	protected void uncheckedAddDatum(String datumName, Object datum) {
 		((Queue) overseer.getCache().get(datumName)).add(datum);
+		synchronized (LOCK) {
+			if (getProgress() == 1) {
+				throw new IllegalStateException("StreamNode is already full!");
+			}
 
-		setUsable(true);
-		if (limit != -1) {
-			setProgress((double) count.incrementAndGet() / limit);
+			setUsable(true);
+			count++;
+			if (limit != -1) {
+				setProgress((double) count / limit);
+			}
 		}
 		overseer.ticktock(this);
 	}
@@ -64,7 +70,7 @@ public final class StreamNode extends Node {
 	@Override
 	public void reset() {
 		super.reset();
-		count.set(0);
+		count = 0;
 	}
 
 	@Override
