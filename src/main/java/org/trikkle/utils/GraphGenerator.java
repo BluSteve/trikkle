@@ -1,4 +1,6 @@
-package org.trikkle;
+package org.trikkle.utils;
+
+import org.trikkle.*;
 
 import java.util.*;
 

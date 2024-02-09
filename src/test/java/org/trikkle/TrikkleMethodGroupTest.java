@@ -1,6 +1,8 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
+import org.trikkle.annotation.LinkProcessor;
+import org.trikkle.annotation.TrikkleFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 

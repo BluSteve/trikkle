@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.Test;
 import org.trikkle.*;
+import org.trikkle.annotation.LinkProcessor;
+import org.trikkle.annotation.TrikkleFunction;
 import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.Arrays;

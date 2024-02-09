@@ -1,4 +1,4 @@
-package org.trikkle;
+package org.trikkle.annotation;
 
 import java.lang.annotation.*;
 

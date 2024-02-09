@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class StreamNode extends Node {
+public final class StreamNode extends Node {
 	private int limit = -1;
 	private int count = 0;
 

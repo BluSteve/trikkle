@@ -1,5 +1,8 @@
-package org.trikkle;
+package org.trikkle.annotation;
 
+import org.trikkle.*;
+import org.trikkle.annotation.TrikkleFunction;
+import org.trikkle.annotation.TrikkleFunctionGroup;
 import org.trikkle.structs.MultiHashMap;
 import org.trikkle.structs.MultiMap;
 

@@ -2,7 +2,7 @@ package org.trikkle;
 
 import java.util.*;
 
-public class DiscreteNode extends Node {
+public final class DiscreteNode extends Node {
 	private final Map<String, Boolean> isDatumDone = new HashMap<>();
 
 	private DiscreteNode(Set<String> datumNames) {
