@@ -1,12 +1,14 @@
 package org.trikkle;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class
 	public final Set<String> datumNames; // unique identifies a node
 	protected Overseer overseer;
-	protected boolean usable = false; // can be true then false
-	private double progress = 0; // monotonically increasing
+	private final AtomicBoolean usable = new AtomicBoolean(false); // can be true then false
+	private final AtomicLong progress = new AtomicLong(0); // monotonically increasing
 
 	protected Node(Set<String> datumNames) {
 		this.datumNames = datumNames;
@@ -25,28 +27,28 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	}
 
 	public boolean isUsable() {
-		return usable;
+		return usable.get();
 	}
 
 	public void setUsable(boolean usable) {
-		this.usable = usable;
+		this.usable.set(usable);
 	}
 
 	public double getProgress() {
-		return progress;
+		return Double.longBitsToDouble(progress.get());
 	}
 
 	public void setProgress(double progress) {
 		if (progress < 0 || progress > 1) {
 			throw new IllegalArgumentException("Progress not between 0 and 1!");
 		}
-		if (progress < this.progress) {
+		if (progress < Double.longBitsToDouble(this.progress.get())) {
 			throw new IllegalArgumentException("Progress cannot decrease!");
 		}
 
-		this.progress = progress;
+		this.progress.set(Double.doubleToLongBits(progress));
 		if (progress == 1) {
-			usable = true; // usable declares that this node is ready to be used
+			this.setUsable(true); // usable declares that this node is ready to be used
 			onDone();
 		}
 	}
@@ -63,8 +65,8 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 	@Override
 	public void reset() {
-		usable = false;
-		progress = 0;
+		usable.set(false);
+		progress.set(0);
 		overseer = null;
 	}
 
