@@ -150,7 +150,7 @@ class OverseerTest {
 		Link link = new Link(Set.of(), inputArc, streamNode);
 
 		Arc consumerArc = new Arc() {
-			double total = 0; // is this a pure function?
+			double total = 0; // is this a pure function? it is if you reset()
 
 			@Override
 			public void run() {
@@ -178,6 +178,12 @@ class OverseerTest {
 					returnDatum("result1", total); // this must be the last line as it's a recursive call
 				} else this.status = ArcStatus.IDLE;
 			}
+
+			@Override
+			public void reset() {
+				super.reset();
+				total = 0;
+			}
 		};
 		Node outputNode = DiscreteNode.of("result1");
 		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
@@ -188,5 +194,10 @@ class OverseerTest {
 
 		Map<String, Object> results = overseer.getResultCache();
 		assertEquals(45.0, results.get("result1"));
+
+		overseer = new Overseer(graph);
+		overseer.start();
+
+		assertEquals(45.0, overseer.getDatum("result1"));
 	}
 }

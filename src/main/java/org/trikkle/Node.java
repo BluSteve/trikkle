@@ -1,8 +1,5 @@
 package org.trikkle;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class
@@ -54,12 +51,6 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 		}
 	}
 
-	public void reset() {
-		usable = false;
-		progress = 0;
-		overseer = null;
-	}
-
 	@Override
 	public boolean congruentTo(Node node) {
 		return datumNames.equals(node.datumNames);
@@ -68,6 +59,13 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	@Override
 	public void primeWith(Overseer overseer) {
 		this.overseer = overseer;
+	}
+
+	@Override
+	public void reset() {
+		usable = false;
+		progress = 0;
+		overseer = null;
 	}
 
 	@Override
