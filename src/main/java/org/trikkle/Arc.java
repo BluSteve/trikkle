@@ -10,7 +10,6 @@ public abstract class Arc implements Primable {
 
 	void runWrapper() {
 		outputNode = overseer.getOutputNodeOfArc(this);
-		status = ArcStatus.IN_PROGRESS;
 		run();
 	}
 
