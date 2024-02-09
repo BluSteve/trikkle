@@ -33,24 +33,20 @@ public final class StreamNode extends Node {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	// Assumes that all datums of a particular name are of the same type
-	protected synchronized void uncheckedAddDatum(String datumName, Object datum) {
-		if (getProgress() == 1) {
-			throw new IllegalStateException("StreamNode is already full!");
-		}
+	protected void uncheckedAddDatum(String datumName, Object datum) {
+		synchronized (this) {
+			if (getProgress() == 1) {
+				throw new IllegalStateException("StreamNode is already full!");
+			}
 
-		Map<String, Object> cache = overseer.getCache();
-		if (cache.containsKey(datumName)) {
+			Map<String, Object> cache = overseer.getCache();
 			((Queue) cache.get(datumName)).add(datum);
-		} else {
-			Queue queue = new ConcurrentLinkedQueue();
-			queue.add(datum);
-			cache.put(datumName, queue);
-		}
 
-		usable = true;
-		count++;
-		if (limit != -1) {
-			setProgress((double) count / limit);
+			usable = true;
+			count++;
+			if (limit != -1) {
+				setProgress((double) count / limit);
+			}
 		}
 		overseer.ticktock(this);
 	}
@@ -64,6 +60,12 @@ public final class StreamNode extends Node {
 			throw new IllegalArgumentException("Limit must be positive!");
 		}
 		this.limit = limit;
+	}
+
+	@Override
+	public void primeWith(Overseer overseer) {
+		super.primeWith(overseer);
+		overseer.getCache().put(datumNames.iterator().next(), new ConcurrentLinkedQueue<>());
 	}
 
 	@Override
