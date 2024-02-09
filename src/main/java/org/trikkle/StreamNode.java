@@ -37,13 +37,12 @@ public final class StreamNode extends Node {
 	protected void uncheckedAddDatum(String datumName, Object datum) {
 		((Queue) overseer.getCache().get(datumName)).add(datum);
 		synchronized (LOCK) {
-			if (count == limit) {
-				throw new IllegalStateException("StreamNode is already full!");
-			}
-
 			setUsable(true);
-			count++;
 			if (limit != -1) {
+				if (count == limit) {
+					throw new IllegalStateException("StreamNode is already full!");
+				}
+				count++;
 				setProgress((double) count / limit);
 			}
 		}
