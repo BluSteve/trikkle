@@ -259,5 +259,7 @@ class OverseerTest {
 
 		assertEquals(1.0, overseer.getDatum("res1"));
 		assertEquals(2.0, overseer.getDatum("res2"));
+
+		assertEquals(graph, graph.findPrunedGraphFor(discreteNode));
 	}
 }

@@ -14,8 +14,8 @@ public final class Graph implements Congruent<Graph> {
 	public final Set<Node> startingNodes = new HashSet<>();
 	public final Set<Node> endingNodes = new HashSet<>();
 	public final Map<Arc, Link> arcMap = new HashMap<>();
-	public final Map<Node, Link> outputNodeMap = new HashMap<>();
-	public final Map<Node, Set<Node>> dependenciesOfNode = new HashMap<>();
+	public final MultiMap<Node, Link> outputNodeMap = new MultiHashMap<>();
+	public final MultiMap<Node, Node> dependenciesOfNode = new MultiHashMap<>();
 	private Map<Node, Graph> prunedGraphOfNode;
 
 	public Graph(Set<Link> links) {
@@ -33,8 +33,10 @@ public final class Graph implements Congruent<Graph> {
 			nodes.addAll(link.getDependencies());
 			nodes.add(link.getOutputNode());
 			arcMap.put(link.getArc(), link);
-			outputNodeMap.put(link.getOutputNode(), link);
-			dependenciesOfNode.put(link.getOutputNode(), link.getDependencies());
+			outputNodeMap.putOne(link.getOutputNode(), link);
+			for (Node dependency : link.getDependencies()) {
+				dependenciesOfNode.putOne(link.getOutputNode(), dependency);
+			}
 
 			dependencies.addAll(link.getDependencies());
 		}
@@ -242,12 +244,14 @@ public final class Graph implements Congruent<Graph> {
 		}
 		while (!nodeStack.empty()) {
 			Node node = nodeStack.pop();
-			Link generatingLink = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node);
+			Set<Link> generatingLinks = outputNodeMap.get(node) == null ? null : outputNodeMap.get(node);
 
-			if (generatingLink != null) {
-				finalLinks.add(generatingLink);
-				for (Node dependency : generatingLink.getDependencies()) {
-					nodeStack.push(dependency);
+			if (generatingLinks != null) {
+				finalLinks.addAll(generatingLinks);
+				for (Link generatingLink : generatingLinks) {
+					for (Node dependency : generatingLink.getDependencies()) {
+						nodeStack.push(dependency);
+					}
 				}
 			}
 		}
