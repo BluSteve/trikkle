@@ -86,6 +86,9 @@ public final class Overseer {
 
 		started = true;
 		ticktock(null);
+		if (!hasEnded()) {
+			throw new IllegalStateException("Overseer ended before all ending nodes were filled!");
+		}
 	}
 
 	void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
