@@ -13,7 +13,6 @@ public final class Overseer {
 	private final Graph g;
 	private final MultiMap<IBitmask, Link> links = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
-	private final List<Node> nodeOfIndex = new ArrayList<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
 	private int tick = 0;
@@ -37,7 +36,6 @@ public final class Overseer {
 		// Generate helper indices
 		int i = 0;
 		for (Node node : g.nodes) {
-			nodeOfIndex.add(node);
 			indexOfNode.put(node, i);
 			for (String datumName : node.datumNames) {
 				nodeOfDatumName.put(datumName, node);
@@ -75,6 +73,10 @@ public final class Overseer {
 	}
 
 	public void start() {
+		if (started) {
+			throw new IllegalStateException("Overseer started before!");
+		}
+
 		// check population of startingNodes
 		for (Node startingNode : g.startingNodes) {
 			if (!startingNode.isUsable()) {
@@ -122,12 +124,10 @@ public final class Overseer {
 		// Run all links that can be done now (aka linksNow) in parallel.
 		Link[] linkArray = linksNow.toArray(new Link[0]);
 		List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
-		for (int i = 0; i < linkArray.length; i++) {
-			int finalI = i;
+		for (Link link : linkArray) {
 			tasks.add(new RecursiveAction() {
 				@Override
 				protected void compute() {
-					Link link = linkArray[finalI];
 					//System.out.printf("Started: tick = %d, link = %s%n", tick, link);
 					link.getArc().runWrapper();
 				}
