@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class StreamNode extends Node {
+	private int limit = -1;
+	private int count = 0;
+
 	private StreamNode(String datumName) {
 		super(Collections.singleton(datumName));
 	}
@@ -30,7 +33,11 @@ public class StreamNode extends Node {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
 	// Assumes that all datums of a particular name are of the same type
-	protected void uncheckedAddDatum(String datumName, Object datum) {
+	protected synchronized void uncheckedAddDatum(String datumName, Object datum) {
+		if (getProgress() == 1) {
+			throw new IllegalStateException("StreamNode is already full!");
+		}
+
 		Map<String, Object> cache = overseer.getCache();
 		if (cache.containsKey(datumName)) {
 			((Queue) cache.get(datumName)).add(datum);
@@ -40,10 +47,23 @@ public class StreamNode extends Node {
 			cache.put(datumName, queue);
 		}
 
-		// usable could have been changed from true false before lock on queue was lifted
-
 		usable = true;
+		count++;
+		if (limit != -1) {
+			setProgress((double) count / limit);
+		}
 		overseer.ticktock(this);
+	}
+
+	public int getLimit() {
+		return limit;
+	}
+
+	public void setLimit(int limit) {
+		if (limit <= 0) {
+			throw new IllegalArgumentException("Limit must be positive!");
+		}
+		this.limit = limit;
 	}
 
 	@Override

@@ -23,19 +23,6 @@ class GraphTest {
 	static Graph graph2 = new Graph(link2, link3);
 	static Link link4 = new Link(Set.of(paramNode), arcs.get(3), dipoleNode);
 
-	// learn from ExampleFunctions.java
-
-	@Test
-	void twoArcsSameNode() {
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			new Graph(Set.of(
-					new Link(Set.of(paramNode), arcs.get(0), magicNode),
-					new Link(Set.of(paramNode), arcs.get(1), magicNode)
-			));
-		});
-		assertTrue(exception.getMessage().contains("Two Arcs cannot point to the same output Node!"));
-	}
-
 	@Test
 	void twoLinksSameArc() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {

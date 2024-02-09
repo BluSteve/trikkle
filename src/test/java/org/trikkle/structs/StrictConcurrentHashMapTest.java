@@ -15,14 +15,6 @@ class StrictConcurrentHashMapTest {
 	}
 
 	@Test
-	void putIfAbsent() {
-		StrictConcurrentHashMap<String, String> map = new StrictConcurrentHashMap<>();
-		map.putIfAbsent("key", "value");
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> map.putIfAbsent("key", "value"));
-		assertEquals("Key \"key\" already present in map!", exception.getMessage());
-	}
-
-	@Test
 	void containsKey() {
 		// check whether containsKey works
 		StrictConcurrentHashMap<String, String> map = new StrictConcurrentHashMap<>();

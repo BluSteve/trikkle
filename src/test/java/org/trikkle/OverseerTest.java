@@ -155,7 +155,7 @@ class OverseerTest {
 			@Override
 			public void run() {
 				Queue<Double> queue = (Queue<Double>) getDatum("stream1");
-				Node stream1Node = overseer.getOutputNodeOfDatum("stream1");
+				Node stream1Node = overseer.getNodeOfDatum("stream1");
 
 				double sum = 0;
 				synchronized (queue) {
@@ -199,5 +199,65 @@ class OverseerTest {
 		overseer.start();
 
 		assertEquals(45.0, overseer.getDatum("result1"));
+	}
+
+	@Test
+	void multipleArcs() {
+		StreamNode streamNode = StreamNode.of("numberStream");
+		streamNode.setLimit(18);
+		Arc inputArc = new AutoArc() {
+			@Override
+			public void run() {
+				for (int i = 1; i < 10; i++) {
+					returnDatum("numberStream", (double) i);
+				}
+			}
+		};
+		Arc inputArc2 = new AutoArc() {
+			@Override
+			public void run() {
+				for (int i = 101; i < 110; i++) {
+					returnDatum("numberStream", (double) i);
+				}
+			}
+		};
+		Link link = new Link(Set.of(), inputArc, streamNode);
+		Link link2 = new Link(Set.of(), inputArc2, streamNode);
+		Graph graph = new Graph(link, link2);
+		System.out.println(graph);
+
+		Overseer overseer = new Overseer(graph);
+		overseer.start();
+
+		System.out.println(overseer.getDatum("numberStream"));
+		assertEquals(18, ((Queue<Double>) overseer.getDatum("numberStream")).size());
+		assertEquals(streamNode.getProgress(), 1);
+	}
+
+	@Test
+	void multipleArcsDiscrete() {
+		Node discreteNode = DiscreteNode.of("res1", "res2");
+		Arc inputArc = new AutoArc() {
+			@Override
+			public void run() {
+				returnDatum("res1", 1.0);
+			}
+		};
+		Arc inputArc2 = new AutoArc() {
+			@Override
+			public void run() {
+				returnDatum("res2", 2.0);
+			}
+		};
+		Link link = new Link(Set.of(), inputArc, discreteNode);
+		Link link2 = new Link(Set.of(), inputArc2, discreteNode);
+		Graph graph = new Graph(link, link2);
+		System.out.println(graph);
+
+		Overseer overseer = new Overseer(graph);
+		overseer.start();
+
+		assertEquals(1.0, overseer.getDatum("res1"));
+		assertEquals(2.0, overseer.getDatum("res2"));
 	}
 }

@@ -26,10 +26,6 @@ public final class Graph implements Congruent<Graph> {
 
 		Set<Node> dependencies = new HashSet<>();
 		for (Link link : links) {
-			Set<Node> existingOutputNodes = outputNodeMap.keySet();
-			if (existingOutputNodes.contains(link.getOutputNode())) {
-				throw new IllegalArgumentException("Two Arcs cannot point to the same output Node!");
-			}
 			if (arcMap.containsKey(link.getArc())) {
 				throw new IllegalArgumentException("The same Arc cannot be used for two Links!");
 			}

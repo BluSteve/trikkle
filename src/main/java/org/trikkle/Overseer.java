@@ -159,7 +159,7 @@ public final class Overseer {
 		return new HashMap<>(cache);
 	}
 
-	public Node getOutputNodeOfDatum(String datumName) {
+	public Node getNodeOfDatum(String datumName) {
 		return nodeOfDatumName.get(datumName);
 	}
 
