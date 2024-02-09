@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class StreamNode extends Node {
+	private final Object LOCK = new Object();
 	private int limit = -1;
 	private int count = 0;
 
@@ -34,13 +35,11 @@ public final class StreamNode extends Node {
 	@Override
 	// Assumes that all datums of a particular name are of the same type
 	protected void uncheckedAddDatum(String datumName, Object datum) {
-		synchronized (this) {
+		((Queue) overseer.getCache().get(datumName)).add(datum);
+		synchronized (LOCK) {
 			if (getProgress() == 1) {
 				throw new IllegalStateException("StreamNode is already full!");
 			}
-
-			Map<String, Object> cache = overseer.getCache();
-			((Queue) cache.get(datumName)).add(datum);
 
 			usable = true;
 			count++;
