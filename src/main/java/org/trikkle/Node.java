@@ -8,8 +8,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	public final Set<String> datumNames; // unique identifies a node
 	private final Lock lock = new ReentrantLock();
 	protected Overseer overseer;
-	// todo decide if a node can become unusable after it's been usable
-	private boolean usable = false; // can be true then false
+	private boolean usable = false; // once true cannot be false
 	private double progress = 0; // monotonically increasing
 
 	protected Node(Set<String> datumNames) {
@@ -32,8 +31,8 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 		return usable;
 	}
 
-	public void setUsable(boolean usable) {
-		this.usable = usable;
+	public void setUsable() {
+		this.usable = true;
 	}
 
 	public double getProgress() {
@@ -50,7 +49,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 		this.progress = progress;
 		if (progress == 1) {
-			setUsable(true);
+			setUsable();
 			onDone();
 		}
 	}

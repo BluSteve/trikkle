@@ -169,14 +169,14 @@ class OverseerTest {
 
 						total += sum;
 						// prevents stream1Node from calling this arc again when another node ticktock().
-						stream1Node.setUsable(false);
+						stream1Node.setUsable();
 					}
 				}
 
 				System.out.println("total = " + total);
 
 				if (stream1Node.getProgress() == 1) {
-					stream1Node.setUsable(false);
+					stream1Node.setUsable();
 					this.status = ArcStatus.FINISHED;
 					returnDatum("result1", total); // this must be the last line as it's a recursive call
 				} else this.status = ArcStatus.IDLE;
