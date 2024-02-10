@@ -10,6 +10,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
 public final class Overseer {
+	private static final int PARALLEL_THRESHOLD = 2;
 	private final Graph g;
 	private final MultiMap<IBitmask, Link> linkMap = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
@@ -107,19 +108,26 @@ public final class Overseer {
 			}
 		}
 
-		// Run all links that can be done now (aka linksNow) in parallel.
-		RecursiveAction[] tasks = new RecursiveAction[linksNow.size()];
-		int i = 0;
-		for (Link link : linksNow) {
-			tasks[i] = new RecursiveAction() {
-				@Override
-				protected void compute() {
-					link.getArc().runWrapper();
-				}
-			};
-			i++;
+		if (linksNow.size() < PARALLEL_THRESHOLD) {
+			for (Link link : linksNow) {
+				link.getArc().runWrapper();
+			}
 		}
-		ForkJoinTask.invokeAll(tasks);
+		else {
+			// Run all links that can be done now (aka linksNow) in parallel.
+			RecursiveAction[] tasks = new RecursiveAction[linksNow.size()];
+			int i = 0;
+			for (Link link : linksNow) {
+				tasks[i] = new RecursiveAction() {
+					@Override
+					protected void compute() {
+						link.getArc().runWrapper();
+					}
+				};
+				i++;
+			}
+			ForkJoinTask.invokeAll(tasks);
+		}
 	}
 
 	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
