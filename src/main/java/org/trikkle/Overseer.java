@@ -91,6 +91,7 @@ public final class Overseer {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
+		Set<Arc> doLater = new HashSet<>();
 		// Get all links with idle arcs that the current state allows to be executed
 		IBitmask state = getCurrentState();
 		Collection<Link> linksNow = new ArrayList<>(g.links.size());
@@ -102,6 +103,10 @@ public final class Overseer {
 						if (arc.status == ArcStatus.IDLE) { // until it finds one that's not finished
 							arc.status = ArcStatus.STAND_BY;
 							linksNow.add(link);
+						}
+						else if (arc.status == ArcStatus.STAND_BY || arc.status == ArcStatus.IN_PROGRESS) {
+							// add arc to doLater pile
+							doLater.add(arc);
 						}
 					}
 				}
@@ -128,6 +133,9 @@ public final class Overseer {
 			}
 			ForkJoinTask.invokeAll(tasks);
 		}
+
+		// if any arcs in doLater pile and they're idle, try again.
+		if (doLater.stream().anyMatch(arc -> arc.status == ArcStatus.IDLE)) ticktock();
 	}
 
 	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.

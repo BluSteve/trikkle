@@ -8,6 +8,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	public final Set<String> datumNames; // unique identifies a node
 	private final Lock lock = new ReentrantLock();
 	protected Overseer overseer;
+	// todo decide if a node can become unusable after it's been usable
 	private boolean usable = false; // can be true then false
 	private double progress = 0; // monotonically increasing
 

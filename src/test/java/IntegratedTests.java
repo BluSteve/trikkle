@@ -79,7 +79,10 @@ public class IntegratedTests {
 				if (sum >= 500) {
 					this.status = ArcStatus.FINISHED;
 					returnDatum("coffee", new Coffee(sum));
-				} else this.status = ArcStatus.IDLE;
+				} else {
+					brewerNode.setUsable(false);
+					this.status = ArcStatus.IDLE;
+				}
 			}
 		};
 		coffeeArc.setName("make coffee");
