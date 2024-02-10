@@ -60,7 +60,7 @@ public class IntegratedTests {
 				for (int i = 0; i < 7; i++) {
 					returnDatum("brewer", 100.0);
 					try {
-						TimeUnit.MILLISECONDS.sleep(100);
+						TimeUnit.MILLISECONDS.sleep(10);
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					}

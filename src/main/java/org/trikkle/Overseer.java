@@ -11,7 +11,7 @@ import java.util.concurrent.RecursiveAction;
 
 public final class Overseer {
 	private final Graph g;
-	private final MultiMap<IBitmask, Link> links = new MultiHashMap<>();
+	private final MultiMap<IBitmask, Link> linkMap = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
@@ -45,7 +45,7 @@ public final class Overseer {
 				bitmask.set(indexOfNode.get(dependency));
 			}
 
-			links.putOne(bitmask, link);
+			linkMap.putOne(bitmask, link);
 		}
 	}
 
@@ -92,28 +92,32 @@ public final class Overseer {
 
 		// Get all links with idle arcs that the current state allows to be executed
 		IBitmask state = getCurrentState();
-		Set<Link> linksNow = new HashSet<>();
-		for (Map.Entry<IBitmask, Set<Link>> linkEntry : links.entrySet()) {
+		Collection<Link> linksNow = new ArrayList<>(g.links.size());
+		for (Map.Entry<IBitmask, Set<Link>> linkEntry : linkMap.entrySet()) {
 			if (state.supersetOf(linkEntry.getKey())) { // all where requirements are satisfied
 				for (Link link : linkEntry.getValue()) {
-					if (link.getArc().status == ArcStatus.IDLE) { // until it finds one that's not finished
-						link.getArc().status = ArcStatus.STAND_BY;
-						linksNow.add(link);
+					Arc arc = link.getArc();
+					synchronized (arc) { // prevents one arc from being added to two separate linksNow
+						if (arc.status == ArcStatus.IDLE) { // until it finds one that's not finished
+							arc.status = ArcStatus.STAND_BY;
+							linksNow.add(link);
+						}
 					}
 				}
 			}
 		}
 
 		// Run all links that can be done now (aka linksNow) in parallel.
-		Link[] linkArray = linksNow.toArray(new Link[0]);
-		List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
-		for (Link link : linkArray) {
-			tasks.add(new RecursiveAction() {
+		RecursiveAction[] tasks = new RecursiveAction[linksNow.size()];
+		int i = 0;
+		for (Link link : linksNow) {
+			tasks[i] = new RecursiveAction() {
 				@Override
 				protected void compute() {
 					link.getArc().runWrapper();
 				}
-			});
+			};
+			i++;
 		}
 		ForkJoinTask.invokeAll(tasks);
 	}
