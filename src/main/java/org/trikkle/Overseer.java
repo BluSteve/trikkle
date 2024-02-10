@@ -80,9 +80,8 @@ public final class Overseer {
 		}
 
 		started = true;
-		ticktock();
-		if (!hasEnded()) {
-			throw new IllegalStateException("Overseer ended before all ending nodes were filled!");
+		while (!hasEnded()) {
+			ticktock();
 		}
 		onEnd();
 	}
@@ -91,8 +90,6 @@ public final class Overseer {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
-		Set<Arc> doLater = new HashSet<>();
-		// Get all links with idle arcs that the current state allows to be executed
 		IBitmask state = getCurrentState();
 		Collection<Link> linksNow = new ArrayList<>(g.links.size());
 		for (Map.Entry<IBitmask, Set<Link>> linkEntry : linkMap.entrySet()) {
@@ -104,10 +101,6 @@ public final class Overseer {
 							arc.status = ArcStatus.STAND_BY;
 							linksNow.add(link);
 						}
-						else if (arc.status == ArcStatus.STAND_BY || arc.status == ArcStatus.IN_PROGRESS) {
-							// add arc to doLater pile
-							doLater.add(arc);
-						}
 					}
 				}
 			}
@@ -117,8 +110,7 @@ public final class Overseer {
 			for (Link link : linksNow) {
 				link.getArc().runWrapper();
 			}
-		}
-		else {
+		} else {
 			// Run all links that can be done now (aka linksNow) in parallel.
 			RecursiveAction[] tasks = new RecursiveAction[linksNow.size()];
 			int i = 0;
@@ -133,9 +125,6 @@ public final class Overseer {
 			}
 			ForkJoinTask.invokeAll(tasks);
 		}
-
-		// if any arcs in doLater pile and they're idle, try again.
-		if (doLater.stream().anyMatch(arc -> arc.status == ArcStatus.IDLE)) ticktock();
 	}
 
 	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
