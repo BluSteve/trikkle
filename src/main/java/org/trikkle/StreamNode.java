@@ -46,7 +46,7 @@ public final class StreamNode extends Node {
 				setProgress((double) count / limit);
 			}
 		}
-		overseer.ticktock(this);
+		overseer.ticktock();
 	}
 
 	public int getLimit() {
@@ -74,6 +74,6 @@ public final class StreamNode extends Node {
 
 	@Override
 	protected void onDone() {
-		overseer.ticktock(this);
+		overseer.ticktock();
 	}
 }

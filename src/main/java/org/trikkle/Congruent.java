@@ -9,7 +9,7 @@ public interface Congruent<T> {
 		if (set1.size() != set2.size()) {
 			return false;
 		}
-		
+
 		for (T congruent1 : set1) {
 			boolean found = false;
 			for (T congruent2 : set2) {

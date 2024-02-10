@@ -11,7 +11,7 @@ public final class Link implements Congruent<Link> {
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
 		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
 		if (arc == null) throw new NullPointerException("Arc cannot be null!");
-		if (outputNode == null) throw new NullPointerException("Output Node cannot be null!");
+		if (outputNode == null) throw new NullPointerException("outputNode cannot be null!");
 
 		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
 		boolean autoArc = arc instanceof AutoArc;

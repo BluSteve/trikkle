@@ -21,14 +21,14 @@ public final class Graph implements Congruent<Graph> {
 
 	public Graph(Set<Link> links) {
 		if (links == null || links.isEmpty()) {
-			throw new IllegalArgumentException("Graph must have at least one Link!");
+			throw new IllegalArgumentException("Graph must have at least one link!");
 		}
 		this.links = links;
 
 		Set<Node> dependencies = new HashSet<>();
 		for (Link link : links) {
 			if (arcMap.containsKey(link.getArc())) {
-				throw new IllegalArgumentException("The same Arc cannot be used for two Links!");
+				throw new IllegalArgumentException("The same arc cannot be used for two links!");
 			}
 
 			nodes.addAll(link.getDependencies());
@@ -50,7 +50,7 @@ public final class Graph implements Congruent<Graph> {
 		for (Node node : nodes) {
 			for (String datumName : node.datumNames) {
 				if (datumNames.contains(datumName)) {
-					throw new IllegalArgumentException("Two Nodes cannot have the same datum name!");
+					throw new IllegalArgumentException("Two nodes cannot have the same datum name!");
 				}
 			}
 			datumNames.addAll(node.datumNames);
@@ -153,7 +153,7 @@ public final class Graph implements Congruent<Graph> {
 
 	public Set<Node> findAllDependencies(Node node) {
 		if (!nodes.contains(node)) {
-			throw new IllegalArgumentException("Node must be in the Graph!");
+			throw new IllegalArgumentException("Node must be in the graph!");
 		}
 
 		Set<Node> dependencies = new HashSet<>();
@@ -175,7 +175,7 @@ public final class Graph implements Congruent<Graph> {
 	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {
 		// Note: targetEndingNodes may not be in endingNodes. It's merely the targetEndingNodes of the PRUNED graph.
 		if (!nodes.containsAll(targetEndingNodes)) {
-			throw new IllegalArgumentException("targetNodes must be a subset of the Graph's nodes!");
+			throw new IllegalArgumentException("targetNodes must be a subset of the graph's nodes!");
 		}
 
 		if (targetEndingNodes.size() == 1) {

@@ -9,7 +9,7 @@ public @interface TrikkleFunction {
 	String[] inputs();
 
 	// if two functions have the same nodeId, they will be used to make one outputNode with all their outputDatumNames
-	// 1:1 correspondence with Link
+	// 1:1 correspondence with link
 	String linkId();
 
 	String output();

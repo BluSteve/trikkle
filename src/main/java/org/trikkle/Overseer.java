@@ -15,14 +15,13 @@ public final class Overseer {
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
-	private int tick = 0;
 	private boolean started = false;
 
 	public Overseer(Graph graph) {
 		this.g = graph;
 
-		// undoes previous Overseer's changes
-		// Prime Nodes and Arcs with this Overseer
+		// undoes previous overseer's changes
+		// Prime nodes and arcs with this overseer
 		for (Primable primable : g.primables) {
 			primable.getLock().lock();
 			primable.reset();
@@ -39,7 +38,7 @@ public final class Overseer {
 			i++;
 		}
 
-		// Generate bitmasks for each Link
+		// Generate bitmasks for each link
 		for (Link link : g.links) {
 			IBitmask bitmask = IBitmask.getBitmask(g.nodes.size());
 			for (Node dependency : link.getDependencies()) {
@@ -80,29 +79,18 @@ public final class Overseer {
 		}
 
 		started = true;
-		ticktock(null);
+		ticktock();
 		if (!hasEnded()) {
 			throw new IllegalStateException("Overseer ended before all ending nodes were filled!");
 		}
 		onEnd();
 	}
 
-	void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
+	void ticktock() {
 		if (!started) return; // for adding datums manually
-		tick++;
-		//System.out.println("\ntick = " + tick);
-		if (hasEnded()) {
-			return;
-		}
+		if (hasEnded()) return;
 
-		if (outputNode != null) {
-			//System.out.printf("tick = %d, just filled %s%n", tick, outputNode.datumNames);
-		} else {
-			//System.out.printf("tick = %d, outputNode not passed%n", tick);
-		}
-
-
-		// Get all Links with idle Arcs that the current state allows to be executed
+		// Get all links with idle arcs that the current state allows to be executed
 		IBitmask state = getCurrentState();
 		Set<Link> linksNow = new HashSet<>();
 		for (Map.Entry<IBitmask, Set<Link>> linkEntry : links.entrySet()) {
@@ -116,9 +104,6 @@ public final class Overseer {
 			}
 		}
 
-		//System.out.printf("tick = %d, linksNow.size() = %d%n", tick, linksNow.size());
-
-
 		// Run all links that can be done now (aka linksNow) in parallel.
 		Link[] linkArray = linksNow.toArray(new Link[0]);
 		List<RecursiveAction> tasks = new ArrayList<>(); // parallel stream doesn't work fsr
@@ -126,7 +111,6 @@ public final class Overseer {
 			tasks.add(new RecursiveAction() {
 				@Override
 				protected void compute() {
-					//System.out.printf("Started: tick = %d, link = %s%n", tick, link);
 					link.getArc().runWrapper();
 				}
 			});
@@ -188,7 +172,6 @@ public final class Overseer {
 		for (Primable primable : g.primables) {
 			primable.getLock().unlock();
 		}
-		//System.out.println("Overseer finished!");
 	}
 
 	public Graph getGraph() {

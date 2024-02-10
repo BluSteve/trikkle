@@ -32,7 +32,7 @@ class GraphTest {
 					new Link(Set.of(magicNode), arcs.get(0), hfNode)
 			));
 		});
-		assertTrue(exception.getMessage().contains("The same Arc cannot be used for two Links!"));
+		assertTrue(exception.getMessage().contains("The same arc cannot be used for two links!"));
 	}
 
 	@Test
@@ -247,7 +247,7 @@ class GraphTest {
 			));
 		});
 
-		assertTrue(exception.getMessage().contains("Two Nodes cannot have the same datum name!"));
+		assertTrue(exception.getMessage().contains("Two nodes cannot have the same datum name!"));
 	}
 
 	@Test
@@ -270,12 +270,12 @@ class GraphTest {
 		Exception e = assertThrows(IllegalArgumentException.class, () -> {
 			graph1.findPrunedGraphFor(Set.of(paramNode));
 		});
-		assertTrue(e.getMessage().contains("Graph must have at least one Link!"));
+		assertTrue(e.getMessage().contains("Graph must have at least one link!"));
 
 		Exception e1 = assertThrows(IllegalArgumentException.class, () -> {
 			graph1.findPrunedGraphFor(Set.of(paramNode, matrixNode));
 		});
-		assertTrue(e1.getMessage().contains("targetNodes must be a subset of the Graph's nodes!"));
+		assertTrue(e1.getMessage().contains("targetNodes must be a subset of the graph's nodes!"));
 
 		Graph graph = graph1.findPrunedGraphFor(Set.of(hfNode));
 		Graph graphcached = graph1.findPrunedGraphFor(Set.of(hfNode));

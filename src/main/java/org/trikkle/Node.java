@@ -17,7 +17,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 	public void addDatum(String datumName, Object datum) {
 		if (!datumNames.contains(datumName)) {
-			throw new IllegalArgumentException("Datum \"" + datumName + "\" was not declared by this Node!");
+			throw new IllegalArgumentException("Datum \"" + datumName + "\" was not declared by this node!");
 		}
 		uncheckedAddDatum(datumName, datum);
 	}
