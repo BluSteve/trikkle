@@ -25,8 +25,7 @@ class OverseerTest {
 		Exception e1 = assertThrows(IllegalArgumentException.class, () -> node.setProgress(2));
 		assertTrue(e1.getMessage().contains("Progress 2.0 not between 0 and 1!"));
 
-		Exception e2 = assertThrows(IllegalArgumentException.class, () -> node.setProgress(0.5));
-		assertTrue(e2.getMessage().contains("Progress cannot decrease!"));
+		assertFalse(node.setProgress(0.5));
 	}
 
 	@Test

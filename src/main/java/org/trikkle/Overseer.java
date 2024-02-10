@@ -91,34 +91,34 @@ public final class Overseer {
 		if (hasEnded()) return;
 
 		IBitmask state = getCurrentState();
-		Collection<Link> linksNow = new ArrayList<>(g.links.size());
+		Collection<Arc> arcsNow = new ArrayList<>(g.arcs.size());
 		for (Map.Entry<IBitmask, Set<Link>> linkEntry : linkMap.entrySet()) {
 			if (state.supersetOf(linkEntry.getKey())) { // all where requirements are satisfied
 				for (Link link : linkEntry.getValue()) {
 					Arc arc = link.getArc();
-					synchronized (arc) { // prevents one arc from being added to two separate linksNow
+					synchronized (arc) { // prevents one arc from being added to two separate arcsNow
 						if (arc.status == ArcStatus.IDLE) { // until it finds one that's not finished
 							arc.status = ArcStatus.STAND_BY;
-							linksNow.add(link);
+							arcsNow.add(arc);
 						}
 					}
 				}
 			}
 		}
 
-		if (linksNow.size() < PARALLEL_THRESHOLD) {
-			for (Link link : linksNow) {
-				link.getArc().runWrapper();
+		if (arcsNow.size() < PARALLEL_THRESHOLD) {
+			for (Arc arc : arcsNow) {
+				arc.runWrapper();
 			}
 		} else {
-			// Run all links that can be done now (aka linksNow) in parallel.
-			RecursiveAction[] tasks = new RecursiveAction[linksNow.size()];
+			// Run all links that can be done now (aka arcsNow) in parallel.
+			RecursiveAction[] tasks = new RecursiveAction[arcsNow.size()];
 			int i = 0;
-			for (Link link : linksNow) {
+			for (Arc arc : arcsNow) {
 				tasks[i] = new RecursiveAction() {
 					@Override
 					protected void compute() {
-						link.getArc().runWrapper();
+						arc.runWrapper();
 					}
 				};
 				i++;

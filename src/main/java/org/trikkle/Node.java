@@ -39,12 +39,12 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 		return progress;
 	}
 
-	public void setProgress(double progress) {
+	public boolean setProgress(double progress) {
 		if (progress < 0 || progress > 1) {
 			throw new IllegalArgumentException("Progress " + progress + " not between 0 and 1!");
 		}
 		if (progress < this.progress) {
-			throw new IllegalArgumentException("Progress cannot decrease!");
+			return false;
 		}
 
 		this.progress = progress;
@@ -52,6 +52,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 			setUsable();
 			onDone();
 		}
+		return true;
 	}
 
 	@Override
