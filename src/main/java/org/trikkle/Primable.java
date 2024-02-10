@@ -1,5 +1,7 @@
 package org.trikkle;
 
+import java.util.concurrent.locks.Lock;
+
 public interface Primable {
 	void primeWith(Overseer overseer);
 
@@ -8,4 +10,6 @@ public interface Primable {
 	 * fields.
 	 */
 	void reset();
+
+	Lock getLock();
 }

@@ -4,9 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.trikkle.viz.IGraphViz;
 import org.trikkle.viz.MermaidGraphViz;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -231,6 +234,42 @@ class OverseerTest {
 
 		System.out.println(overseer.getDatum("numberStream"));
 		assertEquals(18, ((Queue<Double>) overseer.getDatum("numberStream")).size());
+		assertEquals(streamNode.getProgress(), 1);
+	}
+
+	@Test
+	void stressTest() {
+		StreamNode streamNode = StreamNode.of("numberStream");
+		streamNode.setLimit(1000);
+		Set<Link> links = new HashSet<>();
+		for (int i = 0; i < 100; i++) {
+			Arc inputArc = new AutoArc() {
+				@Override
+				public void run() {
+					for (int i = 1; i <= 10; i++) {
+						returnDatum("numberStream", (double) i);
+					}
+				}
+			};
+			Link link = new Link(Set.of(), inputArc, streamNode);
+			links.add(link);
+		}
+		Graph graph = new Graph(links);
+		System.out.println(graph);
+
+		Set<RecursiveAction> actions = new HashSet<>();
+		for (int i = 0; i < 2; i++) {
+			actions.add(new RecursiveAction() {
+				@Override
+				protected void compute() {
+					Overseer overseer = new Overseer(graph);
+					overseer.start();
+					assertEquals(1000, ((Queue<Double>) overseer.getDatum("numberStream")).size());
+				}
+			});
+		}
+		ForkJoinTask.invokeAll(actions);
+
 		assertEquals(streamNode.getProgress(), 1);
 	}
 

@@ -23,15 +23,11 @@ public final class Overseer {
 
 		// undoes previous Overseer's changes
 		// Prime Nodes and Arcs with this Overseer
-		for (Primable primable : g.nodes) {
+		for (Primable primable : g.primables) {
+			primable.getLock().lock();
 			primable.reset();
 			primable.primeWith(this);
 		}
-		for (Primable primable : g.arcs) {
-			primable.reset();
-			primable.primeWith(this);
-		}
-
 
 		// Generate helper indices
 		int i = 0;
@@ -42,7 +38,6 @@ public final class Overseer {
 			}
 			i++;
 		}
-
 
 		// Generate bitmasks for each Link
 		for (Link link : g.links) {
@@ -89,6 +84,7 @@ public final class Overseer {
 		if (!hasEnded()) {
 			throw new IllegalStateException("Overseer ended before all ending nodes were filled!");
 		}
+		onEnd();
 	}
 
 	void ticktock(Node outputNode) { // passing outputNode is only for debugging purposes
@@ -96,7 +92,6 @@ public final class Overseer {
 		tick++;
 		//System.out.println("\ntick = " + tick);
 		if (hasEnded()) {
-			onEnd();
 			return;
 		}
 
@@ -190,6 +185,9 @@ public final class Overseer {
 	}
 
 	private void onEnd() {
+		for (Primable primable : g.primables) {
+			primable.getLock().unlock();
+		}
 		//System.out.println("Overseer finished!");
 	}
 

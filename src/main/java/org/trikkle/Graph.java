@@ -9,6 +9,7 @@ import java.util.*;
 public final class Graph implements Congruent<Graph> {
 	public static boolean ALLOW_CYCLES = false;
 	public final Set<Link> links;
+	public final Set<Primable> primables;
 	public final Set<Arc> arcs;
 	public final Set<Node> nodes = new HashSet<>();
 	public final Set<Node> startingNodes = new HashSet<>();
@@ -41,6 +42,8 @@ public final class Graph implements Congruent<Graph> {
 			dependencies.addAll(link.getDependencies());
 		}
 		arcs = arcMap.keySet();
+		primables = new HashSet<>(nodes);
+		primables.addAll(arcs);
 
 		// throw an error if two nodes have any datum names in common
 		Set<String> datumNames = new HashSet<>();

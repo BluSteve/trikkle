@@ -1,9 +1,12 @@
 package org.trikkle;
 
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class
 	public final Set<String> datumNames; // unique identifies a node
+	private final Lock lock = new ReentrantLock();
 	protected Overseer overseer;
 	private boolean usable = false; // can be true then false
 	private double progress = 0; // monotonically increasing
@@ -66,6 +69,11 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 		usable = false;
 		progress = 0;
 		overseer = null;
+	}
+
+	@Override
+	public Lock getLock() {
+		return lock;
 	}
 
 	@Override
