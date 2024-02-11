@@ -19,7 +19,6 @@ public abstract class Arc implements Primable {
 		int before = overseer.alertCount.get();
 		run();
 		if (!(getStatus() == ArcStatus.FINISHED) && overseer.alertCount.get() > before) {
-			System.err.println("Rerunning " + name + " because of data alerts.");
 			runWrapper();
 		}
 	}

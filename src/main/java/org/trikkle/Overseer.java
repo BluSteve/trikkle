@@ -95,7 +95,6 @@ public final class Overseer {
 		while (!tasks.isEmpty()) {
 			tasks.pop().join();
 		}
-		System.out.println("Overseer ended in " + tick.get() + " ticks.");
 		onEnd();
 	}
 
