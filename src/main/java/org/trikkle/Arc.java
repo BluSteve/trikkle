@@ -1,5 +1,6 @@
 package org.trikkle;
 
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -7,13 +8,13 @@ public abstract class Arc implements Primable {
 	private final Lock lock = new ReentrantLock();
 	protected Overseer overseer;
 	protected ArcStatus status = ArcStatus.IDLE;
-	protected Node outputNode;
+	protected Set<Node> dependencies, outputNodes;
+	private Node outputNode;
 	private String name;
 
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {
-		outputNode = overseer.getOutputNodeOfArc(this);
 		run();
 	}
 
@@ -22,7 +23,13 @@ public abstract class Arc implements Primable {
 	}
 
 	protected void returnDatum(String datumName, Object datum) {
-		outputNode.addDatum(datumName, datum);
+		Node node = overseer.getNodeOfDatum(datumName);
+		if (outputNodes.contains(node)) {
+			node.addDatum(datumName, datum);
+		} else {
+			throw new IllegalArgumentException(
+					"Arc " + name + " cannot return datum " + datumName + " because it is not an output of this arc!");
+		}
 	}
 
 	public ArcStatus getStatus() {
@@ -34,19 +41,34 @@ public abstract class Arc implements Primable {
 	}
 
 	public void setName(String name) {
-		if (name.isEmpty()) this.name = null;
-		else this.name = name;
+		if (name.isEmpty()) {
+			this.name = null;
+		} else {
+			this.name = name;
+		}
+	}
+
+	protected Node getOutputNode() {
+		return outputNode;
 	}
 
 	@Override
-	public void primeWith(Overseer overseer) {
+	public void primeWith(Overseer overseer) { // aka initialize
 		this.overseer = overseer;
+		Link link = overseer.getGraph().arcMap.get(this);
+		dependencies = link.getDependencies();
+		outputNodes = link.getOutputNodes();
+		if (outputNodes.size() == 1) {
+			outputNode = outputNodes.iterator().next();
+		}
 	}
 
 	@Override
 	public void reset() {
 		overseer = null;
 		status = ArcStatus.IDLE;
+		dependencies = null;
+		outputNodes = null;
 		outputNode = null;
 	}
 

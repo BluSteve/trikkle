@@ -32,11 +32,13 @@ public final class Graph implements Congruent<Graph> {
 			}
 
 			nodes.addAll(link.getDependencies());
-			nodes.add(link.getOutputNode());
+			nodes.addAll(link.getOutputNodes());
 			arcMap.put(link.getArc(), link);
-			outputNodeMap.putOne(link.getOutputNode(), link);
-			for (Node dependency : link.getDependencies()) {
-				dependenciesOfNode.putOne(link.getOutputNode(), dependency);
+			for (Node outputNode : link.getOutputNodes()) {
+				outputNodeMap.putOne(outputNode, link);
+				for (Node dependency : link.getDependencies()) {
+					dependenciesOfNode.putOne(outputNode, dependency);
+				}
 			}
 
 			dependencies.addAll(link.getDependencies());
@@ -45,7 +47,7 @@ public final class Graph implements Congruent<Graph> {
 		primables = new HashSet<>(nodes);
 		primables.addAll(arcs);
 
-		// throw an error if two nodes have any datum names in common
+		// todo remove this
 		Set<String> datumNames = new HashSet<>();
 		for (Node node : nodes) {
 			for (String datumName : node.datumNames) {

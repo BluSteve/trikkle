@@ -142,10 +142,10 @@ class OverseerTest {
 			public void run() {
 				for (int i = 1; i < 10; i++) {
 					returnDatum("stream1", (double) i);
-					outputNode.setProgress(i / 10.0);
+					getOutputNode().setProgress(i / 10.0);
 				}
 
-				outputNode.setProgress(1);
+				getOutputNode().setProgress(1);
 			}
 		};
 		Node streamNode = StreamNode.of("stream1");

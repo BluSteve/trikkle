@@ -15,7 +15,7 @@ public final class Overseer {
 	private final MultiMap<IBitmask, Link> linkMap = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
-	private final Map<String, Node> nodeOfDatumName = new HashMap<>();
+	private final Map<String, Node> nodeOfDatum = new HashMap<>();
 	private boolean started = false;
 
 	public Overseer(Graph graph) {
@@ -34,7 +34,7 @@ public final class Overseer {
 		for (Node node : g.nodes) {
 			indexOfNode.put(node, i);
 			for (String datumName : node.datumNames) {
-				nodeOfDatumName.put(datumName, node);
+				nodeOfDatum.put(datumName, node);
 			}
 			i++;
 		}
@@ -59,7 +59,7 @@ public final class Overseer {
 	}
 
 	public void addStartingDatum(String datumName, Object datum) {
-		Node node = nodeOfDatumName.get(datumName);
+		Node node = nodeOfDatum.get(datumName);
 		if (!g.startingNodes.contains(node)) {
 			throw new IllegalArgumentException(
 					"Node of datumName \"" + datumName + "\" does not belong to a starting node!");
@@ -151,11 +151,7 @@ public final class Overseer {
 	}
 
 	public Node getNodeOfDatum(String datumName) {
-		return nodeOfDatumName.get(datumName);
-	}
-
-	Node getOutputNodeOfArc(Arc arc) {
-		return g.arcMap.get(arc).getOutputNode();
+		return nodeOfDatum.get(datumName);
 	}
 
 	private IBitmask getCurrentState() {

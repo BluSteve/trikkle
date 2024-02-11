@@ -6,12 +6,16 @@ import java.util.Set;
 public final class Link implements Congruent<Link> {
 	private final Set<Node> dependencies;
 	private final Arc arc;
-	private final Node outputNode;
+	private final Set<Node> outputNodes;
 
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
+		this(dependencies, arc, Set.of(outputNode));
+	}
+
+	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
 		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
 		if (arc == null) throw new NullPointerException("Arc cannot be null!");
-		if (outputNode == null) throw new NullPointerException("outputNode cannot be null!");
+		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
 
 		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
 		boolean autoArc = arc instanceof AutoArc;
@@ -21,7 +25,7 @@ public final class Link implements Congruent<Link> {
 
 		this.dependencies = dependencies;
 		this.arc = arc;
-		this.outputNode = outputNode;
+		this.outputNodes = outputNodes;
 	}
 
 	public Set<Node> getDependencies() {
@@ -33,12 +37,18 @@ public final class Link implements Congruent<Link> {
 	}
 
 	public Node getOutputNode() {
-		return outputNode;
+		if (outputNodes.size() > 1) throw new IllegalStateException("Link has multiple output nodes!");
+		return outputNodes.iterator().next();
+	}
+
+	public Set<Node> getOutputNodes() {
+		return outputNodes;
 	}
 
 	@Override
 	public boolean congruentTo(Link link) {
-		return Congruent.setsCongruent(dependencies, link.dependencies) && outputNode.congruentTo(link.outputNode);
+		return Congruent.setsCongruent(dependencies, link.dependencies) &&
+				Congruent.setsCongruent(outputNodes, link.outputNodes);
 	}
 
 	@Override
@@ -47,11 +57,11 @@ public final class Link implements Congruent<Link> {
 		if (o == null || getClass() != o.getClass()) return false;
 		Link link = (Link) o;
 		return Objects.equals(dependencies, link.dependencies) && Objects.equals(arc, link.arc) &&
-				Objects.equals(outputNode, link.outputNode);
+				Objects.equals(outputNodes, link.outputNodes);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(dependencies, arc, outputNode);
+		return Objects.hash(dependencies, arc, outputNodes);
 	}
 }
