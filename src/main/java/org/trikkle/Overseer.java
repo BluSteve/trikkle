@@ -8,6 +8,7 @@ import org.trikkle.structs.StrictConcurrentHashMap;
 import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class Overseer {
 	private static final int PARALLEL_THRESHOLD = 2;
@@ -15,6 +16,7 @@ public final class Overseer {
 	private final MultiMap<IBitmask, Link> linkMap = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
+	private final AtomicInteger tick = new AtomicInteger(0);
 	private boolean started = false;
 
 	public Overseer(Graph graph) {
@@ -82,9 +84,10 @@ public final class Overseer {
 		onEnd();
 	}
 
-	void ticktock() {
+	private void ticktock() {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
+		tick.incrementAndGet();
 
 		IBitmask state = getCurrentState();
 		Collection<Arc> arcsNow = new ArrayList<>(g.arcs.size());

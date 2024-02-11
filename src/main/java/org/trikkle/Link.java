@@ -1,5 +1,7 @@
 package org.trikkle;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
@@ -9,7 +11,7 @@ public final class Link implements Congruent<Link> {
 	private final Set<Node> outputNodes;
 
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
-		this(dependencies, arc, Set.of(outputNode));
+		this(dependencies, arc, Collections.singleton(outputNode));
 	}
 
 	// todo can a link have no outputNodes?
