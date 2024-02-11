@@ -17,17 +17,6 @@ public class LongArrayBitmask implements IBitmask {
 		this.bitmask = new long[(int) ((length - 1) / Long.SIZE + 1)];
 	}
 
-	public static void main(String[] args) {
-		// Test LongArrayBitmask
-		IBitmask lb = new LongArrayBitmask(65);
-		lb.set(0);
-		lb.set(1);
-		lb.set(63);
-		lb.set(64);
-		System.out.println(lb);
-		System.out.println("MAX_LENGTH = " + MAX_LENGTH);
-	}
-
 	@Override
 	public long length() {
 		return length;

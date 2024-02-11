@@ -3,7 +3,7 @@ package org.trikkle.structs;
 public interface IBitmask {
 	static IBitmask getBitmask(int length) {
 		if (length < 0) throw new IllegalArgumentException("Length cannot be < 0!");
-		if (length > 64) return new ArrayBitmask(length);
+		if (length > 64) return new LongArrayBitmask(length);
 		else return new LongBitmask(length);
 	}
 

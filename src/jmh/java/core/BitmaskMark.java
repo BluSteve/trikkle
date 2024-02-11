@@ -3,9 +3,10 @@ package core;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.trikkle.structs.IBitmask;
+import org.trikkle.structs.LongArrayBitmask;
+import org.trikkle.structs.LongBitmask;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -33,16 +34,16 @@ public class BitmaskMark {
 
 	@org.openjdk.jmh.annotations.State(Scope.Benchmark)
 	public static class State {
-		final int C  = 65;
-		final int N  = 100000;
+		final int C = 64;
+		final int N = 100000;
 		final IBitmask[] bitmasks = new IBitmask[N];
-		final IBitmask query = IBitmask.getBitmask(C);
+		final IBitmask query = new LongArrayBitmask(C);
 		Random random = new Random(123);
 
 		@Setup(Level.Trial)
 		public void setup() {
 			for (int i = 0; i < N; i++) {
-				bitmasks[i] = IBitmask.getBitmask(C);
+				bitmasks[i] = new LongArrayBitmask(C);
 				for (int j = 0; j < C; j++) {
 					if (random.nextBoolean()) {
 						bitmasks[i].set(j);
