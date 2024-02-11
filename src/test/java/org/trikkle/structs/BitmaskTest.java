@@ -82,4 +82,17 @@ class BitmaskTest {
 
 		assertEquals(lb1, lb2);
 	}
+
+	@Test
+	void test5() {
+		IBitmask lb1 = new LongArrayBitmask(1000);
+		lb1.set(2);
+		lb1.set(800);
+
+		IBitmask lb2 = new ArrayBitmask(1000);
+		lb2.set(2);
+		lb2.set(800);
+
+		assertEquals(lb1, lb2);
+	}
 }

@@ -7,9 +7,13 @@ public interface IBitmask {
 		else return new LongBitmask(length);
 	}
 
-	void set(int index);
+	long length();
 
-	void unset(int index);
+	long maxLength();
+
+	void set(long index);
+
+	void unset(long index);
 
 	boolean supersetOf(IBitmask o);
 

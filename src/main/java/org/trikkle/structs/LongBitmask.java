@@ -2,27 +2,37 @@ package org.trikkle.structs;
 
 import java.util.Objects;
 
-class LongBitmask implements IBitmask {
-	public final int length;
+public class LongBitmask implements IBitmask {
+	private static final long MAX_LENGTH = Long.SIZE;
+	private final int length;
 	private long bitmask;
 
-	LongBitmask(int length) {
-		if (length > 64) {
+	public LongBitmask(int length) {
+		if (length > MAX_LENGTH) {
 			throw new IllegalArgumentException("Bitmask length out of range!");
 		}
-
 		this.length = length;
 		this.bitmask = 0;
 	}
 
 	@Override
-	public void set(int index) {
+	public long length() {
+		return length;
+	}
+
+	@Override
+	public long maxLength() {
+		return MAX_LENGTH;
+	}
+
+	@Override
+	public void set(long index) {
 		if (index >= length) throw new IllegalArgumentException("Index out of range!");
 		bitmask = bitmask | (1L << index);
 	}
 
 	@Override
-	public void unset(int index) {
+	public void unset(long index) {
 		if (index >= length) throw new IllegalArgumentException("Index out of range!");
 		bitmask = bitmask & ~(1L << index);
 	}
@@ -32,8 +42,11 @@ class LongBitmask implements IBitmask {
 		if (this == o) return true;
 		if (o == null) return false;
 		if (!(o instanceof LongBitmask)) {
-			if (o instanceof IBitmask) return this.toString().equals(o.toString());
-			else return false;
+			if (o instanceof IBitmask) {
+				return this.toString().equals(o.toString());
+			} else {
+				return false;
+			}
 		}
 		LongBitmask that = (LongBitmask) o;
 		return length == that.length && bitmask == that.bitmask;

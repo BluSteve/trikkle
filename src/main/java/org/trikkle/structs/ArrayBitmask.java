@@ -3,25 +3,39 @@ package org.trikkle.structs;
 import java.util.Arrays;
 import java.util.Objects;
 
-class ArrayBitmask implements IBitmask {
-	public final int length;
+public class ArrayBitmask implements IBitmask {
+	private static final long MAX_LENGTH = Integer.MAX_VALUE - 8;
+	private final int length;
 	private final boolean[] array;
 
-	ArrayBitmask(int length) {
+	public ArrayBitmask(int length) {
+		if (length > MAX_LENGTH) {
+			throw new IllegalArgumentException("Bitmask length out of range!");
+		}
 		this.length = length;
 		array = new boolean[length];
 	}
 
 	@Override
-	public void set(int index) {
-		if (index > length) throw new IllegalArgumentException("Index out of range!");
-		array[index] = true;
+	public long length() {
+		return length;
 	}
 
 	@Override
-	public void unset(int index) {
+	public long maxLength() {
+		return MAX_LENGTH;
+	}
+
+	@Override
+	public void set(long index) {
 		if (index > length) throw new IllegalArgumentException("Index out of range!");
-		array[index] = false;
+		array[(int) index] = true;
+	}
+
+	@Override
+	public void unset(long index) {
+		if (index > length) throw new IllegalArgumentException("Index out of range!");
+		array[(int) index] = false;
 	}
 
 	@Override
@@ -29,8 +43,11 @@ class ArrayBitmask implements IBitmask {
 		if (this == o) return true;
 		if (o == null) return false;
 		if (!(o instanceof ArrayBitmask)) {
-			if (o instanceof IBitmask) return this.toString().equals(o.toString());
-			else return false;
+			if (o instanceof IBitmask) {
+				return this.toString().equals(o.toString());
+			} else {
+				return false;
+			}
 		}
 		ArrayBitmask that = (ArrayBitmask) o;
 		return length == that.length && Arrays.equals(array, that.array);
