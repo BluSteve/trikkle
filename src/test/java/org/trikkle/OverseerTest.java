@@ -57,8 +57,6 @@ class OverseerTest {
 		inputNode.addDatum("toSquare", 2.0);
 		overseer.start();
 
-		assertEquals(overseer.getCacheCopy(), overseer.getCache());
-		assertNotSame(overseer.getCacheCopy(), overseer.getCache());
 		Map<String, Object> results = overseer.getResultCache();
 		assertEquals(4.0, results.get("squared"));
 	}
@@ -177,9 +175,9 @@ class OverseerTest {
 
 				if (stream1Node.getProgress() == 1) {
 					stream1Node.setUsable();
-					this.status = ArcStatus.FINISHED;
+					this.setStatus(ArcStatus.FINISHED);
 					returnDatum("result1", total); // this must be the last line as it's a recursive call
-				} else this.status = ArcStatus.IDLE;
+				} else this.setStatus(ArcStatus.IDLE);
 			}
 
 			@Override

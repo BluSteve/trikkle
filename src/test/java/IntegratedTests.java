@@ -77,11 +77,11 @@ public class IntegratedTests {
 				List<Double> volumes = Arrays.asList(volume.toArray(new Double[0])); // thread-safe snapshot
 				double sum = volumes.stream().mapToDouble(Double::doubleValue).sum();
 				if (sum >= 500) {
-					this.status = ArcStatus.FINISHED;
+					this.setStatus(ArcStatus.FINISHED);
 					returnDatum("coffee", new Coffee(sum));
 				} else {
 					brewerNode.setUsable();
-					this.status = ArcStatus.IDLE;
+					this.setStatus(ArcStatus.IDLE);
 				}
 			}
 		};

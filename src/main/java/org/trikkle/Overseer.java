@@ -6,8 +6,13 @@ import org.trikkle.structs.MultiMap;
 import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public final class Overseer {
 	private static final int PARALLEL_THRESHOLD = 2;
@@ -16,11 +21,13 @@ public final class Overseer {
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final AtomicInteger tick = new AtomicInteger(0);
+	private final BlockingQueue<Boolean> bq = new ArrayBlockingQueue<>(1);
 	private final Stack<RecursiveAction> tasks = new Stack<>();
 	private boolean started = false;
 
 	public Overseer(Graph graph) {
 		this.g = graph;
+		bq.add(true);
 
 		// undoes previous overseer's changes
 		// Prime nodes and arcs with this overseer
@@ -78,7 +85,13 @@ public final class Overseer {
 		}
 
 		started = true;
+
 		while (!hasEnded()) {
+			try {
+				bq.take();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 			ticktock();
 		}
 		while (!tasks.isEmpty()) {
@@ -100,8 +113,8 @@ public final class Overseer {
 				for (Link link : linkEntry.getValue()) {
 					Arc arc = link.getArc();
 					synchronized (arc) { // prevents one arc from being added to two separate arcsNow
-						if (arc.status == ArcStatus.IDLE) { // until it finds one that's not finished
-							arc.status = ArcStatus.STAND_BY;
+						if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
+							arc.setStatus(ArcStatus.STAND_BY);
 							arcsNow.add(arc);
 						}
 					}
@@ -136,8 +149,16 @@ public final class Overseer {
 		}
 	}
 
-	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
-		return cache;
+	void alert() {
+		bq.offer(true);
+	}
+
+	void cachePut(String datumName, Object datum) {
+		cache.put(datumName, datum);
+	}
+
+	Object cacheGet(String datumName) {
+		return cache.get(datumName);
 	}
 
 	public Object getDatum(String datumName) {

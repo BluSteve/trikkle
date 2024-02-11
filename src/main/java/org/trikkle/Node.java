@@ -33,6 +33,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 	public void setUsable() {
 		this.usable = true;
+		if (overseer != null) overseer.alert();
 	}
 
 	public double getProgress() {

@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Arc implements Primable {
 	private final Lock lock = new ReentrantLock();
 	protected Overseer overseer;
-	protected ArcStatus status = ArcStatus.IDLE;
 	protected Set<Node> dependencies, outputNodes;
+	private ArcStatus status = ArcStatus.IDLE;
 	private Node outputNode;
 	private String name;
 
@@ -19,7 +19,7 @@ public abstract class Arc implements Primable {
 	}
 
 	protected Object getDatum(String datumName) {
-		return overseer.getCache().get(datumName);
+		return overseer.cacheGet(datumName);
 	}
 
 	protected void returnDatum(String datumName, Object datum) {
@@ -38,6 +38,16 @@ public abstract class Arc implements Primable {
 
 	public ArcStatus getStatus() {
 		return status;
+	}
+
+	protected void setStatus(ArcStatus status) {
+		if (status == null) {
+			throw new NullPointerException("Status cannot be null!");
+		}
+		if (overseer != null && status != this.status) {
+			overseer.alert();
+		}
+		this.status = status;
 	}
 
 	public String getName() {
@@ -70,7 +80,7 @@ public abstract class Arc implements Primable {
 	@Override
 	public void reset() {
 		overseer = null;
-		status = ArcStatus.IDLE;
+		setStatus(ArcStatus.IDLE);
 		dependencies = null;
 		outputNodes = null;
 		outputNode = null;
