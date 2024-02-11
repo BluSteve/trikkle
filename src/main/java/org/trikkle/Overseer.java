@@ -122,7 +122,16 @@ public final class Overseer {
 				};
 				i++;
 			}
+			// todo maybe fork instead?
 			ForkJoinTask.invokeAll(tasks);
+		}
+
+		pruneLinks();
+	}
+
+	private void pruneLinks() {
+		for (Set<Link> value : linkMap.values()) {
+			value.removeIf(link -> link.getArc().getStatus() == ArcStatus.FINISHED);
 		}
 	}
 
