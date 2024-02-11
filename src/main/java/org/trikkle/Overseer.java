@@ -58,7 +58,7 @@ public final class Overseer {
 		Node node = g.nodeOfDatum.get(datumName);
 		if (!g.startingNodes.contains(node)) {
 			throw new IllegalArgumentException(
-					"Node of datumName \"" + datumName + "\" does not belong to a starting node!");
+					"Datum " + datumName + " does not belong to a starting node!");
 		}
 		node.addDatum(datumName, datum);
 	}

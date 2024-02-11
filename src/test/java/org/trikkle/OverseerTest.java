@@ -20,7 +20,7 @@ class OverseerTest {
 		node.setProgress(1);
 
 		Exception e = assertThrows(IllegalArgumentException.class, () -> node.addDatum("toSquare2", 3.0));
-		assertTrue(e.getMessage().contains("Datum \"toSquare2\" was not declared by this node!"));
+		assertTrue(e.getMessage().contains("Datum toSquare2 was not declared by this node!"));
 
 		Exception e1 = assertThrows(IllegalArgumentException.class, () -> node.setProgress(2));
 		assertTrue(e1.getMessage().contains("Progress 2.0 not between 0 and 1!"));
@@ -117,7 +117,7 @@ class OverseerTest {
 		overseer.addStartingDatum("finalMultiplier", 3.0);
 
 		Exception e1 = assertThrows(IllegalArgumentException.class, () -> overseer.addStartingDatum("result2", 30));
-		assertTrue(e1.getMessage().contains("Node of datumName \"result2\" does not belong to a starting node!"));
+		assertTrue(e1.getMessage().contains("Datum result2 does not belong to a starting node!"));
 
 		Exception e = assertThrows(IllegalStateException.class, overseer::start);
 		assertTrue(e.getMessage().contains("Starting nodes not fully populated; unable to start!"));
@@ -308,10 +308,11 @@ class OverseerTest {
 			public void run() {
 				returnDatum("res1", 1.0);
 				returnDatum("res2", 2.0);
+				returnDatum("res2a", 3.0);
 			}
 		};
 		Node discreteNode = DiscreteNode.of("res1");
-		Node discreteNode2 = DiscreteNode.of("res2");
+		Node discreteNode2 = DiscreteNode.of("res2", "res2a");
 		Link link = new Link(Set.of(), inputArc, Set.of(discreteNode, discreteNode2));
 		Graph graph = new Graph(link);
 		System.out.println(graph);
@@ -321,5 +322,6 @@ class OverseerTest {
 
 		assertEquals(1.0, overseer.getDatum("res1"));
 		assertEquals(2.0, overseer.getDatum("res2"));
+		assertEquals(3.0, overseer.getDatum("res2a"));
 	}
 }
