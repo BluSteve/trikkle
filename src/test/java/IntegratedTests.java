@@ -80,7 +80,6 @@ public class IntegratedTests {
 					this.setStatus(ArcStatus.FINISHED);
 					returnDatum("coffee", new Coffee(sum));
 				} else {
-					brewerNode.setUsable();
 					this.setStatus(ArcStatus.IDLE);
 				}
 			}

@@ -97,7 +97,6 @@ public final class Overseer {
 		while (!tasks.isEmpty()) {
 			tasks.pop().join();
 		}
-		System.out.println("Overseer ended in " + tick.get() + " ticks.");
 		onEnd();
 	}
 
@@ -149,12 +148,13 @@ public final class Overseer {
 		}
 	}
 
-	void alert() {
+	void alert(Primable caller) {
 		bq.offer(true);
 	}
 
 	void cachePut(String datumName, Object datum) {
 		cache.put(datumName, datum);
+		alert(null);
 	}
 
 	Object cacheGet(String datumName) {

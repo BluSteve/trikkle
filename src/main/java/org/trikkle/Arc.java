@@ -44,8 +44,12 @@ public abstract class Arc implements Primable {
 		if (status == null) {
 			throw new NullPointerException("Status cannot be null!");
 		}
-		if (overseer != null && status != this.status) {
-			overseer.alert();
+		if (this.status == ArcStatus.FINISHED && status != ArcStatus.FINISHED) {
+			throw new IllegalStateException("Arc " + name + " is already finished!");
+		}
+
+		if (overseer != null) {
+			overseer.alert(this);
 		}
 		this.status = status;
 	}
@@ -80,7 +84,7 @@ public abstract class Arc implements Primable {
 	@Override
 	public void reset() {
 		overseer = null;
-		setStatus(ArcStatus.IDLE);
+		status = ArcStatus.IDLE;
 		dependencies = null;
 		outputNodes = null;
 		outputNode = null;
