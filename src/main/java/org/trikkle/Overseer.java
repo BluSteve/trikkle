@@ -84,7 +84,7 @@ public final class Overseer {
 		onEnd();
 	}
 
-	private void ticktock() {
+	void ticktock() {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 		tick.incrementAndGet();
@@ -122,10 +122,14 @@ public final class Overseer {
 				};
 				i++;
 			}
-			ForkJoinTask.invokeAll(tasks);
+			for (RecursiveAction task : tasks) {
+				task.fork();
+			}
+			for (int j = tasks.length - 1; j >= 0; j--) {
+				tasks[j].join();
+				ticktock();
+			}
 		}
-
-		pruneLinks();
 	}
 
 	private void pruneLinks() {
