@@ -4,6 +4,7 @@ import org.trikkle.*;
 
 import java.util.*;
 
+@Deprecated
 public class GraphGenerator {
 	private final static long SEED = 504957110;
 

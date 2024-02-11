@@ -24,6 +24,10 @@ public abstract class Arc implements Primable {
 
 	protected void returnDatum(String datumName, Object datum) {
 		Node node = overseer.getNodeOfDatum(datumName);
+		if (node == null) {
+			throw new IllegalArgumentException("No node is associated with datum " + datumName + "!");
+		}
+
 		if (outputNodes.contains(node)) {
 			node.addDatum(datumName, datum);
 		} else {

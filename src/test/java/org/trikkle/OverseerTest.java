@@ -300,4 +300,26 @@ class OverseerTest {
 
 		assertEquals(graph, graph.findPrunedGraphFor(discreteNode));
 	}
+
+	@Test
+	void multipleOutputTest() {
+		Arc inputArc = new AutoArc() {
+			@Override
+			public void run() {
+				returnDatum("res1", 1.0);
+				returnDatum("res2", 2.0);
+			}
+		};
+		Node discreteNode = DiscreteNode.of("res1");
+		Node discreteNode2 = DiscreteNode.of("res2");
+		Link link = new Link(Set.of(), inputArc, Set.of(discreteNode, discreteNode2));
+		Graph graph = new Graph(link);
+		System.out.println(graph);
+
+		Overseer overseer = new Overseer(graph);
+		overseer.start();
+
+		assertEquals(1.0, overseer.getDatum("res1"));
+		assertEquals(2.0, overseer.getDatum("res2"));
+	}
 }

@@ -12,6 +12,7 @@ public final class Link implements Congruent<Link> {
 		this(dependencies, arc, Set.of(outputNode));
 	}
 
+	// todo can a link have no outputNodes?
 	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
 		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
 		if (arc == null) throw new NullPointerException("Arc cannot be null!");

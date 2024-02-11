@@ -61,14 +61,14 @@ public class MermaidGraphViz implements IGraphViz {
 		return arcId + "{" + (arc.getName() == null ? arcId : arc.getName()) + "}";
 	}
 
-	private static String makeLink(Set<String> dependencyIds, String arcId, String outputNodeId) {
+	private static String makeLink(Set<String> dependencyIds, String arcId, Set<String> outputNodeIds) {
 		StringBuilder sb = new StringBuilder();
 
 		String dependencyStr =
 				dependencyIds.isEmpty() ? "NULL" + UUID.randomUUID() + ":::hidden" : String.join(" & ", dependencyIds);
 		sb.append(dependencyStr);
 
-		if (dependencyIds.size() > 1) {
+		if (dependencyIds.size() > 1 || outputNodeIds.size() > 1) {
 			sb.append(" --- ");
 			sb.append(arcId);
 			sb.append(" --> ");
@@ -78,7 +78,9 @@ public class MermaidGraphViz implements IGraphViz {
 			sb.append(" --> ");
 		}
 
-		sb.append(outputNodeId);
+		String outputNodeStr =
+				outputNodeIds.isEmpty() ? "NULL" + UUID.randomUUID() + ":::hidden" : String.join(" & ", outputNodeIds);
+		sb.append(outputNodeStr);
 
 		return sb.toString();
 	}
@@ -131,12 +133,14 @@ public class MermaidGraphViz implements IGraphViz {
 
 				Set<String> dependencyIds = link.getDependencies().stream()
 						.map(nodeIdOfNode::get).collect(Collectors.toSet());
-				if (link.getDependencies().size() > 1) {
+				Set<String> outputNodeIds = link.getOutputNodes().stream()
+						.map(nodeIdOfNode::get).collect(Collectors.toSet());
+				if (link.getDependencies().size() > 1 || link.getOutputNodes().size() > 1) {
 					lines.add(arcToMermaid(link.getArc(), arcId));
-					linkLines.add(makeLink(dependencyIds, arcId, nodeIdOfNode.get(link.getOutputNode())));
+					linkLines.add(makeLink(dependencyIds, arcId, outputNodeIds));
 				} else {
 					String arcName = link.getArc().getName() == null ? arcId : link.getArc().getName();
-					linkLines.add(makeLink(dependencyIds, arcName, nodeIdOfNode.get(link.getOutputNode())));
+					linkLines.add(makeLink(dependencyIds, arcName, outputNodeIds));
 				}
 			}
 
