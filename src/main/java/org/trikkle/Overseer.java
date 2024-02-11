@@ -89,16 +89,21 @@ public final class Overseer {
 		if (hasEnded()) return;
 		tick.incrementAndGet();
 
+		pruneLinks();
+
 		IBitmask state = getCurrentState();
 		Collection<Arc> arcsNow = new ArrayList<>(g.arcs.size());
 		for (Map.Entry<IBitmask, Set<Link>> linkEntry : linkMap.entrySet()) {
 			if (state.supersetOf(linkEntry.getKey())) { // all where requirements are satisfied
-				for (Link link : linkEntry.getValue()) {
-					Arc arc = link.getArc();
-					synchronized (arc) { // prevents one arc from being added to two separate arcsNow
-						if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
-							arc.setStatus(ArcStatus.STAND_BY);
-							arcsNow.add(arc);
+				Set<Link> value = linkEntry.getValue();
+				synchronized (value) {
+					for (Link link : value) {
+						Arc arc = link.getArc();
+						synchronized (arc) { // prevents one arc from being added to two separate arcsNow
+							if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
+								arc.setStatus(ArcStatus.STAND_BY);
+								arcsNow.add(arc);
+							}
 						}
 					}
 				}
@@ -134,7 +139,9 @@ public final class Overseer {
 
 	private void pruneLinks() {
 		for (Set<Link> value : linkMap.values()) {
-			value.removeIf(link -> link.getArc().getStatus() == ArcStatus.FINISHED);
+			synchronized (value) {
+				value.removeIf(link -> link.getArc().getStatus() == ArcStatus.FINISHED);
+			}
 		}
 	}
 
