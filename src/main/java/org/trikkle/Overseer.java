@@ -6,7 +6,6 @@ import org.trikkle.structs.MultiMap;
 import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,6 +16,7 @@ public final class Overseer {
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final AtomicInteger tick = new AtomicInteger(0);
+	private final Stack<RecursiveAction> tasks = new Stack<>();
 	private boolean started = false;
 
 	public Overseer(Graph graph) {
@@ -81,6 +81,10 @@ public final class Overseer {
 		while (!hasEnded()) {
 			ticktock();
 		}
+		while (!tasks.isEmpty()) {
+			tasks.pop().join();
+		}
+		System.out.println("Overseer ended in " + tick.get() + " ticks.");
 		onEnd();
 	}
 
@@ -111,19 +115,16 @@ public final class Overseer {
 			}
 		} else {
 			// Run all links that can be done now (aka arcsNow) in parallel.
-			RecursiveAction[] tasks = new RecursiveAction[arcsNow.size()];
-			int i = 0;
 			for (Arc arc : arcsNow) {
-				tasks[i] = new RecursiveAction() {
+				RecursiveAction task = new RecursiveAction() {
 					@Override
 					protected void compute() {
 						arc.runWrapper();
 					}
 				};
-				i++;
+				tasks.push(task);
+				task.fork();
 			}
-			// todo maybe fork instead?
-			ForkJoinTask.invokeAll(tasks);
 		}
 
 		pruneLinks();
