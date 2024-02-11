@@ -166,6 +166,11 @@ public final class Overseer {
 				return false;
 			}
 		}
+		for (Arc arc : g.arcs) {
+			if (arc.getStatus() != ArcStatus.FINISHED) {
+				return false;
+			}
+		}
 		return true;
 	}
 

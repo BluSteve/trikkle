@@ -22,7 +22,7 @@ public class MermaidGraphViz implements IGraphViz {
 	}
 
 	private static String nodeToMermaid(Node node, String nodeId, NodeType nodeType) {
-		String nodeText = String.join("<br>", node.datumNames);
+		String nodeText = node.datumNames.isEmpty() ? "<br>" : String.join("<br>", node.datumNames);
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(nodeId);

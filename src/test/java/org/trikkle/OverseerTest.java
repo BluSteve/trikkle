@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -323,5 +324,28 @@ class OverseerTest {
 		assertEquals(1.0, overseer.getDatum("res1"));
 		assertEquals(2.0, overseer.getDatum("res2"));
 		assertEquals(3.0, overseer.getDatum("res2a"));
+	}
+
+	@Test
+	void noOutputTest() {
+		AtomicBoolean ab = new AtomicBoolean(false);
+		Arc inputArc = new AutoArc() {
+			@Override
+			public void run() {
+				System.out.println("hello there! i'm done!");
+				ab.set(true);
+			}
+		};
+		Node discreteNode = DiscreteNode.of();
+		Link link = new Link(Set.of(discreteNode), inputArc, Set.of());
+		Graph graph = new Graph(link);
+		System.out.println(graph);
+
+		Overseer overseer = new Overseer(graph);
+		discreteNode.setUsable();
+		overseer.start();
+
+		assertTrue(ab.get());
+		assertTrue(overseer.getResultCache().isEmpty());
 	}
 }
