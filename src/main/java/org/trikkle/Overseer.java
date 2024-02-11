@@ -81,6 +81,7 @@ public final class Overseer {
 		while (!hasEnded()) {
 			ticktock();
 		}
+		System.out.println("Overseer ended in " + tick.get() + " ticks.");
 		onEnd();
 	}
 
@@ -96,8 +97,8 @@ public final class Overseer {
 				for (Link link : linkEntry.getValue()) {
 					Arc arc = link.getArc();
 					synchronized (arc) { // prevents one arc from being added to two separate arcsNow
-						if (arc.status == ArcStatus.IDLE) { // until it finds one that's not finished
-							arc.status = ArcStatus.STAND_BY;
+						if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
+							arc.setStatus(ArcStatus.STAND_BY);
 							arcsNow.add(arc);
 						}
 					}
@@ -122,7 +123,6 @@ public final class Overseer {
 				};
 				i++;
 			}
-			// todo maybe fork instead?
 			ForkJoinTask.invokeAll(tasks);
 		}
 

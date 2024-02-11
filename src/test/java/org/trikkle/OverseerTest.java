@@ -177,9 +177,9 @@ class OverseerTest {
 
 				if (stream1Node.getProgress() == 1) {
 					stream1Node.setUsable();
-					this.status = ArcStatus.FINISHED;
+					this.setStatus(ArcStatus.FINISHED);
 					returnDatum("result1", total); // this must be the last line as it's a recursive call
-				} else this.status = ArcStatus.IDLE;
+				} else this.setStatus(ArcStatus.IDLE);
 			}
 
 			@Override

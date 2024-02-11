@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Arc implements Primable {
 	private final Lock lock = new ReentrantLock();
 	protected Overseer overseer;
-	protected ArcStatus status = ArcStatus.IDLE;
 	protected Set<Node> dependencies, outputNodes;
+	private ArcStatus status = ArcStatus.IDLE;
 	private Node outputNode;
 	private String name;
 
@@ -38,6 +38,16 @@ public abstract class Arc implements Primable {
 
 	public ArcStatus getStatus() {
 		return status;
+	}
+
+	protected void setStatus(ArcStatus status) {
+		if (status == null) {
+			throw new NullPointerException("Status cannot be null!");
+		}
+		if (this.status == ArcStatus.FINISHED && status != ArcStatus.FINISHED) {
+			throw new IllegalStateException("Arc " + name + " is already finished!");
+		}
+		this.status = status;
 	}
 
 	public String getName() {
