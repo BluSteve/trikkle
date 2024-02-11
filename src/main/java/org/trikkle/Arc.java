@@ -80,4 +80,13 @@ public abstract class Arc implements Primable {
 	public Lock getLock() {
 		return lock;
 	}
+
+	@Override
+	public String toString() {
+		if (name == null) {
+			return super.toString();
+		} else {
+			return name;
+		}
+	}
 }
