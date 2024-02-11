@@ -276,9 +276,5 @@ class GraphTest {
 			graph1.findPrunedGraphFor(Set.of(paramNode, matrixNode));
 		});
 		assertTrue(e1.getMessage().contains("targetNodes must be a subset of the graph's nodes!"));
-
-		Graph graph = graph1.findPrunedGraphFor(Set.of(hfNode));
-		Graph graphcached = graph1.findPrunedGraphFor(Set.of(hfNode));
-		assertSame(graph, graphcached);
 	}
 }

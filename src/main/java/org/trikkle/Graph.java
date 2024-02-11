@@ -17,7 +17,7 @@ public final class Graph implements Congruent<Graph> {
 	public final Map<Arc, Link> arcMap = new HashMap<>();
 	public final MultiMap<Node, Link> outputNodeMap = new MultiHashMap<>();
 	public final MultiMap<Node, Node> dependenciesOfNode = new MultiHashMap<>();
-	private Map<Node, Graph> prunedGraphOfNode;
+	public final Map<String, Node> nodeOfDatum = new HashMap<>();
 
 	public Graph(Set<Link> links) {
 		if (links == null || links.isEmpty()) {
@@ -47,15 +47,13 @@ public final class Graph implements Congruent<Graph> {
 		primables = new HashSet<>(nodes);
 		primables.addAll(arcs);
 
-		// todo remove this
-		Set<String> datumNames = new HashSet<>();
 		for (Node node : nodes) {
 			for (String datumName : node.datumNames) {
-				if (datumNames.contains(datumName)) {
+				Node rnode = nodeOfDatum.put(datumName, node);
+				if (rnode != null) {
 					throw new IllegalArgumentException("Two nodes cannot have the same datum name!");
 				}
 			}
-			datumNames.addAll(node.datumNames);
 		}
 
 		// find ending nodes
@@ -180,14 +178,6 @@ public final class Graph implements Congruent<Graph> {
 			throw new IllegalArgumentException("targetNodes must be a subset of the graph's nodes!");
 		}
 
-		if (targetEndingNodes.size() == 1) {
-			if (prunedGraphOfNode == null) {
-				prunedGraphOfNode = new HashMap<>();
-			} else if (prunedGraphOfNode.containsKey(targetEndingNodes.iterator().next())) { // cache hit
-				return prunedGraphOfNode.get(targetEndingNodes.iterator().next());
-			}
-		}
-
 		/*
 		 find link which creates this targetEndingNodes
 		 record this link
@@ -215,11 +205,7 @@ public final class Graph implements Congruent<Graph> {
 			}
 		}
 
-		Graph prunedGraph = new Graph(finalLinks);
-		if (targetEndingNodes.size() == 1) {
-			prunedGraphOfNode.put(targetEndingNodes.iterator().next(), prunedGraph);
-		}
-		return prunedGraph;
+		return new Graph(finalLinks);
 	}
 
 	public Graph findPrunedGraphFor(Node... targetEndingNodes) {
