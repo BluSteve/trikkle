@@ -274,6 +274,30 @@ class OverseerTest {
 	}
 
 	@Test
+	void manyNodes() {
+		Set<Node> dependencies = new HashSet<>();
+		for (int i = 0; i < 100; i++) {
+			dependencies.add(new Nodespace().discreteOf());
+		}
+		Arc inputArc = new AutoArc() {
+			@Override
+			public void run() {
+				getOutputNode().setProgress(1);
+			}
+		};
+		Link link = new Link(dependencies, inputArc, DiscreteNode.of());
+
+		Graph graph = new Graph(link);
+		System.out.println(graph);
+
+		Overseer overseer = new Overseer(graph);
+		for (Node dependency : dependencies) {
+			dependency.setUsable();
+		}
+		overseer.start();
+	}
+
+	@Test
 	void multipleArcsDiscrete() {
 		Node discreteNode = DiscreteNode.of("res1", "res2");
 		Arc inputArc = new AutoArc() {
