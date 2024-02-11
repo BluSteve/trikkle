@@ -6,7 +6,6 @@ import org.trikkle.structs.MultiMap;
 import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -89,21 +88,20 @@ public final class Overseer {
 		if (hasEnded()) return;
 		tick.incrementAndGet();
 
-		pruneLinks();
-
 		IBitmask state = getCurrentState();
 		Collection<Arc> arcsNow = new ArrayList<>(g.arcs.size());
 		for (Map.Entry<IBitmask, Set<Link>> linkEntry : linkMap.entrySet()) {
 			if (state.supersetOf(linkEntry.getKey())) { // all where requirements are satisfied
-				Set<Link> value = linkEntry.getValue();
-				synchronized (value) {
-					for (Link link : value) {
-						Arc arc = link.getArc();
-						synchronized (arc) { // prevents one arc from being added to two separate arcsNow
-							if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
-								arc.setStatus(ArcStatus.STAND_BY);
-								arcsNow.add(arc);
-							}
+				for (Iterator<Link> iterator = linkEntry.getValue().iterator(); iterator.hasNext(); ) {
+					Link link = iterator.next();
+					Arc arc = link.getArc();
+					synchronized (arc) { // prevents one arc from being added to two separate arcsNow
+						if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
+							arc.setStatus(ArcStatus.STAND_BY);
+							arcsNow.add(arc);
+						}
+						else if (arc.getStatus() == ArcStatus.FINISHED) {
+							iterator.remove();
 						}
 					}
 				}
@@ -133,14 +131,6 @@ public final class Overseer {
 			for (int j = tasks.length - 1; j >= 0; j--) {
 				tasks[j].join();
 				ticktock();
-			}
-		}
-	}
-
-	private void pruneLinks() {
-		for (Set<Link> value : linkMap.values()) {
-			synchronized (value) {
-				value.removeIf(link -> link.getArc().getStatus() == ArcStatus.FINISHED);
 			}
 		}
 	}
