@@ -15,7 +15,13 @@ public abstract class Arc implements Primable {
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {
+		// if there have been any data alerts in during run() then run again.
+		int before = overseer.alertCount.get();
 		run();
+		if (!(getStatus() == ArcStatus.FINISHED) && overseer.alertCount.get() > before) {
+			System.err.println("Rerunning " + name + " because of data alerts.");
+			runWrapper();
+		}
 	}
 
 	protected Object getDatum(String datumName) {
@@ -48,7 +54,7 @@ public abstract class Arc implements Primable {
 			throw new IllegalStateException("Arc " + name + " is already finished!");
 		}
 
-		if (overseer != null) {
+		if (overseer != null && status == ArcStatus.FINISHED) {
 			overseer.alert(this);
 		}
 		this.status = status;

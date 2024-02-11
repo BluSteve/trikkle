@@ -4,7 +4,7 @@ public abstract class AutoArc extends Arc {
 	@Override
 	void runWrapper() {
 		setStatus(ArcStatus.IN_PROGRESS);
-		super.runWrapper();
+		run();
 		setStatus(ArcStatus.FINISHED);
 	}
 }

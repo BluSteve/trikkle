@@ -9,13 +9,11 @@ import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public final class Overseer {
 	private static final int PARALLEL_THRESHOLD = 2;
+	final AtomicInteger alertCount = new AtomicInteger(0);
 	private final Graph g;
 	private final MultiMap<IBitmask, Link> linkMap = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
@@ -97,6 +95,7 @@ public final class Overseer {
 		while (!tasks.isEmpty()) {
 			tasks.pop().join();
 		}
+		System.out.println("Overseer ended in " + tick.get() + " ticks.");
 		onEnd();
 	}
 
@@ -104,6 +103,8 @@ public final class Overseer {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 		tick.incrementAndGet();
+
+		pruneLinks();
 
 		IBitmask state = getCurrentState();
 		Collection<Arc> arcsNow = new ArrayList<>(g.arcs.size());
@@ -138,8 +139,6 @@ public final class Overseer {
 				task.fork();
 			}
 		}
-
-		pruneLinks();
 	}
 
 	private void pruneLinks() {
@@ -148,7 +147,8 @@ public final class Overseer {
 		}
 	}
 
-	void alert(Primable caller) {
+	synchronized void alert(Primable caller) {
+		alertCount.incrementAndGet();
 		bq.offer(true);
 	}
 
