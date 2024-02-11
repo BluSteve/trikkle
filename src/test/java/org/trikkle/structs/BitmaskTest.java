@@ -67,6 +67,12 @@ class BitmaskTest {
 	}
 
 	@Test
+	void bigTest() {
+		IBitmask lab = new LongArrayBitmask(50000);
+		System.out.println(lab);
+	}
+
+	@Test
 	void test3() {
 		IBitmask lb1 = new ArrayBitmask(64);
 		lb1.set(2);
