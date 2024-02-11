@@ -81,7 +81,6 @@ public final class Overseer {
 		while (!hasEnded()) {
 			ticktock();
 		}
-		System.out.println("Overseer ended in " + tick.get() + " ticks.");
 		onEnd();
 	}
 
