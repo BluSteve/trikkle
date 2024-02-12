@@ -4,17 +4,34 @@ import org.junit.jupiter.api.Test;
 import org.trikkle.viz.IGraphViz;
 import org.trikkle.viz.MermaidGraphViz;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class OverseerTest {
+	public static void sleep(int milliseconds) {
+		try {
+			TimeUnit.MILLISECONDS.sleep(milliseconds);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void printLinkTrace(Queue<Collection<Link>> linkTrace) {
+		int tick = 1;
+		for (Collection<Link> links : linkTrace) {
+			System.out.println("Tick " + tick++);
+			for (Link link : links) {
+				System.out.println(link);
+			}
+			System.out.println();
+		}
+	}
+
 	@Test
 	void nodeTest() {
 		Node node = DiscreteNode.of("toSquare");
@@ -150,7 +167,7 @@ class OverseerTest {
 		Node streamNode = StreamNode.of("stream1");
 		Link link = new Link(Set.of(), inputArc, streamNode);
 
-		Arc consumerArc = new Arc() {
+		Arc consumerArc = new Arc(false) {
 			double total = 0; // is this a pure function? it is if you reset()
 
 			@Override
@@ -339,6 +356,7 @@ class OverseerTest {
 		Node discreteNode = DiscreteNode.of("res1");
 		Node discreteNode2 = DiscreteNode.of("res2", "res2a");
 		Link link = new Link(Set.of(), inputArc, Set.of(discreteNode, discreteNode2));
+		System.out.println(link);
 		Graph graph = new Graph(link);
 		System.out.println(graph);
 
@@ -389,5 +407,49 @@ class OverseerTest {
 			assertTrue(e.getMessage().contains("Overseer construction and start() must be called in the same " +
 					"thread!"));
 		}
+	}
+
+	@Test
+	void IRcomparison() {
+		Arc long1 = new AutoArc() {
+			@Override
+			public void run() {
+				sleep(200);
+			}
+		};
+		long1.setName("long1");
+
+		Arc med1 = new AutoArc() {
+			@Override
+			public void run() {
+				sleep(100);
+				getOutputNode().setUsable();
+			}
+		};
+		med1.setName("med1");
+
+		Arc med2 = new AutoArc() {
+			@Override
+			public void run() {
+				sleep(100);
+			}
+		};
+		med2.setName("med2");
+
+		Node medNode = DiscreteNode.of();
+
+		Link link = new Link(Set.of(), long1, Set.of());
+		Link link2 = new Link(Set.of(), med1, medNode);
+		Link link3 = new Link(Set.of(medNode), med2, Set.of());
+
+		Graph graph = new Graph(link, link2, link3);
+		Overseer overseer = new Overseer(graph);
+
+		long start = System.currentTimeMillis();
+		overseer.start();
+		long end = System.currentTimeMillis();
+		System.out.println("time = " + (end - start));
+
+		printLinkTrace(overseer.getLinkTrace());
 	}
 }

@@ -70,7 +70,7 @@ public class IntegratedTests {
 		brewerArc.setName("brew coffee");
 		Node brewerNode = StreamNode.of("brewer");
 		Link brewerLink = new Link(Set.of(), brewerArc, brewerNode);
-		Arc coffeeArc = new Arc() {
+		Arc coffeeArc = new Arc(false) {
 			@Override
 			public void run() {
 				Queue<Double> volume = (Queue<Double>) getDatum("brewer");

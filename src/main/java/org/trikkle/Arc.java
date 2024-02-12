@@ -5,11 +5,16 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class Arc implements Primable {
 	private final ReentrantLock lock = new ReentrantLock();
+	private final boolean safe;
 	protected Overseer overseer;
 	protected Set<Node> dependencies, outputNodes;
 	private ArcStatus status = ArcStatus.IDLE;
 	private Node outputNode;
 	private String name;
+
+	public Arc(boolean safe) { // wow overriding this is really clean
+		this.safe = safe;
+	}
 
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
@@ -46,6 +51,10 @@ public abstract class Arc implements Primable {
 		if (this.status == ArcStatus.FINISHED && status != ArcStatus.FINISHED) {
 			throw new IllegalStateException("Arc " + name + " is already finished!");
 		}
+		if (safe && status.stage() < this.status.stage()) {
+			throw new IllegalArgumentException(
+					"Safe arc " + name + " cannot be set to " + status + " from " + this.status + "!");
+		}
 		this.status = status;
 	}
 
@@ -59,6 +68,10 @@ public abstract class Arc implements Primable {
 		} else {
 			this.name = name;
 		}
+	}
+
+	public boolean isSafe() {
+		return safe;
 	}
 
 	protected Node getOutputNode() {

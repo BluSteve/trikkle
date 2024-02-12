@@ -67,4 +67,9 @@ public final class Link implements Congruent<Link> {
 	public int hashCode() {
 		return Objects.hash(dependencies, arc, outputNodes);
 	}
+
+	@Override
+	public String toString() {
+		return dependencies.toString() + " -> " + arc + " -> " + outputNodes.toString();
+	}
 }
