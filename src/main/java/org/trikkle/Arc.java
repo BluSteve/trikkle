@@ -7,8 +7,7 @@ public abstract class Arc implements Primable {
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
 	protected Overseer overseer;
-	private Set<Node> dependencies, outputNodes;
-	private Node outputNode;
+	private Link link;
 	private ArcStatus status = ArcStatus.IDLE;
 	private String name;
 
@@ -34,7 +33,7 @@ public abstract class Arc implements Primable {
 			throw new IllegalArgumentException("No node is associated with datum " + datumName + "!");
 		}
 
-		if (outputNodes.contains(node)) {
+		if (getOutputNodes().contains(node)) {
 			node.addDatum(datumName, datum);
 		} else {
 			throw new IllegalArgumentException(
@@ -80,33 +79,30 @@ public abstract class Arc implements Primable {
 	@Override
 	public void primeWith(Overseer overseer) { // aka initialize
 		this.overseer = overseer;
-		Link link = overseer.g.arcMap.get(this);
-		dependencies = link.getDependencies();
-		outputNodes = link.getOutputNodes();
-		if (outputNodes.size() == 1) {
-			outputNode = outputNodes.iterator().next();
-		}
+		link = overseer.g.arcMap.get(this);
+	}
+
+	protected Link getLink() {
+		return link;
 	}
 
 	protected Set<Node> getDependencies() {
-		return dependencies;
+		return link.getDependencies();
 	}
 
 	protected Set<Node> getOutputNodes() {
-		return outputNodes;
+		return link.getOutputNodes();
 	}
 
 	protected Node getOutputNode() {
-		return outputNode;
+		return link.getOutputNode();
 	}
 
 	@Override
 	public void reset() {
 		overseer = null;
 		status = ArcStatus.IDLE;
-		dependencies = null;
-		outputNodes = null;
-		outputNode = null;
+		link = null;
 	}
 
 	@Override
