@@ -57,9 +57,6 @@ public abstract class Arc implements Primable {
 					"Safe arc " + this + " cannot be set to " + status + " from " + this.status + "!");
 		}
 		this.status = status;
-		if (status == ArcStatus.IDLE) {
-			overseer.unsafeTicktock();
-		}
 	}
 
 	public String getName() {
