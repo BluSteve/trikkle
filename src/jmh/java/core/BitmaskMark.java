@@ -2,12 +2,13 @@ package core;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
+import org.trikkle.*;
 import org.trikkle.structs.IBitmask;
 import org.trikkle.structs.LongArrayBitmask;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Fork(value = 1, warmups = 0)
@@ -22,13 +23,29 @@ public class BitmaskMark {
 
 	@Benchmark
 	public static void run(State state, Blackhole blackhole) {
-		List<IBitmask> list = new ArrayList<>(state.N);
-		for (int i = 0; i < state.N; i++) {
-			if (state.query.supersetOf(state.bitmasks[i])) {
-				list.add(state.bitmasks[i]);
-			}
+		Set<Link> manyLinks = new HashSet<>();
+		for (int i = 0; i < 10000; i++) {
+			Arc arc = new AutoArc() {
+				@Override
+				public void run() {
+
+				}
+			};
+			manyLinks.add(new Link(Set.of(new Nodespace().discreteOf()), arc, Set.of()));
 		}
-		blackhole.consume(list);
+		Overseer overseer = new Overseer(new Graph(manyLinks));
+		for (Node startingNode : overseer.getGraph().startingNodes) {
+			startingNode.setUsable();
+		}
+		overseer.start();
+
+//		List<IBitmask> list = new ArrayList<>(state.N);
+//		for (int i = 0; i < state.N; i++) {
+//			if (state.query.supersetOf(state.bitmasks[i])) {
+//				list.add(state.bitmasks[i]);
+//			}
+//		}
+//		blackhole.consume(list);
 	}
 
 	@org.openjdk.jmh.annotations.State(Scope.Benchmark)

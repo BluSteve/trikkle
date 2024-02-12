@@ -1,8 +1,5 @@
 package org.trikkle;
 
-import org.trikkle.structs.IBitmask;
-import org.trikkle.structs.MultiHashMap;
-import org.trikkle.structs.MultiMap;
 import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
@@ -13,9 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class Overseer {
 	private static final int PARALLEL_THRESHOLD = 2;
 	private final Graph g;
-	private final MultiMap<IBitmask, Link> linkMap = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
-	private final Map<Node, Integer> indexOfNode = new HashMap<>();
 	private final AtomicInteger tick = new AtomicInteger(0);
 	private final Queue<Collection<Link>> linkTrace = new ConcurrentLinkedQueue<>();
 	private boolean started = false;
@@ -38,23 +33,6 @@ public final class Overseer {
 		for (Primable primable : g.primables) {
 			if (cache == null) primable.reset();
 			primable.primeWith(this);
-		}
-
-		// Generate helper indices
-		int i = 0;
-		for (Node node : g.nodes) {
-			indexOfNode.put(node, i);
-			i++;
-		}
-
-		// Generate bitmasks for each link
-		for (Link link : g.links) {
-			IBitmask bitmask = IBitmask.getBitmask(g.nodes.size());
-			for (Node dependency : link.getDependencies()) {
-				bitmask.set(indexOfNode.get(dependency));
-			}
-
-			linkMap.putOne(bitmask, link);
 		}
 	}
 
@@ -106,20 +84,25 @@ public final class Overseer {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
-		IBitmask state = getCurrentState();
 		Collection<Link> linksNow = new ArrayList<>(g.links.size());
-		for (Map.Entry<IBitmask, Set<Link>> linkEntry : linkMap.entrySet()) {
-			if (state.supersetOf(linkEntry.getKey())) { // all where requirements are satisfied
-				for (Link link : linkEntry.getValue()) {
-					Arc arc = link.getArc();
-					if (recursive && !arc.isSafe()) {
-						continue;
-					}
-					synchronized (arc) { // prevents one arc from being added to two separate linksNow
-						if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
-							arc.setStatus(ArcStatus.STAND_BY);
-							linksNow.add(link);
-						}
+		for (Link link : g.links) {
+			if (link.getArc().getStatus() == ArcStatus.FINISHED) continue;
+			boolean allDependenciesUsable = true;
+			for (Node dependency : link.getDependencies()) {
+				if (!dependency.isUsable()) {
+					allDependenciesUsable = false;
+					break;
+				}
+			}
+			if (allDependenciesUsable) {
+				Arc arc = link.getArc();
+				if (recursive && !arc.isSafe()) {
+					continue;
+				}
+				synchronized (arc) { // prevents one arc from being added to two separate linksNow
+					if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
+						arc.setStatus(ArcStatus.STAND_BY);
+						linksNow.add(link);
 					}
 				}
 			}
@@ -194,16 +177,6 @@ public final class Overseer {
 
 	public Queue<Collection<Link>> getLinkTrace() {
 		return linkTrace;
-	}
-
-	private IBitmask getCurrentState() {
-		IBitmask state = IBitmask.getBitmask(g.nodes.size());
-		for (Node node : g.nodes) {
-			if (node.isUsable()) {
-				state.set(indexOfNode.get(node));
-			}
-		}
-		return state;
 	}
 
 	private boolean hasEnded() {
