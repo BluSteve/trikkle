@@ -85,6 +85,14 @@ public final class Overseer {
 			}
 		}
 
+		// check that overseer and .start() are called in the same thread
+		for (Primable primable : g.primables) {
+			if (!primable.getLock().isHeldByCurrentThread()) {
+				throw new IllegalStateException(
+						"Overseer construction and start() must be called in the same thread!");
+			}
+		}
+
 		started = true;
 		while (!hasEnded()) {
 			ticktock();
@@ -108,8 +116,7 @@ public final class Overseer {
 						if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
 							arc.setStatus(ArcStatus.STAND_BY);
 							arcsNow.add(arc);
-						}
-						else if (arc.getStatus() == ArcStatus.FINISHED) {
+						} else if (arc.getStatus() == ArcStatus.FINISHED) {
 							iterator.remove();
 						}
 					}

@@ -1,11 +1,10 @@
 package org.trikkle;
 
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class Arc implements Primable {
-	private final Lock lock = new ReentrantLock();
+	private final ReentrantLock lock = new ReentrantLock();
 	protected Overseer overseer;
 	protected Set<Node> dependencies, outputNodes;
 	private ArcStatus status = ArcStatus.IDLE;
@@ -87,7 +86,7 @@ public abstract class Arc implements Primable {
 	}
 
 	@Override
-	public Lock getLock() {
+	public ReentrantLock getLock() {
 		return lock;
 	}
 

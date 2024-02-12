@@ -1,6 +1,6 @@
 package org.trikkle;
 
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public interface Primable {
 	void primeWith(Overseer overseer);
@@ -11,5 +11,5 @@ public interface Primable {
 	 */
 	void reset();
 
-	Lock getLock();
+	ReentrantLock getLock();
 }

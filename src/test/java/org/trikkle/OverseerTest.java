@@ -48,7 +48,6 @@ class OverseerTest {
 		Node outputNode = ns.discreteOf("squared");
 		Link link = new Link(Set.of(inputNode), arc, outputNode);
 
-
 		Graph graph = new Graph(link);
 		System.out.println(new MermaidGraphViz().visualize(graph));
 		Overseer overseer = new Overseer(graph);
@@ -78,7 +77,6 @@ class OverseerTest {
 		arc.setName("squarer");
 		Node node2 = DiscreteNode.of("squared");
 		Link link = new Link(Set.of(inputNode), arc, node2);
-
 
 		Arc arc2 = new AutoArc() {
 			@Override
@@ -179,7 +177,9 @@ class OverseerTest {
 					stream1Node.setUsable();
 					this.setStatus(ArcStatus.FINISHED);
 					returnDatum("result1", total); // this must be the last line as it's a recursive call
-				} else this.setStatus(ArcStatus.IDLE);
+				} else {
+					this.setStatus(ArcStatus.IDLE);
+				}
 			}
 
 			@Override
@@ -371,5 +371,23 @@ class OverseerTest {
 
 		assertTrue(ab.get());
 		assertTrue(overseer.getResultCache().isEmpty());
+	}
+
+	@Test
+	void sameThread() {
+		Arc foo = new AutoArc() {
+			@Override
+			public void run() {
+				System.out.println("hello");
+			}
+		};
+
+		Overseer overseer = new Overseer(new Graph(new Link(Set.of(), foo, Set.of())));
+		try {
+			new Thread(overseer::start).start();
+		} catch (IllegalStateException e) {
+			assertTrue(e.getMessage().contains("Overseer construction and start() must be called in the same " +
+					"thread!"));
+		}
 	}
 }

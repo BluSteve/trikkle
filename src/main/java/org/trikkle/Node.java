@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class
 	public final Set<String> datumNames; // unique identifies a node
-	private final Lock lock = new ReentrantLock();
+	private final ReentrantLock lock = new ReentrantLock();
 	protected Overseer overseer;
 	private boolean usable = false; // once true cannot be false
 	private double progress = 0; // monotonically increasing
@@ -73,7 +73,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	}
 
 	@Override
-	public Lock getLock() {
+	public ReentrantLock getLock() {
 		return lock;
 	}
 
