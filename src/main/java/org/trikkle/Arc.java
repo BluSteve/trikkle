@@ -36,7 +36,7 @@ public abstract class Arc implements Primable {
 			node.addDatum(datumName, datum);
 		} else {
 			throw new IllegalArgumentException(
-					"Arc " + name + " cannot return datum " + datumName + " because it is not an output of this arc!");
+					"Arc " + this + " cannot return datum " + datumName + " because it is not an output of this arc!");
 		}
 	}
 
@@ -44,18 +44,22 @@ public abstract class Arc implements Primable {
 		return status;
 	}
 
-	protected void setStatus(ArcStatus status) {
+	protected synchronized void setStatus(ArcStatus status) {
 		if (status == null) {
 			throw new NullPointerException("Status cannot be null!");
 		}
+		if (status == this.status) return; // no change don't do anything
 		if (this.status == ArcStatus.FINISHED && status != ArcStatus.FINISHED) {
-			throw new IllegalStateException("Arc " + name + " is already finished!");
+			throw new IllegalStateException("Arc " + this + " is already finished!");
 		}
 		if (safe && status.stage() < this.status.stage()) {
 			throw new IllegalArgumentException(
-					"Safe arc " + name + " cannot be set to " + status + " from " + this.status + "!");
+					"Safe arc " + this + " cannot be set to " + status + " from " + this.status + "!");
 		}
 		this.status = status;
+		if (status == ArcStatus.IDLE) {
+			overseer.unsafeTicktock();
+		}
 	}
 
 	public String getName() {

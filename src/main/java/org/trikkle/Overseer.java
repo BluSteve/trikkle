@@ -102,7 +102,7 @@ public final class Overseer {
 		onEnd();
 	}
 
-	void ticktock(boolean recursive) {
+	private void ticktock(boolean recursive) {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
@@ -110,8 +110,7 @@ public final class Overseer {
 		Collection<Link> linksNow = new ArrayList<>(g.links.size());
 		for (Map.Entry<IBitmask, Set<Link>> linkEntry : linkMap.entrySet()) {
 			if (state.supersetOf(linkEntry.getKey())) { // all where requirements are satisfied
-				for (Iterator<Link> iterator = linkEntry.getValue().iterator(); iterator.hasNext(); ) {
-					Link link = iterator.next();
+				for (Link link : linkEntry.getValue()) {
 					Arc arc = link.getArc();
 					if (recursive && !arc.isSafe()) {
 						continue;
@@ -120,8 +119,6 @@ public final class Overseer {
 						if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
 							arc.setStatus(ArcStatus.STAND_BY);
 							linksNow.add(link);
-						} else if (arc.getStatus() == ArcStatus.FINISHED) {
-							iterator.remove();
 						}
 					}
 				}
@@ -136,7 +133,6 @@ public final class Overseer {
 		if (linksNow.size() < PARALLEL_THRESHOLD) {
 			for (Link link : linksNow) {
 				link.getArc().runWrapper();
-				ticktock(true);
 			}
 		} else {
 			// Run all links that can be done now (aka linksNow) in parallel.
@@ -156,9 +152,12 @@ public final class Overseer {
 			}
 			for (int j = tasks.length - 1; j >= 0; j--) {
 				tasks[j].join();
-				ticktock(true);
 			}
 		}
+	}
+
+	void unsafeTicktock() {
+		ticktock(true);
 	}
 
 	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.

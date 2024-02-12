@@ -452,4 +452,18 @@ class OverseerTest {
 
 		printLinkTrace(overseer.getLinkTrace());
 	}
+
+	@Test
+	void unsafeTest() {
+		Arc unsafeArc = new Arc(false) {
+			@Override
+			public void run() {
+				setStatus(ArcStatus.FINISHED);
+			}
+		};
+
+		Graph graph = new Graph(new Link(Set.of(), unsafeArc, Set.of()));
+		Overseer overseer = new Overseer(graph);
+		overseer.start();
+	}
 }
