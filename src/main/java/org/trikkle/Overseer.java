@@ -130,6 +130,7 @@ public final class Overseer {
 			linkTrace.add(linksNow);
 		}
 
+		if (linksNow.isEmpty()) return;
 		if (linksNow.size() < PARALLEL_THRESHOLD) {
 			for (Link link : linksNow) {
 				link.getArc().runWrapper();

@@ -49,7 +49,7 @@ public abstract class Arc implements Primable {
 			throw new NullPointerException("Status cannot be null!");
 		}
 		if (status == this.status) return; // no change don't do anything
-		if (this.status == ArcStatus.FINISHED && status != ArcStatus.FINISHED) {
+		if (this.status == ArcStatus.FINISHED) {
 			throw new IllegalStateException("Arc " + this + " is already finished!");
 		}
 		if (safe && status.stage() < this.status.stage()) {
