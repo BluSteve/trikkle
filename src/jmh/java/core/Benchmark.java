@@ -3,11 +3,8 @@ package core;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.trikkle.*;
-import org.trikkle.structs.IBitmask;
-import org.trikkle.structs.LongArrayBitmask;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -16,12 +13,12 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 3, time = 7)
 @BenchmarkMode(Mode.SampleTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-public class BitmaskMark {
+public class Benchmark {
 	public static void main(String[] args) throws Exception {
 		org.openjdk.jmh.Main.main(args);
 	}
 
-	@Benchmark
+	@org.openjdk.jmh.annotations.Benchmark
 	public static void run(State state, Blackhole blackhole) {
 		Set<Link> manyLinks = new HashSet<>();
 		for (int i = 0; i < 10000; i++) {
@@ -38,42 +35,12 @@ public class BitmaskMark {
 			startingNode.setUsable();
 		}
 		overseer.start();
-
-//		List<IBitmask> list = new ArrayList<>(state.N);
-//		for (int i = 0; i < state.N; i++) {
-//			if (state.query.supersetOf(state.bitmasks[i])) {
-//				list.add(state.bitmasks[i]);
-//			}
-//		}
-//		blackhole.consume(list);
 	}
 
 	@org.openjdk.jmh.annotations.State(Scope.Benchmark)
 	public static class State {
-		final int C = 20;
-		final int N = 1000000;
-		final IBitmask[] bitmasks = new IBitmask[N];
-		final IBitmask query = new LongArrayBitmask(C);
-		Random random = new Random(123);
-
 		@Setup(Level.Trial)
 		public void setup() {
-			for (int i = 0; i < N; i++) {
-				bitmasks[i] = new LongArrayBitmask(C);
-				for (int j = 0; j < C; j++) {
-					if (random.nextBoolean()) {
-						bitmasks[i].set(j);
-					}
-				}
-			}
-
-			for (int j = 0; j < C; j++) {
-				if (j % 2 == 0 || random.nextBoolean()) {
-					query.set(j);
-				}
-			}
-
-			System.out.println(query.getClass().getSimpleName());
 		}
 	}
 }
