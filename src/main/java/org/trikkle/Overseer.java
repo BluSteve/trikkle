@@ -3,6 +3,7 @@ package org.trikkle;
 import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
@@ -12,6 +13,7 @@ public final class Overseer {
 	private static final int PARALLEL_THRESHOLD = 2;
 	private final Graph g;
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
+	private final Set<Link> linkSet = ConcurrentHashMap.newKeySet();
 	private final AtomicInteger tick = new AtomicInteger(0);
 	private final Queue<Collection<Link>> linkTrace = new ConcurrentLinkedQueue<>();
 	private boolean started = false;
@@ -35,6 +37,8 @@ public final class Overseer {
 			if (cache == null) primable.reset();
 			primable.primeWith(this);
 		}
+
+		linkSet.addAll(g.links);
 	}
 
 	public Set<String> getStartingDatumNames() {
@@ -85,8 +89,9 @@ public final class Overseer {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
-		Collection<Link> linksNow = new ArrayList<>(g.links.size());
-		for (Link link : g.links) {
+		linkSet.removeIf(link -> link.getArc().getStatus() == ArcStatus.FINISHED);
+		Collection<Link> linksNow = new ArrayList<>(linkSet.size());
+		for (Link link : linkSet) {
 			if (link.runnable()) {
 				Arc arc = link.getArc();
 				if (recursive && !arc.isSafe()) {
