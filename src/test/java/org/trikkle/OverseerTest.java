@@ -283,7 +283,7 @@ class OverseerTest {
 	void manyNodes() {
 		Set<Node> dependencies = new HashSet<>();
 		for (int i = 0; i < 100; i++) {
-			dependencies.add(new Nodespace().discreteOf());
+			dependencies.add(new Nodespace().emptyOf());
 		}
 		Arc inputArc = new AutoArc() {
 			@Override
@@ -291,7 +291,7 @@ class OverseerTest {
 				getOutputNode().setProgress(1);
 			}
 		};
-		Link link = new Link(dependencies, inputArc, DiscreteNode.of());
+		Link link = new Link(dependencies, inputArc, EmptyNode.of());
 
 		Graph graph = new Graph(link);
 		System.out.println(graph);
@@ -367,7 +367,7 @@ class OverseerTest {
 				ab.set(true);
 			}
 		};
-		Node discreteNode = DiscreteNode.of();
+		Node discreteNode = EmptyNode.of();
 		Link link = new Link(Set.of(discreteNode), inputArc, Set.of());
 		Graph graph = new Graph(link);
 		System.out.println(graph);
@@ -425,7 +425,7 @@ class OverseerTest {
 		};
 		med2.setName("med2");
 
-		Node medNode = DiscreteNode.of();
+		Node medNode = EmptyNode.of();
 
 		Link link = new Link(Set.of(), long1, Set.of());
 		Link link2 = new Link(Set.of(), med1, medNode);

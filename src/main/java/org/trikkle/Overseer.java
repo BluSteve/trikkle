@@ -198,7 +198,7 @@ public final class Overseer {
 		return linkTrace;
 	}
 
-	public void printLinkTrace() {
+	public void printLinkTrace() { // todo change to String get
 		int tick = 1;
 		for (Collection<Link> links : linkTrace) {
 			System.out.println("Tick " + tick++);

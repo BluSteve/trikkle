@@ -11,6 +11,11 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	private double progress = 0; // monotonically increasing
 
 	protected Node(Set<String> datumNames) {
+		for (String datumName : datumNames) {
+			if (datumName == null) {
+				throw new NullPointerException("Datum name cannot be null!");
+			}
+		}
 		this.datumNames = datumNames;
 	}
 

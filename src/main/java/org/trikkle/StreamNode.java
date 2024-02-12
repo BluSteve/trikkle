@@ -17,10 +17,10 @@ public final class StreamNode extends Node {
 	}
 
 	public static StreamNode of(String datumName) {
-		return of(Nodespace.instance, datumName);
+		return fromNodespace(Nodespace.instance, datumName);
 	}
 
-	static StreamNode of(Nodespace nodespace, String datumName) {
+	static StreamNode fromNodespace(Nodespace nodespace, String datumName) {
 		Set<String> singleton = Collections.singleton(datumName);
 		Map<Set<String>, Node> nodeCache = nodespace.nodeCache;
 		if (nodeCache.containsKey(singleton)) {

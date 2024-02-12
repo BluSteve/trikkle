@@ -13,14 +13,17 @@ public final class DiscreteNode extends Node {
 	}
 
 	public static DiscreteNode of(Set<String> datumNames) {
-		return of(Nodespace.instance, datumNames);
+		return fromNodespace(Nodespace.instance, datumNames);
 	}
 
 	public static DiscreteNode of(String... datumNames) {
-		return of(new HashSet<>(Arrays.asList(datumNames)));
+		return fromNodespace(Nodespace.instance, new HashSet<>(Arrays.asList(datumNames)));
 	}
 
-	static DiscreteNode of(Nodespace nodespace, Set<String> datumNames) {
+	static DiscreteNode fromNodespace(Nodespace nodespace, Set<String> datumNames) {
+		if (datumNames.isEmpty()) {
+			throw new IllegalArgumentException("DiscreteNode must have at least one datum");
+		}
 		Map<Set<String>, Node> nodeCache = nodespace.nodeCache;
 		if (nodeCache.containsKey(datumNames)) {
 			return (DiscreteNode) nodeCache.get(datumNames);
@@ -29,10 +32,6 @@ public final class DiscreteNode extends Node {
 			nodeCache.put(node.datumNames, node);
 			return node;
 		}
-	}
-
-	static DiscreteNode of(Nodespace nodespace, String... datumNames) {
-		return of(nodespace, new HashSet<>(Arrays.asList(datumNames)));
 	}
 
 	@Override
