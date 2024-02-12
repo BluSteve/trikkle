@@ -111,6 +111,7 @@ public final class Overseer {
 		if (arcsNow.size() < PARALLEL_THRESHOLD) {
 			for (Arc arc : arcsNow) {
 				arc.runWrapper();
+				ticktock();
 			}
 		} else {
 			// Run all links that can be done now (aka arcsNow) in parallel.
