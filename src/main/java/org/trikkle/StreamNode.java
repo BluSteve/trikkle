@@ -45,6 +45,9 @@ public final class StreamNode extends Node {
 			}
 			setProgress((double) (c + 1) / limit);
 		}
+		if (!overseer.g.endingNodes.contains(this)) {
+			overseer.unsafeTicktock();
+		}
 	}
 
 	public int getLimit() {

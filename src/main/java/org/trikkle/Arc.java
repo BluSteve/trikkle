@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Arc implements Primable {
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
-	protected Overseer overseer;
+	protected Overseer overseer; // todo encapsulate
 	protected Set<Node> dependencies, outputNodes;
 	private ArcStatus status = ArcStatus.IDLE;
 	private Node outputNode;
@@ -85,7 +85,7 @@ public abstract class Arc implements Primable {
 	@Override
 	public void primeWith(Overseer overseer) { // aka initialize
 		this.overseer = overseer;
-		Link link = overseer.getGraph().arcMap.get(this);
+		Link link = overseer.g.arcMap.get(this);
 		dependencies = link.getDependencies();
 		outputNodes = link.getOutputNodes();
 		if (outputNodes.size() == 1) {

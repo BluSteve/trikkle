@@ -22,5 +22,6 @@ public class Profiling {
 		}
 		overseer.setParallel(false);
 		overseer.start();
+		overseer.printLinkTrace();
 	}
 }

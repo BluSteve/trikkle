@@ -9,7 +9,7 @@ import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class Overseer {
-	private final Graph g;
+	final Graph g;
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Collection<Link> links = new ConcurrentLinkedQueue<>();
 	private final AtomicInteger tick = new AtomicInteger(0);
@@ -196,6 +196,17 @@ public final class Overseer {
 
 	public Queue<Collection<Link>> getLinkTrace() {
 		return linkTrace;
+	}
+
+	public void printLinkTrace() {
+		int tick = 1;
+		for (Collection<Link> links : linkTrace) {
+			System.out.println("Tick " + tick++);
+			for (Link link : links) {
+				System.out.println(link);
+			}
+			System.out.println();
+		}
 	}
 
 	public Graph getGraph() {

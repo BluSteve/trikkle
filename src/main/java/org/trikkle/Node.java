@@ -19,13 +19,9 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 			throw new IllegalArgumentException("Datum " + datumName + " was not declared by this node!");
 		}
 		uncheckedAddDatum(datumName, datum);
-		overseer.unsafeTicktock();
 	}
 
 	protected abstract void uncheckedAddDatum(String datumName, Object datum);
-
-	protected void onDone() {
-	}
 
 	public boolean isUsable() {
 		return usable;
@@ -33,7 +29,6 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 	public void setUsable() {
 		this.usable = true;
-		overseer.unsafeTicktock();
 	}
 
 	public double getProgress() {
@@ -49,10 +44,6 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 		}
 
 		this.progress = progress;
-		if (progress == 1) {
-			setUsable();
-			onDone();
-		}
 		return true;
 	}
 

@@ -42,6 +42,10 @@ public final class DiscreteNode extends Node {
 
 		if (!isDatumDone.containsValue(false)) { // all datums filled
 			setProgress(1);
+			setUsable();
+			if (!overseer.g.endingNodes.contains(this)) {
+				overseer.unsafeTicktock();
+			}
 		}
 	}
 

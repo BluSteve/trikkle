@@ -21,17 +21,6 @@ class OverseerTest {
 		}
 	}
 
-	public static void printLinkTrace(Queue<Collection<Link>> linkTrace) {
-		int tick = 1;
-		for (Collection<Link> links : linkTrace) {
-			System.out.println("Tick " + tick++);
-			for (Link link : links) {
-				System.out.println(link);
-			}
-			System.out.println();
-		}
-	}
-
 	@Test
 	void nodeTest() {
 		Node node = DiscreteNode.of("toSquare");
@@ -448,6 +437,7 @@ class OverseerTest {
 		long start = System.currentTimeMillis();
 		overseer.start();
 		long end = System.currentTimeMillis();
+		System.out.println("parallel: " + (end - start));
 		assertTrue(end - start < 300);
 
 		Overseer overseer2 = new Overseer(graph);
@@ -455,9 +445,10 @@ class OverseerTest {
 		long start2 = System.currentTimeMillis();
 		overseer2.start();
 		long end2 = System.currentTimeMillis();
+		System.out.println("sequential: " + (end2 - start2));
 		assertTrue(end2 - start2 > 300);
 
-		printLinkTrace(overseer.getLinkTrace());
+		overseer2.printLinkTrace();
 	}
 
 	@Test
