@@ -3,8 +3,6 @@ package org.trikkle;
 import java.util.Set;
 
 public interface Congruent<T> {
-	boolean congruentTo(T t);
-
 	static <T extends Congruent<T>> boolean setsCongruent(Set<T> set1, Set<T> set2) {
 		if (set1.size() != set2.size()) {
 			return false;
@@ -24,4 +22,6 @@ public interface Congruent<T> {
 		}
 		return true;
 	}
+
+	boolean congruentTo(T t);
 }

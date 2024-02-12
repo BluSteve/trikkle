@@ -8,15 +8,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class StreamNode extends Node {
-	private int limit = -1;
 	private final AtomicInteger count = new AtomicInteger(0);
+	private int limit = -1;
 
 	private StreamNode(String datumName) {
 		super(Collections.singleton(datumName));
 	}
 
 	public static StreamNode of(String datumName) {
-		return fromNodespace(Nodespace.instance, datumName);
+		return fromNodespace(Nodespace.DEFAULT, datumName);
 	}
 
 	static StreamNode fromNodespace(Nodespace nodespace, String datumName) {

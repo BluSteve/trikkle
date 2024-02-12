@@ -11,7 +11,7 @@ public class EmptyNode extends Node {
 	}
 
 	public static EmptyNode of() {
-		return fromNodespace(Nodespace.instance);
+		return fromNodespace(Nodespace.DEFAULT);
 	}
 
 	static EmptyNode fromNodespace(Nodespace nodespace) {

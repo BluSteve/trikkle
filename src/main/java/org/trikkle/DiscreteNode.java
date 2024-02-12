@@ -13,11 +13,11 @@ public final class DiscreteNode extends Node {
 	}
 
 	public static DiscreteNode of(Set<String> datumNames) {
-		return fromNodespace(Nodespace.instance, datumNames);
+		return fromNodespace(Nodespace.DEFAULT, datumNames);
 	}
 
 	public static DiscreteNode of(String... datumNames) {
-		return fromNodespace(Nodespace.instance, new HashSet<>(Arrays.asList(datumNames)));
+		return fromNodespace(Nodespace.DEFAULT, new HashSet<>(Arrays.asList(datumNames)));
 	}
 
 	static DiscreteNode fromNodespace(Nodespace nodespace, Set<String> datumNames) {

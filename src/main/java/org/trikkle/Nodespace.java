@@ -3,8 +3,8 @@ package org.trikkle;
 import java.util.*;
 
 public final class Nodespace {
+	public final static Nodespace DEFAULT = new Nodespace();
 	final Map<Set<String>, Node> nodeCache = new HashMap<>();
-	public final static Nodespace instance = new Nodespace();
 
 	public DiscreteNode discreteOf(Set<String> datumNames) {
 		return DiscreteNode.fromNodespace(this, datumNames);

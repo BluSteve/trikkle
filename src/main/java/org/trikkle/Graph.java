@@ -239,14 +239,4 @@ public final class Graph implements Congruent<Graph> {
 	public String toString() {
 		return MermaidGraphViz.defaultVisualize(this);
 	}
-
-	private static class Way {
-		public final int graphIndex;
-		public final Set<Node> dependencies;
-
-		public Way(int graphIndex, Set<Node> dependencies) {
-			this.graphIndex = graphIndex;
-			this.dependencies = dependencies;
-		}
-	}
 }
