@@ -11,7 +11,7 @@ public class Profiling {
 			Arc arc = new AutoArc() {
 				@Override
 				public void run() {
-					getOutputNode().setProgress(1);
+					getOutputNode().setUsable();
 				}
 			};
 			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, new Nodespace().emptyOf()));

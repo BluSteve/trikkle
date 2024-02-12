@@ -1,15 +1,16 @@
 package org.trikkle;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class DiscreteNode extends Node {
-	private final Map<String, Boolean> isDatumDone = new HashMap<>();
+	private final AtomicInteger datumsFilled = new AtomicInteger(0);
 
 	private DiscreteNode(Set<String> datumNames) {
 		super(datumNames);
-		for (String datumName : datumNames) {
-			isDatumDone.put(datumName, false);
-		}
 	}
 
 	public static DiscreteNode of(Set<String> datumNames) {
@@ -37,11 +38,9 @@ public final class DiscreteNode extends Node {
 	@Override
 	protected void uncheckedAddDatum(String datumName, Object datum) {
 		overseer.getCache().put(datumName, datum);
-		isDatumDone.put(datumName, true);
 
-		if (!isDatumDone.containsValue(false)) { // all datums filled
+		if (datumsFilled.incrementAndGet() == datumNames.size()) { // all datums filled
 			setProgress(1);
-			setUsable();
 			if (!overseer.g.endingNodes.contains(this)) {
 				overseer.unsafeTicktock();
 			}
@@ -49,10 +48,16 @@ public final class DiscreteNode extends Node {
 	}
 
 	@Override
+	public void setUsable() {
+		if (datumsFilled.get() < datumNames.size()) {
+			throw new IllegalStateException("DiscreteNode is not yet done!");
+		}
+		super.setUsable();
+	}
+
+	@Override
 	public void reset() {
 		super.reset();
-		for (String datumName : datumNames) {
-			isDatumDone.put(datumName, false);
-		}
+		datumsFilled.set(0);
 	}
 }

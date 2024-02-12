@@ -49,7 +49,7 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 		}
 
 		this.progress = progress;
-		if (progress == 1) setUsable();
+		if (progress == 1) setUsable(); // IF progress is 1 THEN usable is true
 		return true;
 	}
 
