@@ -4,6 +4,7 @@ import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -123,12 +124,7 @@ public final class Overseer {
 				};
 				i++;
 			}
-			for (RecursiveAction task : tasks) {
-				task.fork();
-			}
-			for (int j = tasks.length - 1; j >= 0; j--) {
-				tasks[j].join();
-			}
+			ForkJoinTask.invokeAll(tasks);
 		}
 	}
 
