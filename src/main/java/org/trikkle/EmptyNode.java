@@ -31,7 +31,8 @@ public class EmptyNode extends Node {
 
 	@Override
 	public void setUsable() {
+		boolean wasUsable = isUsable();
 		super.setUsable();
-		overseer.unsafeTicktock();
+		if (!wasUsable && !overseer.g.endingNodes.contains(this)) overseer.unsafeTicktock();
 	}
 }

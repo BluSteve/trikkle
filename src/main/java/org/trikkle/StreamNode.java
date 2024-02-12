@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class StreamNode extends Node {
-	private final Object LOCK = new Object();
 	private int limit = -1;
 	private final AtomicInteger count = new AtomicInteger(0);
 

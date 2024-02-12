@@ -53,23 +53,6 @@ public final class Overseer {
 		return sb.toString();
 	}
 
-	public Set<String> getStartingDatumNames() {
-		Set<String> startingDatumNames = new HashSet<>();
-		for (Node startingNode : g.startingNodes) {
-			startingDatumNames.addAll(startingNode.datumNames);
-		}
-		return startingDatumNames;
-	}
-
-	public void addStartingDatum(String datumName, Object datum) {
-		Node node = g.nodeOfDatum.get(datumName);
-		if (!g.startingNodes.contains(node)) {
-			throw new IllegalArgumentException(
-					"Datum " + datumName + " does not belong to a starting node!");
-		}
-		node.addDatum(datumName, datum);
-	}
-
 	public void start() {
 		if (started) {
 			throw new IllegalStateException("Overseer started before!");
@@ -151,6 +134,23 @@ public final class Overseer {
 
 	void unsafeTicktock() {
 		ticktock(true);
+	}
+
+	public Set<String> getStartingDatumNames() {
+		Set<String> startingDatumNames = new HashSet<>();
+		for (Node startingNode : g.startingNodes) {
+			startingDatumNames.addAll(startingNode.datumNames);
+		}
+		return startingDatumNames;
+	}
+
+	public void addStartingDatum(String datumName, Object datum) {
+		Node node = g.nodeOfDatum.get(datumName);
+		if (!g.startingNodes.contains(node)) {
+			throw new IllegalArgumentException(
+					"Datum " + datumName + " does not belong to a starting node!");
+		}
+		node.addDatum(datumName, datum);
 	}
 
 	private boolean hasEnded() {

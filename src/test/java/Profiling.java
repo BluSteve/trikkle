@@ -11,10 +11,10 @@ public class Profiling {
 			Arc arc = new AutoArc() {
 				@Override
 				public void run() {
-					returnDatum("foo" + finalI, 1);
+					getOutputNode().setProgress(1);
 				}
 			};
-			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, new Nodespace().discreteOf("foo" + i)));
+			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, new Nodespace().emptyOf()));
 		}
 		Overseer overseer = new Overseer(new Graph(manyLinks));
 		for (Node startingNode : overseer.getGraph().startingNodes) {
