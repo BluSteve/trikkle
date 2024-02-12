@@ -6,6 +6,7 @@ import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.*;
 
+// Graph NEVER modifies the links, nodes, or arcs it's given. It only uses them to create its own data structures.
 public final class Graph implements Congruent<Graph> {
 	public static boolean ALLOW_CYCLES = false;
 	public final Set<Link> links;

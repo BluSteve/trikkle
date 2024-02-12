@@ -61,7 +61,7 @@ public final class StreamNode extends Node {
 	@Override
 	public void primeWith(Overseer overseer) {
 		super.primeWith(overseer);
-		overseer.getCache().put(datumNames.iterator().next(), new ConcurrentLinkedQueue<>());
+		overseer.getCache().putIfAbsent(datumNames.iterator().next(), new ConcurrentLinkedQueue<>());
 	}
 
 	@Override

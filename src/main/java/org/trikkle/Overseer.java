@@ -19,13 +19,22 @@ public final class Overseer {
 	private boolean started = false;
 
 	public Overseer(Graph graph) {
+		this(graph, null);
+	}
+
+	public Overseer(Graph graph, Map<String, Object> cache) {
 		this.g = graph;
+		if (cache != null) {
+			this.cache.putAll(cache); // doesn't check that the cache has datums that are actually in the graph
+		}
 
 		// undoes previous overseer's changes
 		// Prime nodes and arcs with this overseer
 		for (Primable primable : g.primables) {
 			primable.getLock().lock();
-			primable.reset(); // todo make this optional and put it in graph
+		}
+		for (Primable primable : g.primables) {
+			if (cache == null) primable.reset();
 			primable.primeWith(this);
 		}
 
