@@ -3,7 +3,6 @@ package org.trikkle;
 import org.trikkle.structs.StrictConcurrentHashMap;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
@@ -12,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class Overseer {
 	private final Graph g;
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
-	private final Set<Link> linkSet = ConcurrentHashMap.newKeySet();
+	private final Collection<Link> links = new ConcurrentLinkedQueue<>();
 	private final AtomicInteger tick = new AtomicInteger(0);
 	private final Queue<Collection<Link>> linkTrace = new ConcurrentLinkedQueue<>();
 	private boolean started = false;
@@ -28,7 +27,7 @@ public final class Overseer {
 		if (cache != null) {
 			this.cache.putAll(cache); // doesn't check that the cache has datums that are actually in the graph
 		}
-		linkSet.addAll(g.links);
+		links.addAll(g.links);
 
 		// undoes previous overseer's changes
 		// Prime nodes and arcs with this overseer
@@ -89,9 +88,13 @@ public final class Overseer {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
-		linkSet.removeIf(link -> link.getArc().getStatus() == ArcStatus.FINISHED);
-		Collection<Link> linksNow = new ArrayList<>(linkSet.size());
-		for (Link link : linkSet) {
+		Collection<Link> linksNow = new ArrayList<>(links.size());
+		for (Iterator<Link> iterator = links.iterator(); iterator.hasNext(); ) {
+			Link link = iterator.next();
+			if (link.getArc().getStatus() == ArcStatus.FINISHED) {
+				iterator.remove();
+				continue;
+			}
 			if (link.runnable()) {
 				Arc arc = link.getArc();
 				if (recursive && !arc.isSafe()) {
