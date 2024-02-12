@@ -86,15 +86,7 @@ public final class Overseer {
 
 		Collection<Link> linksNow = new ArrayList<>(g.links.size());
 		for (Link link : g.links) {
-			if (link.getArc().getStatus() == ArcStatus.FINISHED) continue;
-			boolean allDependenciesUsable = true;
-			for (Node dependency : link.getDependencies()) {
-				if (!dependency.isUsable()) {
-					allDependenciesUsable = false;
-					break;
-				}
-			}
-			if (allDependenciesUsable) {
+			if (link.runnable()) {
 				Arc arc = link.getArc();
 				if (recursive && !arc.isSafe()) {
 					continue;
