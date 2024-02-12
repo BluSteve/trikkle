@@ -105,10 +105,8 @@ public final class Overseer {
 			}
 		}
 
-		synchronized (this) {
-			tick.incrementAndGet();
-			linkTrace.add(linksNow);
-		}
+		tick.incrementAndGet();
+		linkTrace.add(linksNow);
 
 		if (linksNow.isEmpty()) return;
 		if (!parallel || linksNow.size() < parallelThreshold) {

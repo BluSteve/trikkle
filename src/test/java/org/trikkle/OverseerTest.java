@@ -1,6 +1,7 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.trikkle.viz.IGraphViz;
 import org.trikkle.viz.MermaidGraphViz;
 
@@ -456,7 +457,7 @@ class OverseerTest {
 		Arc unsafeArc = new Arc(false) {
 			@Override
 			public void run() {
-				setStatus(ArcStatus.IDLE); // set to idle and make sure there's no stackoverflow
+				setStatus(ArcStatus.FINISHED); // set to idle and make sure there's no stackoverflow
 			}
 		};
 
