@@ -27,6 +27,7 @@ public final class Overseer {
 		if (cache != null) {
 			this.cache.putAll(cache); // doesn't check that the cache has datums that are actually in the graph
 		}
+		linkSet.addAll(g.links);
 
 		// undoes previous overseer's changes
 		// Prime nodes and arcs with this overseer
@@ -37,8 +38,6 @@ public final class Overseer {
 			if (cache == null) primable.reset();
 			primable.primeWith(this);
 		}
-
-		linkSet.addAll(g.links);
 	}
 
 	public Set<String> getStartingDatumNames() {
@@ -187,11 +186,11 @@ public final class Overseer {
 	}
 
 	private void onEnd() {
-		if (tick.get() != linkTrace.size()) {
-			throw new IllegalStateException("Tick and linkTrace are out of sync!");
-		}
 		for (Primable primable : g.primables) {
 			primable.getLock().unlock();
+		}
+		if (tick.get() != linkTrace.size()) {
+			throw new IllegalStateException("Tick and linkTrace are out of sync!");
 		}
 	}
 
