@@ -22,6 +22,6 @@ public class Profiling {
 		}
 		overseer.setParallel(false);
 		overseer.start();
-		overseer.printLinkTrace();
+		System.out.println(Overseer.linkTraceToString(overseer.getLinkTrace()));
 	}
 }

@@ -40,6 +40,19 @@ public final class Overseer {
 		}
 	}
 
+	public static String linkTraceToString(Queue<Collection<Link>> linkTrace) {
+		StringBuilder sb = new StringBuilder();
+		int tick = 1;
+		for (Collection<Link> links : linkTrace) {
+			sb.append("Tick ").append(tick++).append(":\n");
+			for (Link link : links) {
+				sb.append(link).append("\n");
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
 	public Set<String> getStartingDatumNames() {
 		Set<String> startingDatumNames = new HashSet<>();
 		for (Node startingNode : g.startingNodes) {
@@ -196,17 +209,6 @@ public final class Overseer {
 
 	public Queue<Collection<Link>> getLinkTrace() {
 		return linkTrace;
-	}
-
-	public void printLinkTrace() { // todo change to String get
-		int tick = 1;
-		for (Collection<Link> links : linkTrace) {
-			System.out.println("Tick " + tick++);
-			for (Link link : links) {
-				System.out.println(link);
-			}
-			System.out.println();
-		}
 	}
 
 	public Graph getGraph() {

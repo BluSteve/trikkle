@@ -78,6 +78,6 @@ public final class Link implements Congruent<Link> {
 
 	@Override
 	public String toString() {
-		return dependencies.toString() + " -> " + arc + " -> " + outputNodes.toString();
+		return dependencies + " -> " + arc + " -> " + outputNodes;
 	}
 }

@@ -6,10 +6,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Arc implements Primable {
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
-	protected Overseer overseer; // todo encapsulate
-	protected Set<Node> dependencies, outputNodes;
-	private ArcStatus status = ArcStatus.IDLE;
+	protected Overseer overseer;
+	private Set<Node> dependencies, outputNodes;
 	private Node outputNode;
+	private ArcStatus status = ArcStatus.IDLE;
 	private String name;
 
 	public Arc(boolean safe) { // wow overriding this is really clean
@@ -78,10 +78,6 @@ public abstract class Arc implements Primable {
 		return safe;
 	}
 
-	protected Node getOutputNode() {
-		return outputNode;
-	}
-
 	@Override
 	public void primeWith(Overseer overseer) { // aka initialize
 		this.overseer = overseer;
@@ -91,6 +87,18 @@ public abstract class Arc implements Primable {
 		if (outputNodes.size() == 1) {
 			outputNode = outputNodes.iterator().next();
 		}
+	}
+
+	protected Set<Node> getDependencies() {
+		return dependencies;
+	}
+
+	protected Set<Node> getOutputNodes() {
+		return outputNodes;
+	}
+
+	protected Node getOutputNode() {
+		return outputNode;
 	}
 
 	@Override

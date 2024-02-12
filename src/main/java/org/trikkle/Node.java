@@ -76,6 +76,6 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 	@Override
 	public String toString() {
-		return "Node" + datumNames.toString();
+		return "Node" + datumNames;
 	}
 }

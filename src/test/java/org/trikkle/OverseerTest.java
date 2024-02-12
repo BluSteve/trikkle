@@ -448,7 +448,7 @@ class OverseerTest {
 		System.out.println("sequential: " + (end2 - start2));
 		assertTrue(end2 - start2 > 300);
 
-		overseer2.printLinkTrace();
+		System.out.println(Overseer.linkTraceToString(overseer2.getLinkTrace()));
 	}
 
 	@Test
