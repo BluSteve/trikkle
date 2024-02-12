@@ -14,7 +14,7 @@ public class Profiling {
 					returnDatum("foo" + finalI, 1);
 				}
 			};
-			manyLinks.add(new Link(Set.of(new Nodespace().discreteOf()), arc, new Nodespace().discreteOf("foo" + i)));
+			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, new Nodespace().discreteOf("foo" + i)));
 		}
 		Overseer overseer = new Overseer(new Graph(manyLinks));
 		for (Node startingNode : overseer.getGraph().startingNodes) {
