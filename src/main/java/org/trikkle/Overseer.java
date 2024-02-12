@@ -220,6 +220,9 @@ public final class Overseer {
 	}
 
 	private void onEnd() {
+		if (tick.get() != linkTrace.size()) {
+			throw new IllegalStateException("Tick and linkTrace are out of sync!");
+		}
 		for (Primable primable : g.primables) {
 			primable.getLock().unlock();
 		}

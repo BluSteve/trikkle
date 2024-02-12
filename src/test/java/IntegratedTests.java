@@ -121,6 +121,7 @@ public class IntegratedTests {
 		overseer.start();
 		assertTrue((boolean) overseer.getResultCache().get("customerHappy"));
 		assertTrue((boolean) overseer.getResultCache().get("customerVeryHappy"));
+		System.out.println(overseer.getTick());
 	}
 
 	public record Omelette(int chivesCount, int eggsCount) {
