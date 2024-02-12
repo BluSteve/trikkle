@@ -456,7 +456,7 @@ class OverseerTest {
 		Arc unsafeArc = new Arc(false) {
 			@Override
 			public void run() {
-				setStatus(ArcStatus.FINISHED);
+				setStatus(ArcStatus.IDLE); // set to idle and make sure there's no stackoverflow
 			}
 		};
 

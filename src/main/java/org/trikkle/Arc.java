@@ -12,7 +12,9 @@ public abstract class Arc implements Primable {
 	private ArcStatus status = ArcStatus.IDLE;
 	private String name;
 
-	public Arc(boolean safe) { // wow overriding this is really clean
+	// wow overriding this is really clean
+	// without this there are ways to get a ticktock by for example having a phantom stream node it outputs to
+	public Arc(boolean safe) {
 		this.safe = safe;
 	}
 
