@@ -1,7 +1,6 @@
 package org.trikkle;
 
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class

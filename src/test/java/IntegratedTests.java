@@ -110,7 +110,6 @@ public class IntegratedTests {
 		});
 		assertEquals("StreamNode cannot be the input of an AutoArc. Use Arc instead.", e.getMessage());
 
-
 		Graph graphD = new Graph(brewerLink, coffeeLink, serveBothLink);
 		graphA = Graph.concatGraphs(graphA, graphD);
 		System.out.println(MermaidGraphViz.defaultVisualize(graphA, graphB));

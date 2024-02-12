@@ -80,7 +80,6 @@ class GraphTest {
 		};
 		arc3.setName("arc3");
 
-
 		// make a link connecting nodeB to nodeF with arc1
 		Link link1 = new Link(Set.of(nodeB), arc1, nodeF);
 
@@ -211,7 +210,6 @@ class GraphTest {
 		arc2.setName("arc2");
 		Link link1 = new Link(Set.of(nodeA), arc1, nodeC1);
 		Link link2 = new Link(Set.of(nodeC2), arc2, nodeD);
-
 
 		// generate a graph with links 1 and 2
 		Graph graph = new Graph(link1, link2);
