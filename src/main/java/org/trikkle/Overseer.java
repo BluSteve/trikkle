@@ -25,7 +25,7 @@ public final class Overseer {
 		// Prime nodes and arcs with this overseer
 		for (Primable primable : g.primables) {
 			primable.getLock().lock();
-			primable.reset();
+			primable.reset(); // todo make this optional and put it in graph
 			primable.primeWith(this);
 		}
 
