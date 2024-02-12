@@ -10,13 +10,14 @@ import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class Overseer {
-	private static final int PARALLEL_THRESHOLD = 2;
 	private final Graph g;
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Set<Link> linkSet = ConcurrentHashMap.newKeySet();
 	private final AtomicInteger tick = new AtomicInteger(0);
 	private final Queue<Collection<Link>> linkTrace = new ConcurrentLinkedQueue<>();
 	private boolean started = false;
+	private boolean parallel = true;
+	private int parallelThreshold = 2;
 
 	public Overseer(Graph graph) {
 		this(graph, null);
@@ -111,7 +112,7 @@ public final class Overseer {
 		}
 
 		if (linksNow.isEmpty()) return;
-		if (linksNow.size() < PARALLEL_THRESHOLD) {
+		if (!parallel || linksNow.size() < parallelThreshold) {
 			for (Link link : linksNow) {
 				link.getArc().runWrapper();
 			}
@@ -134,41 +135,6 @@ public final class Overseer {
 
 	void unsafeTicktock() {
 		ticktock(true);
-	}
-
-	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
-		return cache;
-	}
-
-	public Object getDatum(String datumName) {
-		return cache.get(datumName);
-	}
-
-	public Map<String, Object> getResultCache() {
-		Map<String, Object> resultCache = new HashMap<>();
-		for (Node endingNode : g.endingNodes) {
-			for (String datumName : endingNode.datumNames) {
-				Object datum = cache.get(datumName);
-				resultCache.put(datumName, datum);
-			}
-		}
-		return resultCache;
-	}
-
-	public Map<String, Object> getCacheCopy() {
-		return new HashMap<>(cache);
-	}
-
-	public Node getNodeOfDatum(String datumName) {
-		return g.nodeOfDatum.get(datumName);
-	}
-
-	public int getTick() {
-		return tick.get();
-	}
-
-	public Queue<Collection<Link>> getLinkTrace() {
-		return linkTrace;
 	}
 
 	private boolean hasEnded() {
@@ -194,7 +160,61 @@ public final class Overseer {
 		}
 	}
 
+	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
+		return cache;
+	}
+
+	public Map<String, Object> getResultCache() {
+		Map<String, Object> resultCache = new HashMap<>();
+		for (Node endingNode : g.endingNodes) {
+			for (String datumName : endingNode.datumNames) {
+				Object datum = cache.get(datumName);
+				resultCache.put(datumName, datum);
+			}
+		}
+		return resultCache;
+	}
+
+	public Map<String, Object> getCacheCopy() {
+		return new HashMap<>(cache);
+	}
+
+	public Object getDatum(String datumName) {
+		return cache.get(datumName);
+	}
+
+	public Node getNodeOfDatum(String datumName) {
+		return g.nodeOfDatum.get(datumName);
+	}
+
+	public int getTick() {
+		return tick.get();
+	}
+
+	public Queue<Collection<Link>> getLinkTrace() {
+		return linkTrace;
+	}
+
 	public Graph getGraph() {
 		return g;
+	}
+
+	public boolean isParallel() {
+		return parallel;
+	}
+
+	public void setParallel(boolean parallel) {
+		this.parallel = parallel;
+	}
+
+	public int getParallelThreshold() {
+		return parallelThreshold;
+	}
+
+	public void setParallelThreshold(int parallelThreshold) {
+		if (parallelThreshold < 2) {
+			throw new IllegalArgumentException("Parallel threshold must be at least 1!");
+		}
+		this.parallelThreshold = parallelThreshold;
 	}
 }

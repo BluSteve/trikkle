@@ -444,11 +444,18 @@ class OverseerTest {
 
 		Graph graph = new Graph(link, link2, link3);
 		Overseer overseer = new Overseer(graph);
-
+		overseer.setParallelThreshold(2);
 		long start = System.currentTimeMillis();
 		overseer.start();
 		long end = System.currentTimeMillis();
-		System.out.println("time = " + (end - start));
+		assertTrue(end - start < 300);
+
+		Overseer overseer2 = new Overseer(graph);
+		overseer2.setParallel(false);
+		long start2 = System.currentTimeMillis();
+		overseer2.start();
+		long end2 = System.currentTimeMillis();
+		assertTrue(end2 - start2 > 300);
 
 		printLinkTrace(overseer.getLinkTrace());
 	}
