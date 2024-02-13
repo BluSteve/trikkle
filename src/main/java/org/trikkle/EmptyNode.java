@@ -3,7 +3,7 @@ package org.trikkle;
 import java.util.Collections;
 import java.util.Set;
 
-public class EmptyNode extends Node {
+public final class EmptyNode extends Node {
 	private static final Set<String> EMPTY_SET = Collections.emptySet();
 
 	private EmptyNode() {
