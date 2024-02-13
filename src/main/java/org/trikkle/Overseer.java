@@ -134,6 +134,18 @@ public final class Overseer {
 		return startingDatumNames;
 	}
 
+	public Set<String> getUnfilledStartingDatumNames() {
+		Set<String> startingDatumNames = new HashSet<>();
+		for (Node startingNode : g.startingNodes) {
+			for (String datumName : startingNode.datumNames) {
+				if (!cache.containsKey(datumName)) {
+					startingDatumNames.add(datumName);
+				}
+			}
+		}
+		return startingDatumNames;
+	}
+
 	public void addStartingDatum(String datumName, Object datum) {
 		Node node = g.nodeOfDatum.get(datumName);
 		if (!g.startingNodes.contains(node)) {
@@ -141,6 +153,14 @@ public final class Overseer {
 					"Datum " + datumName + " does not belong to a starting node!");
 		}
 		node.addDatum(datumName, datum);
+	}
+
+	public void fillStartingDatums(Map<String, Object> cache) {
+		Set<String> unfilled = getUnfilledStartingDatumNames();
+		for (Map.Entry<String, Object> entry : cache.entrySet()) {
+			if (!unfilled.contains(entry.getKey())) continue;
+			addStartingDatum(entry.getKey(), entry.getValue());
+		}
 	}
 
 	private boolean hasEnded() {
@@ -161,7 +181,7 @@ public final class Overseer {
 		for (Primable primable : g.primables) {
 			primable.getLock().unlock();
 		}
-		if (tick.get() != linkTrace.size()) {
+		if (logging && tick.get() != linkTrace.size()) {
 			throw new IllegalStateException("Tick and linkTrace are out of sync!");
 		}
 	}
