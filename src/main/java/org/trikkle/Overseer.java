@@ -12,10 +12,11 @@ public final class Overseer {
 	final Graph g;
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Collection<Link> links = new ConcurrentLinkedQueue<>();
-	private final AtomicInteger tick = new AtomicInteger(0);
-	private final Queue<Collection<Link>> linkTrace = new ConcurrentLinkedQueue<>();
+	private AtomicInteger tick;
+	private Queue<Collection<Link>> linkTrace;
 	private boolean started = false;
 	private boolean parallel = true;
+	private boolean logging = true;
 	private int parallelThreshold = 2;
 
 	public Overseer(Graph graph) {
@@ -40,31 +41,16 @@ public final class Overseer {
 		}
 	}
 
-	public static String linkTraceToString(Queue<Collection<Link>> linkTrace) {
-		StringBuilder sb = new StringBuilder();
-		int tick = 1;
-		for (Collection<Link> links : linkTrace) {
-			sb.append("Tick ").append(tick++).append(":\n");
-			for (Link link : links) {
-				sb.append(link).append("\n");
-			}
-			sb.append("\n");
-		}
-		return sb.toString();
-	}
-
 	public void start() {
 		if (started) {
 			throw new IllegalStateException("Overseer started before!");
 		}
-
 		// check population of startingNodes
 		for (Node startingNode : g.startingNodes) {
 			if (!startingNode.isUsable()) {
 				throw new IllegalStateException("Starting nodes not fully populated; unable to start!");
 			}
 		}
-
 		// check that overseer and .start() are called in the same thread
 		for (Primable primable : g.primables) {
 			if (!primable.getLock().isHeldByCurrentThread()) {
@@ -74,6 +60,10 @@ public final class Overseer {
 		}
 
 		started = true;
+		if (logging) {
+			tick = new AtomicInteger(0);
+			linkTrace = new ConcurrentLinkedQueue<>();
+		}
 		while (!hasEnded()) {
 			ticktock(false);
 		}
@@ -105,8 +95,10 @@ public final class Overseer {
 			}
 		}
 
-		tick.incrementAndGet();
-		linkTrace.add(linksNow);
+		if (logging) {
+			tick.incrementAndGet();
+			linkTrace.add(linksNow);
+		}
 
 		if (linksNow.isEmpty()) return;
 		if (!parallel || linksNow.size() < parallelThreshold) {
@@ -230,5 +222,13 @@ public final class Overseer {
 			throw new IllegalArgumentException("Parallel threshold must be at least 1!");
 		}
 		this.parallelThreshold = parallelThreshold;
+	}
+
+	public boolean isLogging() {
+		return logging;
+	}
+
+	public void setLogging(boolean logging) {
+		this.logging = logging;
 	}
 }

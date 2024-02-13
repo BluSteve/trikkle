@@ -39,11 +39,14 @@ public final class DiscreteNode extends Node {
 	protected void uncheckedAddDatum(String datumName, Object datum) {
 		overseer.getCache().put(datumName, datum);
 
-		if (datumsFilled.incrementAndGet() == datumNames.size()) { // all datums filled
+		int i = datumsFilled.incrementAndGet();
+		if (i == datumNames.size()) { // all datums filled
 			setProgress(1);
 			if (!overseer.g.endingNodes.contains(this)) {
 				overseer.unsafeTicktock();
 			}
+		} else {
+			setProgress((double) i / datumNames.size());
 		}
 	}
 

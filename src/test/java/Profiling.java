@@ -1,4 +1,5 @@
 import org.trikkle.*;
+import org.trikkle.viz.LogUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,6 @@ public class Profiling {
 		}
 		overseer.setParallel(false);
 		overseer.start();
-		System.out.println(Overseer.linkTraceToString(overseer.getLinkTrace()));
+		System.out.println(LogUtils.linkTraceToString(overseer.getLinkTrace()));
 	}
 }

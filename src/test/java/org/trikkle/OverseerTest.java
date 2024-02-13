@@ -1,8 +1,8 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.trikkle.viz.IGraphViz;
+import org.trikkle.viz.LogUtils;
 import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.*;
@@ -449,7 +449,7 @@ class OverseerTest {
 		System.out.println("sequential: " + (end2 - start2));
 		assertTrue(end2 - start2 > 300);
 
-		System.out.println(Overseer.linkTraceToString(overseer2.getLinkTrace()));
+		System.out.println(LogUtils.linkTraceToString(overseer2.getLinkTrace()));
 	}
 
 	@Test
