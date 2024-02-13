@@ -85,13 +85,13 @@ public class MermaidGraphViz implements IGraphViz {
 		return sb.toString();
 	}
 
-	@Override
-	public String visualize(Graph... graphs) {
+	public String visualize(Set<Node> doneNodes, Graph... graphs) {
 		boolean single = graphs.length == 1;
 
 		List<String> lines = new ArrayList<>();
 		lines.add("flowchart LR");
-		lines.add("classDef hidden display: none;");
+		lines.add("classDef hidden display:none;");
+		if (!doneNodes.isEmpty()) lines.add("classDef done fill:#90EE90;");
 
 		int I = 0;
 		for (int j = graphs.length - 1; j >= 0; j--) {
@@ -122,7 +122,9 @@ public class MermaidGraphViz implements IGraphViz {
 					nodeType = NodeType.ENDING;
 				}
 
-				lines.add(nodeToMermaid(node, nodeId, nodeType));
+				String nodeLine = nodeToMermaid(node, nodeId, nodeType);
+				if (doneNodes.contains(node)) nodeLine += ":::done";
+				lines.add(nodeLine);
 			}
 
 			int k = 0;
@@ -152,6 +154,11 @@ public class MermaidGraphViz implements IGraphViz {
 		}
 
 		return String.join(System.lineSeparator(), lines);
+	}
+
+	@Override
+	public String visualize(Graph... graphs) {
+		return visualize(Collections.emptySet(), graphs);
 	}
 
 	private enum NodeType {

@@ -1,10 +1,7 @@
 package org.trikkle;
 
-import org.trikkle.*;
-
 import java.util.*;
 
-@Deprecated
 public class GraphGenerator {
 	private final static long SEED = 504957110;
 
@@ -30,6 +27,7 @@ public class GraphGenerator {
 		return arcs;
 	}
 
+	@Deprecated
 	public static Graph generateGraph(int numNodes, int numArcs, Random random) {
 		if (numArcs > numNodes) {
 			throw new IllegalArgumentException("numArcs must be less than or equal to numNodes");
@@ -42,6 +40,7 @@ public class GraphGenerator {
 		return getGraph(nodes, arcs, random);
 	}
 
+	@Deprecated
 	public static Graph generateGraph(int numNodes, int numArcs) {
 		return generateGraph(numNodes, numArcs, new Random(SEED));
 	}

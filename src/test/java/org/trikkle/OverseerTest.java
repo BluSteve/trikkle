@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.trikkle.viz.LogUtils.animate;
+import static org.trikkle.viz.LogUtils.toMarkdown;
 
 class OverseerTest {
 	public static void sleep(int milliseconds) {
@@ -486,5 +488,47 @@ class OverseerTest {
 		overseer.setParallel(false);
 		overseer.start();
 		assertEquals(1, overseer.getTick());
+	}
+
+	@Test
+	void animationTest() {
+		// make three arcs that output to one node each with different datum names
+		Arc arc1 = new AutoArc() {
+			@Override
+			public void run() {
+				returnDatum("node1", 1.0);
+			}
+		};
+		Arc arc2 = new AutoArc() {
+			@Override
+			public void run() {
+				returnDatum("node2", 2.0);
+			}
+		};
+		Arc arc3 = new AutoArc() {
+			@Override
+			public void run() {
+				returnDatum("node3", 3.0);
+			}
+		};
+
+		// make three nodes
+		Node node1 = DiscreteNode.of("node1");
+		Node node2 = DiscreteNode.of("node2");
+		Node node3 = DiscreteNode.of("node3");
+		Node initNode = EmptyNode.of();
+
+		// make three links
+		Link link1 = new Link(Set.of(initNode), arc1, node1);
+		Link link2 = new Link(Set.of(node1), arc2, node2);
+		Link link3 = new Link(Set.of(node2), arc3, node3);
+
+		// make a graph with the three links
+		Graph graph = new Graph(link1, link2, link3);
+		Overseer overseer = new Overseer(graph);
+		initNode.setUsable();
+		overseer.start();
+
+		System.out.println(toMarkdown(animate(graph, overseer.getLinkTrace())));
 	}
 }
