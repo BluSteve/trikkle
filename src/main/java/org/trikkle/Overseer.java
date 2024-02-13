@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public final class Overseer {
 	final Graph g;
@@ -15,9 +16,11 @@ public final class Overseer {
 	private AtomicInteger tick;
 	private Queue<Collection<Link>> linkTrace;
 	private boolean started = false;
-	private boolean parallel = true;
-	private boolean logging = true;
+
 	private boolean checkRecursion = true;
+	private boolean logging = true;
+	private BiConsumer<Integer, Collection<Link>> observer = null;
+	private boolean parallel = true;
 	private int parallelThreshold = 2;
 
 	public Overseer(Graph graph) {
@@ -97,8 +100,11 @@ public final class Overseer {
 		}
 
 		if (logging) {
-			tick.incrementAndGet();
+			int t = tick.incrementAndGet();
 			linkTrace.add(linksNow);
+			if (observer != null) observer.accept(t, linksNow);
+		} else {
+			if (observer != null) observer.accept(null, null);
 		}
 
 		if (linksNow.isEmpty()) return;
@@ -182,9 +188,6 @@ public final class Overseer {
 		for (Primable primable : g.primables) {
 			primable.getLock().unlock();
 		}
-		if (logging && tick.get() != linkTrace.size()) {
-			throw new IllegalStateException("Tick and linkTrace are out of sync!");
-		}
 	}
 
 	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
@@ -259,5 +262,13 @@ public final class Overseer {
 
 	public void setCheckRecursion(boolean checkRecursion) { // WARNING this is dangerous
 		this.checkRecursion = checkRecursion;
+	}
+
+	public BiConsumer<Integer, Collection<Link>> getObserver() {
+		return observer;
+	}
+
+	public void setObserver(BiConsumer<Integer, Collection<Link>> observer) {
+		this.observer = observer;
 	}
 }

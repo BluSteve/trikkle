@@ -11,10 +11,11 @@ public final class StreamNode extends Node {
 	private final AtomicInteger count = new AtomicInteger(0);
 	private int limit = -1;
 
-	private StreamNode(String datumName) {
+	public StreamNode(String datumName) {
 		super(Collections.singleton(datumName));
 	}
 
+	@Deprecated
 	public static StreamNode of(String datumName) {
 		return fromNodespace(Nodespace.DEFAULT, datumName);
 	}

@@ -9,14 +9,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class DiscreteNode extends Node {
 	private final AtomicInteger datumsFilled = new AtomicInteger(0);
 
-	private DiscreteNode(Set<String> datumNames) {
+	public DiscreteNode(Set<String> datumNames) {
 		super(datumNames);
 	}
 
+	@Deprecated
 	public static DiscreteNode of(Set<String> datumNames) {
 		return fromNodespace(Nodespace.DEFAULT, datumNames);
 	}
 
+	@Deprecated
 	public static DiscreteNode of(String... datumNames) {
 		return fromNodespace(Nodespace.DEFAULT, new HashSet<>(Arrays.asList(datumNames)));
 	}

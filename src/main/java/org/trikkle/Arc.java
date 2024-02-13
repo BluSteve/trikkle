@@ -45,7 +45,7 @@ public abstract class Arc implements Primable {
 		return status;
 	}
 
-	protected synchronized void setStatus(ArcStatus status) {
+	protected synchronized void setStatus(ArcStatus status) { // todo should this throw so much
 		if (status == null) {
 			throw new NullPointerException("Status cannot be null!");
 		}

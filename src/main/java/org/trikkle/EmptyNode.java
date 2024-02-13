@@ -6,10 +6,11 @@ import java.util.Set;
 public final class EmptyNode extends Node {
 	private static final Set<String> EMPTY_SET = Collections.emptySet();
 
-	private EmptyNode() {
+	public EmptyNode() {
 		super(EMPTY_SET);
 	}
 
+	@Deprecated
 	public static EmptyNode of() {
 		return fromNodespace(Nodespace.DEFAULT);
 	}

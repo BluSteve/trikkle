@@ -5,11 +5,15 @@ import org.trikkle.viz.IGraphViz;
 import org.trikkle.viz.LogUtils;
 import org.trikkle.viz.MermaidGraphViz;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.trikkle.viz.LogUtils.animate;
@@ -530,5 +534,40 @@ class OverseerTest {
 		overseer.start();
 
 		System.out.println(toMarkdown(animate(graph, overseer.getLinkTrace())));
+	}
+
+	@Test
+	void testMonitor() {
+		// make a graph with 3 nodes and 2 arcs connecting them
+		Arc arc1 = new AutoArc() {
+			@Override
+			public void run() {
+				getOutputNode().setUsable();
+			}
+		};
+		Arc arc2 = new AutoArc() {
+			@Override
+			public void run() {
+				getOutputNode().setUsable();
+			}
+		};
+
+
+		Node node1 = new EmptyNode();
+		Node node2 = new EmptyNode();
+		Node node3 = new EmptyNode();
+		Link link1 = new Link(Set.of(node1), arc1, node2);
+		Link link2 = new Link(Set.of(node2), arc2, node3);
+		Graph graph = new Graph(link1, link2);
+		Overseer overseer = new Overseer(graph);
+		node1.setUsable();
+		AtomicInteger tick2 = new AtomicInteger(0);
+		overseer.setObserver((tick, collection) -> {
+			System.out.println("tick: " + tick);
+			System.out.println("collection: " + collection);
+			tick2.incrementAndGet();
+		});
+		overseer.start();
+		assertEquals(2, tick2.get());
 	}
 }
