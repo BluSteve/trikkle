@@ -17,6 +17,7 @@ public final class Overseer {
 	private boolean started = false;
 	private boolean parallel = true;
 	private boolean logging = true;
+	private boolean checkRecursion = true;
 	private int parallelThreshold = 2;
 
 	public Overseer(Graph graph) {
@@ -83,7 +84,7 @@ public final class Overseer {
 			}
 			if (link.runnable()) {
 				Arc arc = link.getArc();
-				if (recursive && !arc.isSafe()) {
+				if (checkRecursion && recursive && !arc.isSafe()) {
 					continue;
 				}
 				synchronized (arc) { // prevents one arc from being added to two separate linksNow
@@ -250,5 +251,13 @@ public final class Overseer {
 
 	public void setLogging(boolean logging) {
 		this.logging = logging;
+	}
+
+	public boolean isCheckRecursion() {
+		return checkRecursion;
+	}
+
+	public void setCheckRecursion(boolean checkRecursion) { // WARNING this is dangerous
+		this.checkRecursion = checkRecursion;
 	}
 }
