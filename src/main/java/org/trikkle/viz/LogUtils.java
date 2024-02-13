@@ -26,6 +26,7 @@ public class LogUtils {
 
 		Set<Node> done = new HashSet<>();
 		for (Collection<Link> links : linkTrace) {
+			if (links.isEmpty()) continue;
 			for (Link link : links) {
 				done.addAll(link.getDependencies());
 			}
