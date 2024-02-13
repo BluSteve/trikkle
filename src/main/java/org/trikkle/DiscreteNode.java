@@ -45,7 +45,7 @@ public final class DiscreteNode extends Node {
 		if (i == datumNames.size()) { // all datums filled
 			setProgress(1);
 			if (!overseer.g.endingNodes.contains(this)) {
-				overseer.unsafeTicktock();
+				overseer.unsafeTicktock(this);
 			}
 		} else {
 			setProgress((double) i / datumNames.size());

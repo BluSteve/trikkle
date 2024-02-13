@@ -36,7 +36,7 @@ public final class EmptyNode extends Node {
 			super.setUsable();
 			setProgress(1);
 			if (!overseer.g.endingNodes.contains(this)) {
-				overseer.unsafeTicktock();
+				overseer.unsafeTicktock(this);
 			}
 		}
 	}

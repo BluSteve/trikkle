@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 
 public final class Overseer {
 	final Graph g;
@@ -19,7 +18,7 @@ public final class Overseer {
 
 	private boolean checkRecursion = true;
 	private boolean logging = true;
-	private BiConsumer<Integer, Collection<Link>> observer = null;
+	private Observer observer = null;
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
 
@@ -69,12 +68,12 @@ public final class Overseer {
 			linkTrace = new ConcurrentLinkedQueue<>();
 		}
 		while (!hasEnded()) {
-			ticktock(false);
+			ticktock(null);
 		}
 		onEnd();
 	}
 
-	private void ticktock(boolean recursive) {
+	private void ticktock(Node caller) {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
@@ -87,7 +86,7 @@ public final class Overseer {
 			}
 			if (link.runnable()) {
 				Arc arc = link.getArc();
-				if (checkRecursion && recursive && !arc.isSafe()) {
+				if (checkRecursion && caller != null && !arc.isSafe()) {
 					continue;
 				}
 				synchronized (arc) { // prevents one arc from being added to two separate linksNow
@@ -102,9 +101,9 @@ public final class Overseer {
 		if (logging) {
 			int t = tick.incrementAndGet();
 			linkTrace.add(linksNow);
-			if (observer != null) observer.accept(t, linksNow);
+			if (observer != null) observer.accept(caller, t, linksNow);
 		} else {
-			if (observer != null) observer.accept(null, null);
+			if (observer != null) observer.accept(caller, 0, null);
 		}
 
 		if (linksNow.isEmpty()) return;
@@ -129,8 +128,11 @@ public final class Overseer {
 		}
 	}
 
-	void unsafeTicktock() {
-		ticktock(true);
+	void unsafeTicktock(Node caller) {
+		if (caller == null) {
+			throw new NullPointerException("Caller cannot be null!");
+		}
+		ticktock(caller);
 	}
 
 	public Set<String> getStartingDatumNames() {
@@ -264,11 +266,16 @@ public final class Overseer {
 		this.checkRecursion = checkRecursion;
 	}
 
-	public BiConsumer<Integer, Collection<Link>> getObserver() {
+	public Observer getObserver() {
 		return observer;
 	}
 
-	public void setObserver(BiConsumer<Integer, Collection<Link>> observer) {
+	public void setObserver(Observer observer) {
 		this.observer = observer;
+	}
+
+	@FunctionalInterface
+	public interface Observer {
+		void accept(Node caller, int tick, Collection<Link> links);
 	}
 }

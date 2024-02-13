@@ -562,7 +562,18 @@ class OverseerTest {
 		Overseer overseer = new Overseer(graph);
 		node1.setUsable();
 		AtomicInteger tick2 = new AtomicInteger(0);
-		overseer.setObserver((tick, collection) -> {
+		overseer.setObserver((caller, tick, collection) -> {
+			System.out.println(caller);
+			if (tick == 1) {
+				assertNull(caller);
+				assertEquals(1, collection.size());
+			} else if (tick == 2) {
+				assertSame(node2, caller);
+				assertEquals(1, collection.size());
+			} else if (tick == 3) {
+				assertSame(node3, caller);
+				assertEquals(0, collection.size());
+			}
 			System.out.println("tick: " + tick);
 			System.out.println("collection: " + collection);
 			tick2.incrementAndGet();
