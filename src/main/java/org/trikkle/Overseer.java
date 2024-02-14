@@ -8,6 +8,35 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A class that manages the execution of {@link Graph}s. It is responsible for running the graph and keeping track of
+ * the cache.
+ * <p>
+ * In Trikkle's architecture, a {@link Node} is only used to represent a dependency relationship. The actual
+ * data associated with the node is stored in the overseer's cache. This is to allow for the same graph to be run
+ * multiple times with different input data.
+ * <p>
+ * An overseer object can only be started and therefore run once. If you need to run the same graph again, you must
+ * create a new overseer. An overseer may "carry on" the work of a previous overseer by using the cache of the
+ * previous overseer as its initial cache, with its graph being an extension of the previous graph.
+ * <p>
+ * Concurrent execution of overlapping graphs leads to unexpected behavior and is prevented by the overseer. All locks
+ * on {@link Primable}s are acquired by the overseer during construction and only released when the overseer ends.
+ * <p>
+ * A "tick" passes every time the overseer checks for runnable links and runs them. The frequency and timing of going
+ * to the next tick, or "ticktocking" was a subject of much deliberation. The current implementation is to ticktock
+ * sparsely and economically, only when the state of the <b>nodes</b> change (not the arcs). This allows the overseer
+ * to tick only when needed and avoids the overhead of polling. More information on this can be found in the
+ * documentation of the {@link #ticktock(Node)} method.
+ *
+ * @author Steve Cao
+ * @see Graph
+ * @see Node
+ * @see Arc
+ * @see Link
+ * @see Primable
+ * @since 0.1.0
+ */
 public final class Overseer {
 	final Graph g;
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
@@ -22,10 +51,21 @@ public final class Overseer {
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
 
+	/**
+	 * Constructs an overseer with the given graph. The initial cache is empty.
+	 *
+	 * @param graph the graph to be executed
+	 */
 	public Overseer(Graph graph) {
 		this(graph, null);
 	}
 
+	/**
+	 * Constructs an overseer with the given graph and initial cache.
+	 *
+	 * @param graph        the graph to be executed
+	 * @param initialCache the initial cache, possibly from another overseer
+	 */
 	public Overseer(Graph graph, Map<String, Object> initialCache) {
 		this.g = graph;
 		if (initialCache != null) {

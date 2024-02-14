@@ -5,6 +5,16 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.function.Function;
 
+/**
+ * A class that races functions to return the result of the first function that finishes. The other functions are
+ * interrupted.
+ * This class is useful for when you have multiple functions that can return the same result, and you want to use the
+ * result
+ * that comes back first.
+ *
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public final class FunctionRacer {
 	public final Set<Function<Map<String, Object>, Map<String, Object>>> functions;
 	private final Notifier notifier = new Notifier();

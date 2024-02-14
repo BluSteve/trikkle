@@ -3,6 +3,12 @@ package org.trikkle.structs;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * A {@link ConcurrentHashMap} that throws exceptions when a key is already present in the map.
+ *
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public class StrictConcurrentHashMap<K, V> extends ConcurrentHashMap<K, V> {
 	@Override
 	public V put(K key, V value) {

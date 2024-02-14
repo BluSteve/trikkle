@@ -1,7 +1,7 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
-import org.trikkle.viz.IGraphViz;
+import org.trikkle.viz.GraphViz;
 import org.trikkle.viz.LogUtils;
 import org.trikkle.viz.MermaidGraphViz;
 
@@ -128,7 +128,7 @@ class OverseerTest {
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
 		Graph graph = new Graph(link, link2, link3);
-		IGraphViz visualizer = new MermaidGraphViz();
+		GraphViz visualizer = new MermaidGraphViz();
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
 

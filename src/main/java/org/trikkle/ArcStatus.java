@@ -1,5 +1,11 @@
 package org.trikkle;
 
+/**
+ * The status of an Arc.
+ *
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public enum ArcStatus {
 	IDLE(0),
 	STAND_BY(1),

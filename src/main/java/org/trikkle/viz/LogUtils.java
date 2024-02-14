@@ -6,6 +6,12 @@ import org.trikkle.Node;
 
 import java.util.*;
 
+/**
+ * A utility class for logging and visualization.
+ *
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public class LogUtils {
 	public static String linkTraceToString(Queue<Collection<Link>> linkTrace) {
 		StringBuilder sb = new StringBuilder();

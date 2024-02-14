@@ -5,7 +5,13 @@ import org.trikkle.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MermaidGraphViz implements IGraphViz {
+/**
+ * This class is a GraphViz that visualizes a graph using the Mermaid syntax.
+ *
+ * @author Steve Cao
+ * @since 0.1.0
+ */
+public class MermaidGraphViz implements GraphViz {
 	private static final MermaidGraphViz mermaidGraphViz = new MermaidGraphViz();
 	public final String namespace;
 
