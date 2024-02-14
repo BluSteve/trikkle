@@ -26,10 +26,10 @@ public final class Overseer {
 		this(graph, null);
 	}
 
-	public Overseer(Graph graph, Map<String, Object> cache) {
+	public Overseer(Graph graph, Map<String, Object> initialCache) {
 		this.g = graph;
-		if (cache != null) {
-			this.cache.putAll(cache); // doesn't check that the cache has datums that are actually in the graph
+		if (initialCache != null) {
+			this.cache.putAll(initialCache); // doesn't check that the initialCache has datums that are actually in the graph
 		}
 		links.addAll(g.links);
 
@@ -39,8 +39,19 @@ public final class Overseer {
 			primable.getLock().lock();
 		}
 		for (Primable primable : g.primables) {
-			if (cache == null) primable.reset();
 			primable.primeWith(this);
+		}
+	}
+
+	public static void resetGraph(Graph graph) {
+		for (Primable primable : graph.primables) {
+			primable.getLock().lock();
+		}
+		for (Primable primable : graph.primables) {
+			primable.reset();
+		}
+		for (Primable primable : graph.primables) {
+			primable.getLock().unlock();
 		}
 	}
 

@@ -13,6 +13,10 @@ public final class DiscreteNode extends Node {
 		super(datumNames);
 	}
 
+	public DiscreteNode(String... datumNames) {
+		this(new HashSet<>(Arrays.asList(datumNames)));
+	}
+
 	@Deprecated
 	public static DiscreteNode of(Set<String> datumNames) {
 		return fromNodespace(Nodespace.DEFAULT, datumNames);
