@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A class that manages the execution of {@link Graph}s. It is responsible for running the graph and keeping track of
- * the cache.
+ * the cache which stores all data in key-value pairs.
  * <p>
  * In Trikkle's architecture, a {@link Node} is only used to represent a dependency relationship. The actual
  * data associated with the node is stored in the overseer's cache. This is to allow for the same graph to be run
@@ -25,9 +25,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * A "tick" passes every time the overseer checks for runnable links and runs them. The frequency and timing of going
  * to the next tick, or "ticktocking" was a subject of much deliberation. The current implementation is to ticktock
- * sparsely and economically, only when the state of the <b>nodes</b> change (not the arcs). This allows the overseer
- * to tick only when needed and avoids the overhead of polling. More information on this can be found in the
- * documentation of the {@link #ticktock(Node)} method.
+ * sparsely and economically, only when
+ * <ol>
+ * <li>the state of the <b>nodes</b> change (not the arcs)</li>
+ * <li>no change was detected but the overseer has not finished.</li>
+ * </ol>
+ * <p>
+ * This allows the overseer to tick only when needed and avoids the overhead of polling.
  *
  * @author Steve Cao
  * @see Graph
@@ -45,14 +49,15 @@ public final class Overseer {
 	private Queue<Collection<Link>> linkTrace;
 	private boolean started = false;
 
-	private boolean checkRecursion = true;
+	private boolean unsafeOnRecursive = false;
 	private boolean logging = true;
 	private Observer observer = null;
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
 
 	/**
-	 * Constructs an overseer with the given graph. The initial cache is empty.
+	 * Constructs an overseer with the given graph. The initial cache is empty. All {@link Primable}s will be locked and
+	 * primed with this overseer.
 	 *
 	 * @param graph the graph to be executed
 	 */
@@ -61,7 +66,8 @@ public final class Overseer {
 	}
 
 	/**
-	 * Constructs an overseer with the given graph and initial cache.
+	 * Constructs an overseer with the given graph and initial cache. All {@link Primable}s will be locked and primed
+	 * with this overseer.
 	 *
 	 * @param graph        the graph to be executed
 	 * @param initialCache the initial cache, possibly from another overseer
@@ -83,6 +89,10 @@ public final class Overseer {
 		}
 	}
 
+	/**
+	 * Resets the graph (nodes and arcs) to its initial state. This method is useful for running the same graph multiple
+	 * times with different input data. The cache is not affected.
+	 */
 	public void resetGraph() {
 		for (Primable primable : g.primables) {
 			primable.reset();
@@ -90,6 +100,15 @@ public final class Overseer {
 		}
 	}
 
+	/**
+	 * Starts the overseer by running some checks and then ticking until the graph has all ending nodes at progress 1
+	 * ({@link Node#getProgress()}) and all arcs are {@link ArcStatus#FINISHED}. Blocks the current thread until the
+	 * graph has ended.
+	 *
+	 * @throws IllegalStateException if the overseer has already started
+	 * @throws IllegalStateException if the starting nodes are not fully populated
+	 * @throws IllegalStateException if the overseer construction and start() are called in different threads
+	 */
 	public void start() {
 		if (started) {
 			throw new IllegalStateException("Overseer started before!");
@@ -126,17 +145,17 @@ public final class Overseer {
 		Collection<Link> linksNow = new ArrayList<>(links.size());
 		for (Iterator<Link> iterator = links.iterator(); iterator.hasNext(); ) {
 			Link link = iterator.next();
-			if (link.getArc().getStatus() == ArcStatus.FINISHED) {
+			if (link.getArc().getStatus() == ArcStatus.FINISHED) { // lazily remove finished links
 				iterator.remove();
 				continue;
 			}
 			if (link.runnable()) {
 				Arc arc = link.getArc();
-				if (checkRecursion && caller != null && !arc.isSafe()) {
+				if (!unsafeOnRecursive && caller != null && !arc.isSafe()) {
 					continue;
 				}
 				synchronized (arc) { // prevents one arc from being added to two separate linksNow
-					if (arc.getStatus() == ArcStatus.IDLE) { // until it finds one that's not finished
+					if (arc.getStatus() == ArcStatus.IDLE) {
 						arc.setStatus(ArcStatus.STAND_BY);
 						linksNow.add(link);
 					}
@@ -304,22 +323,59 @@ public final class Overseer {
 		this.logging = logging;
 	}
 
-	public boolean isCheckRecursion() {
-		return checkRecursion;
+	public boolean isUnsafeOnRecursive() {
+		return unsafeOnRecursive;
 	}
 
-	public void setCheckRecursion(boolean checkRecursion) { // WARNING this is dangerous
-		this.checkRecursion = checkRecursion;
+	/**
+	 * Default: {@code false}
+	 * <p>
+	 * WARNING: setting this to false can lead to infinite loops easily. Only set this to false if you are absolutely
+	 * sure that your unsafe arcs are well-behaved.
+	 * <p>
+	 * By default, unsafe arcs can only be activated via an iterative ticktock from the overseer itself, leading to
+	 * marginally decreased performance. Recursive ticktocks are completely safe on safe arcs.
+	 *
+	 * @param unsafeOnRecursive whether to run unsafe arcs on a recursive ticktock call
+	 * @see Arc#isSafe()
+	 */
+	public void setUnsafeOnRecursive(boolean unsafeOnRecursive) { // WARNING this is dangerous
+		this.unsafeOnRecursive = unsafeOnRecursive;
 	}
 
+	/**
+	 * Returns the observer for this overseer.
+	 *
+	 * @return the observer for this overseer
+	 */
 	public Observer getObserver() {
 		return observer;
 	}
 
+	/**
+	 * Sets the observer for this overseer. The observer is called every time the overseer ticks. The observer is called
+	 * with the following parameters:
+	 * <ol>
+	 *   <li>the node that called the tick</li>
+	 *   <li>the current tick number</li>
+	 *   <li>the links that are runnable at the current tick</li>
+	 *   </ol>
+	 *
+	 * @param observer custom observer
+	 */
 	public void setObserver(Observer observer) {
 		this.observer = observer;
 	}
 
+	/**
+	 * A functional interface for observing the overseer's progress. The observer is called every time the overseer
+	 * ticks. The observer is called with the following parameters:
+	 * <ol>
+	 * <li>the node that called the tick</li>
+	 * <li>the current tick number</li>
+	 * <li>the links that are runnable at the current tick</li>
+	 * </ol>
+	 */
 	@FunctionalInterface
 	public interface Observer {
 		void accept(Node caller, int tick, Collection<Link> links);
