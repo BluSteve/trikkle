@@ -565,7 +565,6 @@ class OverseerTest {
 			}
 		};
 
-
 		Node node1 = new EmptyNode();
 		Node node2 = new EmptyNode();
 		Node node3 = new EmptyNode();
