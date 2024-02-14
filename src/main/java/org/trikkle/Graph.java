@@ -52,7 +52,7 @@ public final class Graph implements Congruent<Graph> {
 			for (String datumName : node.datumNames) {
 				Node rnode = nodeOfDatum.put(datumName, node);
 				if (rnode != null) {
-					throw new IllegalArgumentException("Two nodes cannot have the same datum name!");
+					throw new IllegalArgumentException("Two nodes cannot have the same datum name " + datumName + "!");
 				}
 			}
 		}
@@ -87,7 +87,7 @@ public final class Graph implements Congruent<Graph> {
 	 * @param endingNodes the ending Nodes of the merged Graph
 	 * @return the merged Graph
 	 */
-	public static Graph mergeGraphs(List<Graph> graphs, Set<Node> endingNodes) {
+	public static Graph mergeGraphs(List<Graph> graphs, Collection<Node> endingNodes) {
 		Map<Node, Graph> graphUsedOfNode = new HashMap<>();
 		for (Node endingNode : endingNodes) {
 			for (Graph graph : graphs) {
@@ -96,6 +96,10 @@ public final class Graph implements Congruent<Graph> {
 					break;
 				}
 			}
+		}
+
+		if (graphUsedOfNode.size() != endingNodes.size()) {
+			throw new IllegalArgumentException("Not all ending nodes are reachable by the given graphs!");
 		}
 
 		Set<Link> finalLinks = new HashSet<>();

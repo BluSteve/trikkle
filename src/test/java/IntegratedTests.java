@@ -49,8 +49,10 @@ public class IntegratedTests {
 				"serveExpressOmelette2");
 		Graph graphB = linkProcessor.getGraph();
 
+		System.out.println(graphA);
+		System.out.println(graphB);
 		Graph graphC = Graph.mergeGraphs(List.of(graphA, graphB),
-				Set.of(DiscreteNode.of("customerHappy"), DiscreteNode.of("customer2Happy")));
+				Set.of(Nodespace.DEFAULT.discreteOf("customerHappy"), Nodespace.DEFAULT.discreteOf("customer2Happy")));
 		System.out.println(graphC);
 
 		Arc brewerArc = new AutoArc() {
@@ -68,7 +70,7 @@ public class IntegratedTests {
 			}
 		};
 		brewerArc.setName("brew coffee");
-		Node brewerNode = StreamNode.of("brewer");
+		Node brewerNode = Nodespace.DEFAULT.streamOf("brewer");
 		Link brewerLink = new Link(Set.of(), brewerArc, brewerNode);
 		Arc coffeeArc = new Arc(false) {
 			@Override
@@ -85,9 +87,9 @@ public class IntegratedTests {
 			}
 		};
 		coffeeArc.setName("make coffee");
-		Node coffeeNode = DiscreteNode.of("coffee");
+		Node coffeeNode = Nodespace.DEFAULT.discreteOf("coffee");
 		Link coffeeLink = new Link(Set.of(brewerNode), coffeeArc, coffeeNode);
-		Node omeletteNode = DiscreteNode.of("omelette");
+		Node omeletteNode = Nodespace.DEFAULT.discreteOf("omelette");
 		Arc serveBothArc = new AutoArc() {
 			@Override
 			public void run() {
@@ -97,7 +99,7 @@ public class IntegratedTests {
 			}
 		};
 		serveBothArc.setName("serve omelette and coffee");
-		Node customerNode = DiscreteNode.of("customerVeryHappy");
+		Node customerNode = Nodespace.DEFAULT.discreteOf("customerVeryHappy");
 		Link serveBothLink = new Link(Set.of(omeletteNode, coffeeNode), serveBothArc, customerNode);
 
 		Arc autoArc = new AutoArc() {

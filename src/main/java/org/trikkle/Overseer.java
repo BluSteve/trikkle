@@ -43,15 +43,10 @@ public final class Overseer {
 		}
 	}
 
-	public static void resetGraph(Graph graph) {
-		for (Primable primable : graph.primables) {
-			primable.getLock().lock();
-		}
-		for (Primable primable : graph.primables) {
+	public void resetGraph() {
+		for (Primable primable : g.primables) {
 			primable.reset();
-		}
-		for (Primable primable : graph.primables) {
-			primable.getLock().unlock();
+			primable.primeWith(this);
 		}
 	}
 

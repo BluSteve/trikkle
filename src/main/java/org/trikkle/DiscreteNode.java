@@ -17,16 +17,6 @@ public final class DiscreteNode extends Node {
 		this(new HashSet<>(Arrays.asList(datumNames)));
 	}
 
-	@Deprecated
-	public static DiscreteNode of(Set<String> datumNames) {
-		return fromNodespace(Nodespace.DEFAULT, datumNames);
-	}
-
-	@Deprecated
-	public static DiscreteNode of(String... datumNames) {
-		return fromNodespace(Nodespace.DEFAULT, new HashSet<>(Arrays.asList(datumNames)));
-	}
-
 	static DiscreteNode fromNodespace(Nodespace nodespace, Set<String> datumNames) {
 		if (datumNames.isEmpty()) {
 			throw new IllegalArgumentException("DiscreteNode must have at least one datum");
@@ -59,7 +49,7 @@ public final class DiscreteNode extends Node {
 	@Override
 	public void setUsable() {
 		if (datumsFilled.get() < datumNames.size()) {
-			throw new IllegalStateException("DiscreteNode is not yet done!");
+			throw new IllegalStateException("DiscreteNode " + this + " is not fully filled and cannot be set to usable.");
 		}
 		super.setUsable();
 	}

@@ -50,8 +50,8 @@ class FunctionRacerTest {
 			}
 		};
 
-		Node inputNode = DiscreteNode.of("n");
-		Node outputNode = DiscreteNode.of("sum");
+		Node inputNode = new DiscreteNode("n");
+		Node outputNode = new DiscreteNode("sum");
 		Link link = new Link(Set.of(inputNode), arc, outputNode);
 		Graph graph = new Graph(link);
 		Overseer overseer = new Overseer(graph);

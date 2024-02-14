@@ -98,7 +98,7 @@ public class LinkProcessor {
 				Map<String, List<String>> mm = new HashMap<>();
 
 				for (TrikkleFunction tf : method.annotations) {
-					Node dependency = DiscreteNode.of(tf.inputs());
+					Node dependency = Nodespace.DEFAULT.discreteOf(tf.inputs());
 					localDependencies.add(dependency);
 
 					if (!mm.containsKey(tf.output())) {
@@ -114,7 +114,7 @@ public class LinkProcessor {
 				dependencies.addAll(localDependencies);
 			}
 
-			Node outputNode = DiscreteNode.of(outputDatumNames);
+			Node outputNode = Nodespace.DEFAULT.discreteOf(outputDatumNames);
 
 			Arc arc = new AutoArc() {
 				@Override

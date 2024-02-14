@@ -30,7 +30,16 @@ class OverseerTest {
 
 	@Test
 	void nodeTest() {
-		Node node = DiscreteNode.of("toSquare");
+		Node node = new DiscreteNode("toSquare");
+		Arc arc = new AutoArc() {
+			@Override
+			public void run() {
+			}
+		};
+		Link link = new Link(Set.of(node), arc, new EmptyNode());
+		Graph graph = new Graph(link);
+		Overseer overseer = new Overseer(graph);
+		node.addDatum("toSquare", 2.0);
 		node.setProgress(1);
 
 		Exception e = assertThrows(IllegalArgumentException.class, () -> node.addDatum("toSquare2", 3.0));
@@ -46,9 +55,9 @@ class OverseerTest {
 	void simpleTest() {
 		Nodespace ns = new Nodespace();
 		Node inputNode = ns.discreteOf("toSquare");
-		assertNotSame(inputNode, DiscreteNode.of("toSquare"));
-		assertNotEquals(inputNode, DiscreteNode.of("toSquare"));
-		assertTrue(inputNode.congruentTo(DiscreteNode.of("toSquare")));
+		assertNotSame(inputNode, new DiscreteNode("toSquare"));
+		assertNotEquals(inputNode, new DiscreteNode("toSquare"));
+		assertTrue(inputNode.congruentTo(new DiscreteNode("toSquare")));
 
 		Arc arc = new AutoArc() {
 			@Override
@@ -77,8 +86,8 @@ class OverseerTest {
 
 	@Test
 	void complexTest() {
-		Node inputNode2 = DiscreteNode.of("finalMultiplier", "finalExponent");
-		Node inputNode = DiscreteNode.of("toSquare");
+		Node inputNode2 = new DiscreteNode("finalMultiplier", "finalExponent");
+		Node inputNode = new DiscreteNode("toSquare");
 		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
@@ -88,7 +97,7 @@ class OverseerTest {
 			}
 		};
 		arc.setName("squarer");
-		Node node2 = DiscreteNode.of("squared");
+		Node node2 = new DiscreteNode("squared");
 		Link link = new Link(Set.of(inputNode), arc, node2);
 
 		Arc arc2 = new AutoArc() {
@@ -102,7 +111,7 @@ class OverseerTest {
 			}
 		};
 		arc2.setName("process 1");
-		Node node3 = DiscreteNode.of("result1");
+		Node node3 = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
 
 		Arc arc3 = new AutoArc() {
@@ -115,7 +124,7 @@ class OverseerTest {
 			}
 		};
 		arc3.setName("aggregator");
-		Node node4 = DiscreteNode.of("result2");
+		Node node4 = new DiscreteNode("result2");
 		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
 
 		Graph graph = new Graph(link, link2, link3);
@@ -160,7 +169,7 @@ class OverseerTest {
 				getOutputNode().setProgress(1);
 			}
 		};
-		Node streamNode = StreamNode.of("stream1");
+		Node streamNode = Nodespace.DEFAULT.streamOf("stream1");
 		Link link = new Link(Set.of(), inputArc, streamNode);
 
 		Arc consumerArc = new Arc(false) {
@@ -201,7 +210,7 @@ class OverseerTest {
 				total = 0;
 			}
 		};
-		Node outputNode = DiscreteNode.of("result1");
+		Node outputNode = new DiscreteNode("result1");
 		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
 
 		Graph graph = new Graph(link, link2);
@@ -212,6 +221,7 @@ class OverseerTest {
 		assertEquals(45.0, results.get("result1"));
 
 		overseer = new Overseer(graph);
+		overseer.resetGraph();
 		overseer.start();
 
 		assertEquals(45.0, overseer.getDatum("result1"));
@@ -219,7 +229,7 @@ class OverseerTest {
 
 	@Test
 	void multipleArcs() {
-		StreamNode streamNode = StreamNode.of("numberStream");
+		StreamNode streamNode = Nodespace.DEFAULT.streamOf("numberStream");
 		streamNode.setLimit(18);
 		Arc inputArc = new AutoArc() {
 			@Override
@@ -243,6 +253,7 @@ class OverseerTest {
 		System.out.println(graph);
 
 		Overseer overseer = new Overseer(graph);
+		overseer.resetGraph();
 		overseer.start();
 
 		System.out.println(overseer.getDatum("numberStream"));
@@ -252,7 +263,7 @@ class OverseerTest {
 
 	@Test
 	void stressTest() {
-		StreamNode streamNode = StreamNode.of("numberStream");
+		StreamNode streamNode = Nodespace.DEFAULT.streamOf("numberStream");
 		streamNode.setLimit(1000);
 		Set<Link> links = new HashSet<>();
 		for (int i = 0; i < 100; i++) {
@@ -276,6 +287,7 @@ class OverseerTest {
 				@Override
 				protected void compute() {
 					Overseer overseer = new Overseer(graph);
+					overseer.resetGraph();
 					overseer.start();
 					assertEquals(1000, ((Queue<Double>) overseer.getDatum("numberStream")).size());
 				}
@@ -312,7 +324,7 @@ class OverseerTest {
 
 	@Test
 	void multipleArcsDiscrete() {
-		Node discreteNode = DiscreteNode.of("res1", "res2");
+		Node discreteNode = new DiscreteNode("res1", "res2");
 		Arc inputArc = new AutoArc() {
 			@Override
 			public void run() {
@@ -349,8 +361,8 @@ class OverseerTest {
 				returnDatum("res2a", 3.0);
 			}
 		};
-		Node discreteNode = DiscreteNode.of("res1");
-		Node discreteNode2 = DiscreteNode.of("res2", "res2a");
+		Node discreteNode = new DiscreteNode("res1");
+		Node discreteNode2 = new DiscreteNode("res2", "res2a");
 		Link link = new Link(Set.of(), inputArc, Set.of(discreteNode, discreteNode2));
 		System.out.println(link);
 		Graph graph = new Graph(link);
@@ -448,6 +460,7 @@ class OverseerTest {
 		assertTrue(end - start < 300);
 
 		Overseer overseer2 = new Overseer(graph);
+		overseer2.resetGraph();
 		overseer2.setParallel(false);
 		long start2 = System.currentTimeMillis();
 		overseer2.start();
@@ -517,9 +530,9 @@ class OverseerTest {
 		};
 
 		// make three nodes
-		Node node1 = DiscreteNode.of("node1");
-		Node node2 = DiscreteNode.of("node2");
-		Node node3 = DiscreteNode.of("node3");
+		Node node1 = new DiscreteNode("node1");
+		Node node2 = new DiscreteNode("node2");
+		Node node3 = new DiscreteNode("node3");
 		Node initNode = EmptyNode.of();
 
 		// make three links

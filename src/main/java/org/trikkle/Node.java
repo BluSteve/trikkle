@@ -20,6 +20,9 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	}
 
 	public void addDatum(String datumName, Object datum) {
+		if (overseer == null) {
+			throw new IllegalStateException("Node " + this + " is not primed with an overseer!");
+		}
 		if (!datumNames.contains(datumName)) {
 			throw new IllegalArgumentException("Datum " + datumName + " was not declared by this node!");
 		}

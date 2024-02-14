@@ -32,8 +32,8 @@ public class AnnotationTest {
 
 		assertFalse(linkProcessor.getLinks().containsKey("squareInstance"));
 
-		Node inputNode = DiscreteNode.of("toSquare");
-		Node outputNode = DiscreteNode.of("squared");
+		Node inputNode = new DiscreteNode("toSquare");
+		Node outputNode = new DiscreteNode("squared");
 		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
@@ -68,8 +68,8 @@ public class AnnotationTest {
 
 		assertFalse(linkProcessor.getLinks().containsKey("square"));
 
-		Node inputNode = DiscreteNode.of("toSquare");
-		Node outputNode = DiscreteNode.of("squared");
+		Node inputNode = new DiscreteNode("toSquare");
+		Node outputNode = new DiscreteNode("squared");
 		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
@@ -85,6 +85,7 @@ public class AnnotationTest {
 
 		Graph graph = new Graph(linkProcessor.getLinks().get("node3"));
 		Overseer overseer = new Overseer(graph);
+		overseer.resetGraph();
 		overseer.addStartingDatum("toSquare", 2.0);
 		overseer.start();
 

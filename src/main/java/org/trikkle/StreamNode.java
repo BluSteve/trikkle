@@ -15,11 +15,6 @@ public final class StreamNode extends Node {
 		super(Collections.singleton(datumName));
 	}
 
-	@Deprecated
-	public static StreamNode of(String datumName) {
-		return fromNodespace(Nodespace.DEFAULT, datumName);
-	}
-
 	static StreamNode fromNodespace(Nodespace nodespace, String datumName) {
 		Set<String> singleton = Collections.singleton(datumName);
 		Map<Set<String>, Node> nodeCache = nodespace.nodeCache;
