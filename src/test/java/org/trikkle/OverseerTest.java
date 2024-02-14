@@ -310,7 +310,7 @@ class OverseerTest {
 				getOutputNode().setProgress(1);
 			}
 		};
-		Link link = new Link(dependencies, inputArc, EmptyNode.of());
+		Link link = new Link(dependencies, inputArc, Nodespace.DEFAULT.emptyOf());
 
 		Graph graph = new Graph(link);
 		System.out.println(graph);
@@ -386,7 +386,7 @@ class OverseerTest {
 				ab.set(true);
 			}
 		};
-		Node discreteNode = EmptyNode.of();
+		Node discreteNode = Nodespace.DEFAULT.emptyOf();
 		Link link = new Link(Set.of(discreteNode), inputArc, Set.of());
 		Graph graph = new Graph(link);
 		System.out.println(graph);
@@ -444,7 +444,7 @@ class OverseerTest {
 		};
 		med2.setName("med2");
 
-		Node medNode = EmptyNode.of();
+		Node medNode = Nodespace.DEFAULT.emptyOf();
 
 		Link link = new Link(Set.of(), long1, Set.of());
 		Link link2 = new Link(Set.of(), med1, medNode);
@@ -533,7 +533,7 @@ class OverseerTest {
 		Node node1 = new DiscreteNode("node1");
 		Node node2 = new DiscreteNode("node2");
 		Node node3 = new DiscreteNode("node3");
-		Node initNode = EmptyNode.of();
+		Node initNode = Nodespace.DEFAULT.emptyOf();
 
 		// make three links
 		Link link1 = new Link(Set.of(initNode), arc1, node1);

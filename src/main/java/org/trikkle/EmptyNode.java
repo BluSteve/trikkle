@@ -10,11 +10,6 @@ public final class EmptyNode extends Node {
 		super(EMPTY_SET);
 	}
 
-	@Deprecated
-	public static EmptyNode of() {
-		return fromNodespace(Nodespace.DEFAULT);
-	}
-
 	static EmptyNode fromNodespace(Nodespace nodespace) {
 		if (nodespace.nodeCache.containsKey(EMPTY_SET)) {
 			return (EmptyNode) nodespace.nodeCache.get(EMPTY_SET);
