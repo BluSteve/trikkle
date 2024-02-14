@@ -7,7 +7,6 @@ import org.trikkle.structs.MultiMap;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-@Deprecated
 public class LinkProcessor {
 	private final MultiMap<String, Method> methodsOfLinkId = new MultiHashMap<>();
 	private Map<String, Link> links;
