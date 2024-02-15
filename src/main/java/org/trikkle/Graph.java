@@ -6,7 +6,13 @@ import org.trikkle.viz.MermaidGraphViz;
 
 import java.util.*;
 
-// Graph NEVER modifies the links, nodes, or arcs it's given. It only uses them to create its own data structures.
+/**
+ * An execution graph. Graph never modifies the links, nodes, or arcs that are passed to it. It only uses them to
+ * create data structures.
+ *
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public final class Graph implements Congruent<Graph> {
 	@SuppressWarnings("CanBeFinal")
 	public static boolean ALLOW_CYCLES = false;
@@ -82,7 +88,7 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	/**
-	 * Merges the Graphs into one optimized Graph, using the endingNodes as the ending Nodes of the merged Graph.
+	 * Merges the graphs into one optimized graph, using the {@code endingNodes} as the ending nodes of the merged graph.
 	 *
 	 * @param graphs      Graphs to merge in descending order of priority
 	 * @param endingNodes the ending Nodes of the merged Graph
@@ -114,7 +120,7 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	/**
-	 * Combines all links from multiple Graphs into one Graph.
+	 * Combines all links from multiple graphs into one graph.
 	 *
 	 * @param graphs the Graphs to concatenate
 	 * @return the combined Graph

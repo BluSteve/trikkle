@@ -2,33 +2,25 @@ package org.trikkle;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public final class DiscreteNode extends Node {
 	private final AtomicInteger datumsFilled = new AtomicInteger(0);
 
 	public DiscreteNode(Set<String> datumNames) {
 		super(datumNames);
+		if (datumNames.isEmpty()) {
+			throw new IllegalArgumentException("DiscreteNode must have at least one datum");
+		}
 	}
 
 	public DiscreteNode(String... datumNames) {
 		this(new HashSet<>(Arrays.asList(datumNames)));
-	}
-
-	static DiscreteNode fromNodespace(Nodespace nodespace, Set<String> datumNames) {
-		if (datumNames.isEmpty()) {
-			throw new IllegalArgumentException("DiscreteNode must have at least one datum");
-		}
-		Map<Set<String>, Node> nodeCache = nodespace.nodeCache;
-		if (nodeCache.containsKey(datumNames)) {
-			return (DiscreteNode) nodeCache.get(datumNames);
-		} else {
-			DiscreteNode node = new DiscreteNode(datumNames);
-			nodeCache.put(node.datumNames, node);
-			return node;
-		}
 	}
 
 	@Override

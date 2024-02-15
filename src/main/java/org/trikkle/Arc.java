@@ -3,6 +3,10 @@ package org.trikkle;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public abstract class Arc implements Primable {
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
@@ -45,7 +49,17 @@ public abstract class Arc implements Primable {
 		return status;
 	}
 
-	protected synchronized void setStatus(ArcStatus status) { // todo should this throw so much
+	/**
+	 * Sets the status of the arc. The status cannot be set to null. The status cannot be changed if the arc is already
+	 * finished. If the arc is safe, the status cannot be set to a status that is less (see {@link ArcStatus#stage()})
+	 * than the current status.
+	 *
+	 * @param status the new status of the arc
+	 * @throws NullPointerException     if the status is null
+	 * @throws IllegalStateException    if the arc is already finished
+	 * @throws IllegalArgumentException if the arc is safe and the status is less than the current status
+	 */
+	protected synchronized void setStatus(ArcStatus status) {
 		if (status == null) {
 			throw new NullPointerException("Status cannot be null!");
 		}
@@ -72,6 +86,12 @@ public abstract class Arc implements Primable {
 		}
 	}
 
+	/**
+	 * A safe arc is one that cannot be set to a status that is less than its current status. This means it can only be
+	 * run once.
+	 *
+	 * @return true if this arc is safe
+	 */
 	public boolean isSafe() {
 		return safe;
 	}

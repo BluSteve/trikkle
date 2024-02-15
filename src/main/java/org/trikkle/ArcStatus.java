@@ -18,6 +18,11 @@ public enum ArcStatus {
 		this.stage = stage;
 	}
 
+	/**
+	 * The stage of the status. The higher the stage, the more "finished" the status is.
+	 *
+	 * @return the stage of the status
+	 */
 	public int stage() {
 		return stage;
 	}

@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class is a GraphViz that visualizes a graph using the Mermaid syntax.
+ * A GraphViz that visualizes a graph using the Mermaid syntax.
  *
  * @author Steve Cao
  * @since 0.1.0

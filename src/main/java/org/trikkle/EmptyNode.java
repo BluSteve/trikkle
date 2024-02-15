@@ -3,21 +3,15 @@ package org.trikkle;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public final class EmptyNode extends Node {
-	private static final Set<String> EMPTY_SET = Collections.emptySet();
+	static final Set<String> EMPTY_SET = Collections.emptySet();
 
 	public EmptyNode() {
 		super(EMPTY_SET);
-	}
-
-	static EmptyNode fromNodespace(Nodespace nodespace) {
-		if (nodespace.nodeCache.containsKey(EMPTY_SET)) {
-			return (EmptyNode) nodespace.nodeCache.get(EMPTY_SET);
-		} else {
-			EmptyNode node = new EmptyNode();
-			nodespace.nodeCache.put(EMPTY_SET, node);
-			return node;
-		}
 	}
 
 	@Override

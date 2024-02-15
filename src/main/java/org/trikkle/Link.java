@@ -4,6 +4,10 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * @author Steve Cao
+ * @since 0.1.0
+ */
 public final class Link implements Congruent<Link> {
 	private final Set<Node> dependencies;
 	private final Arc arc;
