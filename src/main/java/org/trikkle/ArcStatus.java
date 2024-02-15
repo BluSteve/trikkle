@@ -1,9 +1,11 @@
 package org.trikkle;
 
 /**
- * The status of an Arc.
+ * The status of an arc.
  *
  * @author Steve Cao
+ * @see Arc
+ * @see AutoArc
  * @since 0.1.0
  */
 public enum ArcStatus {

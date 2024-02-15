@@ -10,8 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * This is analogous to an adjacency list entry in a graph, except there are multiple input nodes and output nodes, so
- * it is actually a directed hypergraph.
+ * This is analogous to an adjacency list entry in a graph, except there are multiple input nodes and output nodes.
+ * It is actually a directed hypergraph.
  *
  * @author Steve Cao
  * @see Node

@@ -6,15 +6,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A {@link Node} that can have an unlimited number of datums added to it. However, it can only have one datum name
- * and therefore only one stream. Upon the first datum added, the {@code StreamNode} will be irreversibly set to
- * {@code usable}. Arcs dependent on this node will thus be called every single tick after the first datum is added.
- * <p>
- * The recipient arc of a {@code StreamNode} cannot be an {@link AutoArc} because the recipient arcs will usually be
- * run multiple times as more data streams into this node.
- * <p>
- * An attempt was made to allow {@code usable} to be unset for {@code StreamNode}s, but it led to many concurrency
- * issues.
+ * A {@link Node} that can have an unlimited number of datums of one name added to it. Upon the first datum added,
+ * the {@code StreamNode} will be irreversibly set to {@code usable}. Arcs dependent on this node will thus be called
+ * every single tick after the first datum is added. <p> The recipient arc of a {@code StreamNode} cannot be an
+ * {@link AutoArc} because the recipient arcs will usually be run multiple times as more data streams into this node.
+ * <p> An attempt was made to allow {@code usable} to be unset for {@code StreamNode}s, but it led to many
+ * concurrency issues.
  *
  * @author Steve Cao
  * @see AutoArc
