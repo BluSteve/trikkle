@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.trikkle.annotations.Input;
 import org.trikkle.annotations.Output;
 
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -102,5 +104,75 @@ public class EasyArcTest {
 		overseer.start();
 
 		assertTrue(ran.get());
+	}
+
+	// todo derive which datums go to which nodes automatically from arc annotations?
+
+	@Test
+	void testStream() {
+		Arc inputArc = new AutoArc() {
+			@Override
+			public void run() {
+				for (int i = 1; i < 10; i++) {
+					returnDatum("stream1", (double) i);
+					getOutputNode().setProgress(i / 10.0);
+				}
+
+				getOutputNode().setProgress(1);
+			}
+		};
+		Node streamNode = Nodespace.DEFAULT.streamOf("stream1");
+		Link link = new Link(Set.of(), inputArc, streamNode);
+
+		Arc consumerArc = new Arc(false) {
+			double total = 0; // is this a pure function? it is if you reset()
+			@Input
+			Queue<Double> stream1;
+			@Output
+			double result1;
+
+			@Override
+			public void run() {
+				Node stream1Node = overseer.getNodeOfDatum("stream1");
+
+				double sum = 0;
+				synchronized (stream1) {
+					if (stream1.size() >= 3) {
+						while (!stream1.isEmpty()) {
+							sum += stream1.poll();
+						}
+
+						total += sum;
+						// prevents stream1Node from calling this arc again when another node ticktock().
+						stream1Node.setUsable();
+					}
+				}
+
+				System.out.println("total = " + total);
+
+				if (stream1Node.getProgress() == 1) {
+					stream1Node.setUsable();
+					this.setStatus(ArcStatus.FINISHED);
+					result1 = total;
+				} else {
+					this.setStatus(ArcStatus.IDLE);
+				}
+			}
+
+			@Override
+			public void reset() {
+				super.reset();
+				total = 0;
+			}
+		};
+		Node outputNode = new DiscreteNode("result1");
+		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
+
+		Graph graph = new Graph(link, link2);
+		Overseer overseer = new Overseer(graph);
+		overseer.start();
+
+		Map<String, Object> results = overseer.getResultCache();
+		assertEquals(45.0, results.get("result1"));
 	}
 }

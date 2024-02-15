@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a field in an arc as a return datum.
+ * Marks a field in an arc as an input datum. These are filled by {@link org.trikkle.Arc#getDatum(String)} before the
+ * arc's run method starts.
  *
  * @author Steve Cao
  * @see org.trikkle.Arc
