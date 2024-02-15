@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a field in an arc as an input datum. These are filled by {@link org.trikkle.Arc#getDatum(String)} before the
- * arc's run method starts.
+ * arc's run method starts. Input streams (see {@link org.trikkle.StreamNode}) are generally supported.
  *
  * @author Steve Cao
  * @see org.trikkle.Arc

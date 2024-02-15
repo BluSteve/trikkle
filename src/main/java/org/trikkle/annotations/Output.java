@@ -7,7 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a field in an arc as a return datum. These are only returned via
- * {@link org.trikkle.Arc#returnDatum(String, Object)} after the arc's run method finishes.
+ * {@link org.trikkle.Arc#returnDatum(String, Object)} after the arc's run method finishes. Output streams (see
+ * {@link org.trikkle.StreamNode}) are supported but strongly not recommended due to lack of clarity.
  *
  * @author Steve Cao
  * @see org.trikkle.Arc
