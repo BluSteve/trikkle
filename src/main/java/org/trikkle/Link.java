@@ -25,12 +25,16 @@ public final class Link implements Congruent<Link> {
 	private final Set<Node> outputNodes;
 
 	/**
-	 * Create a link with the given arc. The dependencies and output nodes are automatically generated from the arc via
-	 * annotations.
+	 * Create a link with the given arc. The dependency and output node are automatically generated from the arc via
+	 * annotations. All input datums will be added to a single dependency node, and all output datums will be added to a
+	 * single output node. The nodes created will either be a {@link DiscreteNode} or an {@link EmptyNode}, if there are
+	 * no datums.
 	 *
-	 * @param arc the arc of the link
+	 * @param arc the arc of the link, should have annotations {@link Input} and {@link Output}
 	 * @see Input
 	 * @see Output
+	 * @see DiscreteNode
+	 * @see EmptyNode
 	 */
 	public Link(Arc arc) {
 		dependencies = new HashSet<>();
@@ -48,8 +52,8 @@ public final class Link implements Congruent<Link> {
 			}
 		}
 
-		dependencies.add(new DiscreteNode(inputNames));
-		outputNodes.add(new DiscreteNode(outputNames));
+		dependencies.add(inputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(inputNames));
+		outputNodes.add(outputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(outputNames));
 	}
 
 	/**
