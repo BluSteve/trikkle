@@ -56,7 +56,11 @@ public abstract class Arc implements Primable {
 		try {
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(Input.class)) {
-					field.set(this, getDatum(field.getName()));
+					String name = field.getAnnotation(Input.class).name();
+					if (name.isEmpty()) {
+						name = field.getName();
+					}
+					field.set(this, getDatum(name));
 				}
 			}
 		} catch (IllegalAccessException e) {
@@ -69,7 +73,11 @@ public abstract class Arc implements Primable {
 		try {
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(Output.class)) {
-					returnDatum(field.getName(), field.get(this));
+					String name = field.getAnnotation(Output.class).name();
+					if (name.isEmpty()) {
+						name = field.getName();
+					}
+					returnDatum(name, field.get(this));
 				}
 			}
 		} catch (IllegalAccessException e) {
@@ -134,18 +142,38 @@ public abstract class Arc implements Primable {
 		link = overseer.g.arcMap.get(this);
 	}
 
+	/**
+	 * Gets the link this arc is a part of. Only available after the arc is primed.
+	 *
+	 * @return the link this arc is a part of
+	 */
 	protected Link getLink() {
 		return link;
 	}
 
+	/**
+	 * Gets the dependencies of this arc. Same as {@link Link#getDependencies()}. Only available after the arc is primed.
+	 *
+	 * @return the dependencies of this arc
+	 */
 	protected Set<Node> getDependencies() {
 		return link.getDependencies();
 	}
 
+	/**
+	 * Gets the output nodes of this arc. Same as {@link Link#getOutputNodes()}. Only available after the arc is primed.
+	 *
+	 * @return the output nodes of this arc
+	 */
 	protected Set<Node> getOutputNodes() {
 		return link.getOutputNodes();
 	}
 
+	/**
+	 * Gets the output node of this arc. Same as {@link Link#getOutputNode()}. Only available after the arc is primed.
+	 *
+	 * @return the output node of this arc
+	 */
 	protected Node getOutputNode() {
 		return link.getOutputNode();
 	}

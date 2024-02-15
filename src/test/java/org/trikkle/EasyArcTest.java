@@ -121,13 +121,13 @@ public class EasyArcTest {
 				getOutputNode().setProgress(1);
 			}
 		};
-		Node streamNode = Nodespace.DEFAULT.streamOf("stream1");
+		Node streamNode = new StreamNode("stream1");
 		Link link = new Link(Set.of(), inputArc, streamNode);
 
 		Arc consumerArc = new Arc(false) {
 			double total = 0; // is this a pure function? it is if you reset()
-			@Input
-			Queue<Double> stream1;
+			@Input(name = "stream1")
+			Queue<Double> queue;
 			@Output
 			double result1;
 
@@ -136,10 +136,10 @@ public class EasyArcTest {
 				Node stream1Node = overseer.getNodeOfDatum("stream1");
 
 				double sum = 0;
-				synchronized (stream1) {
-					if (stream1.size() >= 3) {
-						while (!stream1.isEmpty()) {
-							sum += stream1.poll();
+				synchronized (queue) {
+					if (queue.size() >= 3) {
+						while (!queue.isEmpty()) {
+							sum += queue.poll();
 						}
 
 						total += sum;

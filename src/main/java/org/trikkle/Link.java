@@ -46,9 +46,19 @@ public final class Link implements Congruent<Link> {
 		Set<String> outputNames = new HashSet<>();
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(Input.class)) {
-				inputNames.add(field.getName());
+				String name = field.getAnnotation(Input.class).name();
+				if (name.isEmpty()) {
+					inputNames.add(field.getName());
+				} else {
+					inputNames.add(name);
+				}
 			} else if (field.isAnnotationPresent(Output.class)) {
-				outputNames.add(field.getName());
+				String name = field.getAnnotation(Output.class).name();
+				if (name.isEmpty()) {
+					outputNames.add(field.getName());
+				} else {
+					outputNames.add(name);
+				}
 			}
 		}
 
@@ -103,6 +113,13 @@ public final class Link implements Congruent<Link> {
 		return arc;
 	}
 
+	/**
+	 * Convenience method to get the single output node of the link. If there are multiple output nodes, an exception is
+	 * thrown.
+	 *
+	 * @return the output node of the link
+	 * @throws IllegalStateException if there are multiple output nodes
+	 */
 	public Node getOutputNode() {
 		if (outputNodes.size() > 1) throw new IllegalStateException("Link has multiple output nodes!");
 		return outputNodes.iterator().next();

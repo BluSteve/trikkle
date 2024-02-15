@@ -17,4 +17,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Output {
+	/**
+	 * The name of the return datum. If empty, the name of the field will be used.
+	 *
+	 * @return the name of the return datum
+	 */
+	String name() default "";
 }
