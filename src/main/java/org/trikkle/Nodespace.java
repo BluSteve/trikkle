@@ -16,6 +16,8 @@ import static org.trikkle.EmptyNode.EMPTY_SET;
  * with overlapping datum names, but multiple nodespaces with separate graphs and overseers proved to be clearer. The
  * constructor {@link Overseer#Overseer(Graph, Map)} and the method {@link Overseer#fillStartingDatums(Map)} may be
  * useful in joining two overseers.
+ * <p>
+ * This class is thread-safe.
  *
  * @author Steve Cao
  * @see Node

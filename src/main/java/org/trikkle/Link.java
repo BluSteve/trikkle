@@ -10,7 +10,13 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
+ * This is analogous to an adjacency list entry in a graph, except there are multiple input nodes and output nodes, so
+ * it is actually a directed hypergraph.
+ *
  * @author Steve Cao
+ * @see Node
+ * @see Arc
+ * @see Graph
  * @since 0.1.0
  */
 public final class Link implements Congruent<Link> {
@@ -18,6 +24,14 @@ public final class Link implements Congruent<Link> {
 	private final Arc arc;
 	private final Set<Node> outputNodes;
 
+	/**
+	 * Create a link with the given arc. The dependencies and output nodes are automatically generated from the arc via
+	 * annotations.
+	 *
+	 * @param arc the arc of the link
+	 * @see Input
+	 * @see Output
+	 */
 	public Link(Arc arc) {
 		dependencies = new HashSet<>();
 		this.arc = arc;
@@ -38,6 +52,15 @@ public final class Link implements Congruent<Link> {
 		outputNodes.add(new DiscreteNode(outputNames));
 	}
 
+	/**
+	 * Create a link with the given dependencies, arc, and output nodes.
+	 *
+	 * @param dependencies the dependency nodes of the link
+	 * @param arc          the arc of the link
+	 * @param outputNodes  the output nodes of the link
+	 * @throws NullPointerException     if dependencies, arc, or outputNodes is null
+	 * @throws IllegalArgumentException if a StreamNode is the input of an AutoArc
+	 */
 	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
 		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
 		if (arc == null) throw new NullPointerException("Arc cannot be null!");

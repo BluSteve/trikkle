@@ -5,6 +5,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Marks a field in an arc as a return datum.
+ *
+ * @author Steve Cao
+ * @see org.trikkle.Arc
+ * @see org.trikkle.Link
+ * @since 0.1.0
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Input {
