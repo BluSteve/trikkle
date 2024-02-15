@@ -25,6 +25,11 @@ public abstract class Arc implements Primable {
 		this.safe = safe;
 	}
 
+	public Arc(String name, boolean safe) {
+		this(safe);
+		setName(name);
+	}
+
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {

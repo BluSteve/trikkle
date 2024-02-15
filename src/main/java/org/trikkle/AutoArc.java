@@ -12,6 +12,10 @@ public abstract class AutoArc extends Arc {
 		super(true);
 	}
 
+	public AutoArc(String name) {
+		super(name, true);
+	}
+
 	@Override
 	void runWrapper() {
 		setStatus(ArcStatus.IN_PROGRESS);

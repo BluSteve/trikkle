@@ -57,7 +57,7 @@ public class EasyArcTest {
 
 	@Test
 	void testEasyArc2() {
-		Arc arc = new AutoArc() {
+		Arc arc = new AutoArc("sumdiff") {
 			@Input
 			double a, b;
 			@Output
@@ -76,6 +76,7 @@ public class EasyArcTest {
 		Link link = new Link(Set.of(a, b), arc, Set.of(sum, diff));
 
 		Graph graph = new Graph(link);
+		System.out.println(graph);
 		Overseer overseer = new Overseer(graph);
 		overseer.addStartingDatum("a", 2.5);
 		overseer.addStartingDatum("b", 3.6);
