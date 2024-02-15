@@ -1,6 +1,7 @@
 package org.trikkle;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.trikkle.EmptyNode.EMPTY_SET;
 
@@ -22,7 +23,7 @@ import static org.trikkle.EmptyNode.EMPTY_SET;
  */
 public final class Nodespace {
 	public final static Nodespace DEFAULT = new Nodespace();
-	private final Map<Set<String>, Node> nodeCache = new HashMap<>();
+	private final Map<Set<String>, Node> nodeCache = new ConcurrentHashMap<>();
 
 	public DiscreteNode discreteOf(Set<String> datumNames) {
 		if (nodeCache.containsKey(datumNames)) {
@@ -57,6 +58,10 @@ public final class Nodespace {
 			nodeCache.put(EMPTY_SET, node);
 			return node;
 		}
+	}
+
+	public void addNode(Node node) {
+		nodeCache.put(node.datumNames, node);
 	}
 
 	/**

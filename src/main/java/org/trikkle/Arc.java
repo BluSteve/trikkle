@@ -1,5 +1,9 @@
 package org.trikkle;
 
+import org.trikkle.annotations.Input;
+import org.trikkle.annotations.Output;
+
+import java.lang.reflect.Field;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,7 +28,9 @@ public abstract class Arc implements Primable {
 	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {
+		autoFill();
 		run();
+		autoReturn();
 	}
 
 	protected Object getDatum(String datumName) {
@@ -42,6 +48,32 @@ public abstract class Arc implements Primable {
 		} else {
 			throw new IllegalArgumentException(
 					"Arc " + this + " cannot return datum " + datumName + " because it is not an output of this arc!");
+		}
+	}
+
+	private void autoFill() {
+		Field[] fields = getClass().getDeclaredFields();
+		try {
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(Input.class)) {
+					field.set(this, getDatum(field.getName()));
+				}
+			}
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void autoReturn() {
+		Field[] fields = getClass().getDeclaredFields();
+		try {
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(Output.class)) {
+					returnDatum(field.getName(), field.get(this));
+				}
+			}
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

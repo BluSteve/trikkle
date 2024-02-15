@@ -1,6 +1,11 @@
 package org.trikkle;
 
+import org.trikkle.annotations.Input;
+import org.trikkle.annotations.Output;
+
+import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -13,8 +18,24 @@ public final class Link implements Congruent<Link> {
 	private final Arc arc;
 	private final Set<Node> outputNodes;
 
-	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
-		this(dependencies, arc, Collections.singleton(outputNode));
+	public Link(Arc arc) {
+		dependencies = new HashSet<>();
+		this.arc = arc;
+		outputNodes = new HashSet<>();
+
+		Field[] fields = arc.getClass().getDeclaredFields();
+		Set<String> inputNames = new HashSet<>();
+		Set<String> outputNames = new HashSet<>();
+		for (Field field : fields) {
+			if (field.isAnnotationPresent(Input.class)) {
+				inputNames.add(field.getName());
+			} else if (field.isAnnotationPresent(Output.class)) {
+				outputNames.add(field.getName());
+			}
+		}
+
+		dependencies.add(new DiscreteNode(inputNames));
+		outputNodes.add(new DiscreteNode(outputNames));
 	}
 
 	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
@@ -31,6 +52,10 @@ public final class Link implements Congruent<Link> {
 		this.dependencies = dependencies;
 		this.arc = arc;
 		this.outputNodes = outputNodes;
+	}
+
+	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
+		this(dependencies, arc, Collections.singleton(outputNode));
 	}
 
 	public boolean runnable() {
