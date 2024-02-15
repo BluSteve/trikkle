@@ -25,6 +25,35 @@ public final class Link implements Congruent<Link> {
 	private final Set<Node> outputNodes;
 
 	/**
+	 * Create a link with the given dependencies, arc, and output nodes.
+	 *
+	 * @param dependencies the dependency nodes of the link
+	 * @param arc          the arc of the link
+	 * @param outputNodes  the output nodes of the link
+	 * @throws NullPointerException     if dependencies, arc, or outputNodes is null
+	 * @throws IllegalArgumentException if a StreamNode is the input of an AutoArc
+	 */
+	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
+		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
+		if (arc == null) throw new NullPointerException("Arc cannot be null!");
+		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
+
+		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
+		boolean autoArc = arc instanceof AutoArc;
+		if (hasStreamNode && autoArc) {
+			throw new IllegalArgumentException("StreamNode cannot be the input of an AutoArc. Use Arc instead.");
+		}
+
+		this.dependencies = dependencies;
+		this.arc = arc;
+		this.outputNodes = outputNodes;
+	}
+
+	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
+		this(dependencies, arc, Collections.singleton(outputNode));
+	}
+
+	/**
 	 * Create a link with the given arc. The dependency and output node are automatically generated from the arc via
 	 * annotations. All input datums will be added to a single dependency node, and all output datums will be added to a
 	 * single output node. The nodes created will either be a {@link DiscreteNode} or an {@link EmptyNode}, if there are
@@ -67,34 +96,11 @@ public final class Link implements Congruent<Link> {
 	}
 
 	/**
-	 * Create a link with the given dependencies, arc, and output nodes.
+	 * Check if the link is runnable. A link is runnable if all of its dependencies are usable and the arc is not yet
+	 * finished.
 	 *
-	 * @param dependencies the dependency nodes of the link
-	 * @param arc          the arc of the link
-	 * @param outputNodes  the output nodes of the link
-	 * @throws NullPointerException     if dependencies, arc, or outputNodes is null
-	 * @throws IllegalArgumentException if a StreamNode is the input of an AutoArc
+	 * @return true if the link is runnable
 	 */
-	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
-		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
-		if (arc == null) throw new NullPointerException("Arc cannot be null!");
-		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
-
-		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
-		boolean autoArc = arc instanceof AutoArc;
-		if (hasStreamNode && autoArc) {
-			throw new IllegalArgumentException("StreamNode cannot be the input of an AutoArc. Use Arc instead.");
-		}
-
-		this.dependencies = dependencies;
-		this.arc = arc;
-		this.outputNodes = outputNodes;
-	}
-
-	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
-		this(dependencies, arc, Collections.singleton(outputNode));
-	}
-
 	public boolean runnable() {
 		if (arc.getStatus() == ArcStatus.FINISHED) return false;
 		for (Node dependency : dependencies) {

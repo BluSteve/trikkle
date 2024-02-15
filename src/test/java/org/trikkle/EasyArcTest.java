@@ -107,8 +107,6 @@ public class EasyArcTest {
 		assertTrue(ran.get());
 	}
 
-	// todo derive which datums go to which nodes automatically from arc annotations?
-
 	@Test
 	void testStream() {
 		Arc inputArc = new AutoArc() {
