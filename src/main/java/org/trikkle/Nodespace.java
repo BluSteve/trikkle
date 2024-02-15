@@ -23,14 +23,14 @@ import static org.trikkle.EmptyNode.EMPTY_SET;
  */
 public final class Nodespace {
 	public final static Nodespace DEFAULT = new Nodespace();
-	private final Map<Set<String>, Node> nodeCache = new ConcurrentHashMap<>();
+	public final Map<Set<String>, Node> nodeStore = new ConcurrentHashMap<>();
 
 	public DiscreteNode discreteOf(Set<String> datumNames) {
-		if (nodeCache.containsKey(datumNames)) {
-			return (DiscreteNode) nodeCache.get(datumNames);
+		if (nodeStore.containsKey(datumNames)) {
+			return (DiscreteNode) nodeStore.get(datumNames);
 		} else {
 			DiscreteNode node = new DiscreteNode(datumNames);
-			nodeCache.put(node.datumNames, node);
+			nodeStore.put(node.datumNames, node);
 			return node;
 		}
 	}
@@ -41,27 +41,43 @@ public final class Nodespace {
 
 	public StreamNode streamOf(String datumName) {
 		Set<String> singleton = Collections.singleton(datumName);
-		if (nodeCache.containsKey(singleton)) {
-			return (StreamNode) nodeCache.get(singleton);
+		if (nodeStore.containsKey(singleton)) {
+			return (StreamNode) nodeStore.get(singleton);
 		} else {
 			StreamNode node = new StreamNode(datumName);
-			nodeCache.put(node.datumNames, node);
+			nodeStore.put(node.datumNames, node);
 			return node;
 		}
 	}
 
 	public EmptyNode emptyOf() {
-		if (nodeCache.containsKey(EMPTY_SET)) {
-			return (EmptyNode) nodeCache.get(EMPTY_SET);
+		if (nodeStore.containsKey(EMPTY_SET)) {
+			return (EmptyNode) nodeStore.get(EMPTY_SET);
 		} else {
 			EmptyNode node = new EmptyNode();
-			nodeCache.put(EMPTY_SET, node);
+			nodeStore.put(EMPTY_SET, node);
 			return node;
 		}
 	}
 
-	public void addNode(Node node) {
-		nodeCache.put(node.datumNames, node);
+	public void add(Node node) {
+		nodeStore.put(node.datumNames, node);
+	}
+
+	public void addAll(Collection<Node> nodes) {
+		for (Node node : nodes) {
+			nodeStore.put(node.datumNames, node);
+		}
+	}
+
+	public void remove(Node node) {
+		nodeStore.remove(node.datumNames);
+	}
+
+	public void removeAll(Collection<Node> nodes) {
+		for (Node node : nodes) {
+			nodeStore.remove(node.datumNames);
+		}
 	}
 
 	/**
@@ -72,7 +88,7 @@ public final class Nodespace {
 	 */
 	public List<Node> nodesWithDatum(String datumName) {
 		List<Node> nodes = new ArrayList<>();
-		for (Node node : nodeCache.values()) {
+		for (Node node : nodeStore.values()) {
 			if (node.datumNames.contains(datumName)) {
 				nodes.add(node);
 			}
