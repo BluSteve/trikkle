@@ -23,8 +23,13 @@ public abstract class Arc implements Primable {
 	private ArcStatus status = ArcStatus.IDLE;
 	private String name;
 
-	// wow overriding this is really clean
-	// without this there are ways to get a ticktock by for example having a phantom stream node it outputs to
+	/**
+	 * A safe arc is one that cannot be set to a status that is less than its current status. This means it can only be
+	 * run once. This is useful for preventing deadlocks and livelocks, as even though arcs cannot directly
+	 * {@link Overseer#ticktock(Node)} an overseer, it can easily do so indirectly by leveraging nodes and safe arcs.
+	 *
+	 * @param safe true if this arc is safe
+	 */
 	public Arc(boolean safe) {
 		this.safe = safe;
 
@@ -50,12 +55,27 @@ public abstract class Arc implements Primable {
 		}
 	}
 
+	/**
+	 * A safe arc is one that cannot be set to a status that is less than its current status. This means it can only be
+	 * run once. This is useful for preventing deadlocks and livelocks, as even though arcs cannot directly
+	 * {@link Overseer#ticktock(Node)} an overseer, it can easily do so indirectly by leveraging nodes and safe arcs.
+	 *
+	 * @param name the name of this arc
+	 * @param safe true if this arc is safe
+	 */
 	public Arc(String name, boolean safe) {
 		this(safe);
 		setName(name);
 	}
 
-	public abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
+	/**
+	 * Override this method to specify what functions to run when this arc is run. This method is called by the overseer
+	 * if the link containing this arc is {@link Link#runnable()}.
+	 *
+	 * @see Link
+	 * @see Overseer
+	 */
+	protected abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {
 		autoFill();
@@ -63,14 +83,33 @@ public abstract class Arc implements Primable {
 		autoReturn();
 	}
 
+	/**
+	 * Gets the datum with the given name from the overseer's cache.
+	 *
+	 * @param datumName the name of the datum
+	 * @return the datum with the given name
+	 * @throws NullPointerException if there is no datum with the given name in the cache
+	 */
 	protected Object getDatum(String datumName) {
+		if (!overseer.getCache().containsKey(datumName)) {
+			throw new NullPointerException("No datum with name " + datumName + " is in the cache!");
+		}
 		return overseer.getCache().get(datumName);
 	}
 
+	/**
+	 * Returns the datum with the given name to the overseer's cache by calling {@link Node#addDatum(String, Object)}.
+	 * The datum can be null.
+	 *
+	 * @param datumName the name of the datum
+	 * @param datum     the datum to return
+	 * @throws NullPointerException     if the datum name is not associated with any node
+	 * @throws IllegalArgumentException if the node with this datum is not an output of this arc
+	 */
 	protected void returnDatum(String datumName, Object datum) {
 		Node node = overseer.getNodeOfDatum(datumName);
 		if (node == null) {
-			throw new IllegalArgumentException("No node is associated with datum " + datumName + "!");
+			throw new NullPointerException("No node is associated with datum " + datumName + "!");
 		}
 
 		if (getOutputNodes().contains(node)) {
@@ -141,6 +180,11 @@ public abstract class Arc implements Primable {
 		return name;
 	}
 
+	/**
+	 * Sets the name of this arc. If the name is empty, the name is set to null.
+	 *
+	 * @param name the new name of this arc
+	 */
 	public void setName(String name) {
 		if (name.isEmpty()) {
 			this.name = null;
@@ -176,7 +220,6 @@ public abstract class Arc implements Primable {
 
 	/**
 	 * Gets the dependencies of this arc. Same as {@link Link#getDependencies()}. Only available after the arc is primed.
-
 	 *
 	 * @return the dependencies of this arc
 	 */
@@ -186,7 +229,6 @@ public abstract class Arc implements Primable {
 
 	/**
 	 * Gets the output nodes of this arc. Same as {@link Link#getOutputNodes()}. Only available after the arc is primed.
-
 	 *
 	 * @return the output nodes of this arc
 	 */
@@ -203,6 +245,10 @@ public abstract class Arc implements Primable {
 		return link.getOutputNode();
 	}
 
+	/**
+	 * Resets the arc to its initial state. If you declare any persistent fields in an arc, you should override this and
+	 * provide a way to reset them.
+	 */
 	@Override
 	public void reset() {
 		overseer = null;

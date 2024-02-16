@@ -27,7 +27,15 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 		this.datumNames = datumNames;
 	}
 
-	public void addDatum(String datumName, Object datum) {
+	/**
+	 * Adds a datum to the overseer cache of this node. The datum must have been declared by this node.
+	 *
+	 * @param datumName the name of the datum
+	 * @param datum     the datum
+	 * @throws IllegalStateException    if the node is not primed with an overseer
+	 * @throws IllegalArgumentException if the datum was not declared by the node
+	 */
+	public final void addDatum(String datumName, Object datum) {
 		if (overseer == null) {
 			throw new IllegalStateException("Node " + this + " is not primed with an overseer!");
 		}

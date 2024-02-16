@@ -48,9 +48,13 @@ public final class Link extends HalfLink implements Congruent<Link> {
 
 	/**
 	 * Create a link with the given arc. The dependency and output node are automatically generated from the arc via
-	 * annotations. All input datums will be added to a single dependency node, and all output datums will be added to a
+	 * annotations {@link Input} and {@link Output}. All input datums will be added to a single dependency node, and all
+	 * output datums will be added to a
 	 * single output node. The nodes created will either be a {@link DiscreteNode} or an {@link EmptyNode}, if there are
 	 * no datums.
+	 * <p>
+	 * This constructor is ideal for graphs without partial dependencies- that is, an arc that only uses a subset of the
+	 * datums of its dependency.
 	 *
 	 * @param arc the arc of the link, should have annotations {@link Input} and {@link Output}
 	 * @see Input

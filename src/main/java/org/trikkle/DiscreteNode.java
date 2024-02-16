@@ -16,6 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class DiscreteNode extends Node {
 	private final AtomicInteger datumsFilled = new AtomicInteger(0);
 
+	/**
+	 * Creates a new DiscreteNode with the given datum names.
+	 *
+	 * @param datumNames the names of the datums
+	 * @throws IllegalArgumentException if the set of datum names is empty
+	 */
 	public DiscreteNode(Set<String> datumNames) {
 		super(datumNames);
 		if (datumNames.isEmpty()) {
@@ -34,20 +40,25 @@ public final class DiscreteNode extends Node {
 		int i = datumsFilled.incrementAndGet();
 		if (i == datumNames.size()) { // all datums filled
 			setProgress(1);
-			if (!overseer.g.endingNodes.contains(this)) {
-				overseer.unsafeTicktock(this);
-			}
 		} else {
 			setProgress((double) i / datumNames.size());
 		}
 	}
 
+	/**
+	 * Irreversibly sets the node to {@code usable}. Also ticktocks the overseer if this node is not an ending node.
+	 *
+	 * @throws IllegalStateException if the node is not fully filled
+	 */
 	@Override
 	public void setUsable() {
 		if (datumsFilled.get() < datumNames.size()) {
 			throw new IllegalStateException("DiscreteNode " + this + " is not fully filled and cannot be set to usable.");
 		}
 		super.setUsable();
+		if (!overseer.g.endingNodes.contains(this)) {
+			overseer.unsafeTicktock(this);
+		}
 	}
 
 	@Override

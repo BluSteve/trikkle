@@ -23,6 +23,12 @@ public final class EmptyNode extends Node {
 		throw new UnsupportedOperationException("EmptyNode cannot have any datums!");
 	}
 
+	/**
+	 * Irreversibly sets the node to {@code usable}. Also sets the progress to 1 and ticktocks the overseer if this node
+	 * is not an ending node.
+	 *
+	 * @see #setProgress(double)
+	 */
 	@Override
 	public void setUsable() {
 		if (!isUsable()) {
