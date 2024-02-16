@@ -97,12 +97,18 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	/**
-	 * Calls {@link HalfLink#toFullLinks(List)} and then calls {@link #Graph(Collection)} with the result.
+	 * Calls {@link HalfLink#toFullLinks(List)} and then calls {@link #Graph(Collection)} with the result. If the type
+	 * of the given halfLinks is not a list, it will be converted into a list, otherwise the list object will be used
+	 * without copying.
 	 *
 	 * @param halfLinks the half links to convert and then use to create the graph
 	 */
-	public Graph(List<HalfLink> halfLinks) {
-		this(HalfLink.toFullLinks(halfLinks));
+	public static Graph ofHalfLinks(Collection<HalfLink> halfLinks) {
+		if (halfLinks instanceof List) {
+			return new Graph(HalfLink.toFullLinks((List<HalfLink>) halfLinks));
+		} else {
+			return new Graph(HalfLink.toFullLinks(new ArrayList<>(halfLinks)));
+		}
 	}
 
 	/**

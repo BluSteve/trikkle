@@ -151,7 +151,7 @@ public class EasyArcTest {
 
 		System.out.println(links);
 
-		Graph graph = new Graph(links);
+		Graph graph = Graph.ofHalfLinks(List.of(halfLink, halfLink2));
 		Overseer overseer = new Overseer(graph);
 		overseer.addStartingDatum("x", 2.5);
 		empty.setUsable();
