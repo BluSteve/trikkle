@@ -10,6 +10,15 @@ import java.util.Set;
  * @since 0.1.0
  */
 public interface Congruent<T> {
+	/**
+	 * Compare two sets for congruence. Two sets are congruent if they are the same size and for every element in one
+	 * set there is a congruent element in the other set.
+	 *
+	 * @param set1 the first set
+	 * @param set2 the second set
+	 * @param <T>  the type of the set
+	 * @return true if the sets are congruent
+	 */
 	static <T extends Congruent<T>> boolean setsCongruent(Set<T> set1, Set<T> set2) {
 		if (set1.size() != set2.size()) {
 			return false;
@@ -30,5 +39,11 @@ public interface Congruent<T> {
 		return true;
 	}
 
+	/**
+	 * Compare two objects for congruence.
+	 *
+	 * @param t the object to compare to
+	 * @return true if the objects are congruent
+	 */
 	boolean congruentTo(T t);
 }

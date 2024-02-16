@@ -26,6 +26,14 @@ public final class Nodespace {
 	public final static Nodespace DEFAULT = new Nodespace();
 	public final Map<Set<String>, Node> nodeStore = new ConcurrentHashMap<>();
 
+	/**
+	 * Returns a {@link DiscreteNode} with the given datum names. If the node does not exist, it is created and added to
+	 * the
+	 * {@link Nodespace#nodeStore}.
+	 *
+	 * @param datumNames the datum names
+	 * @see DiscreteNode#DiscreteNode(Set)
+	 */
 	public DiscreteNode discreteOf(Set<String> datumNames) {
 		if (nodeStore.containsKey(datumNames)) {
 			return (DiscreteNode) nodeStore.get(datumNames);
@@ -36,10 +44,25 @@ public final class Nodespace {
 		}
 	}
 
+	/**
+	 * Returns a {@link DiscreteNode} with the given datum names. If the node does not exist, it is created and added to
+	 * the
+	 * {@link Nodespace#nodeStore}.
+	 *
+	 * @param datumNames the datum names
+	 * @see DiscreteNode#DiscreteNode(Set)
+	 */
 	public DiscreteNode discreteOf(String... datumNames) {
 		return discreteOf(new HashSet<>(Arrays.asList(datumNames)));
 	}
 
+	/**
+	 * Returns a {@link StreamNode} with the given datum name. If the node does not exist, it is created and added to the
+	 * {@link Nodespace#nodeStore}.
+	 *
+	 * @param datumName the datum name
+	 * @see StreamNode#StreamNode(String)
+	 */
 	public StreamNode streamOf(String datumName) {
 		Set<String> singleton = Collections.singleton(datumName);
 		if (nodeStore.containsKey(singleton)) {
@@ -51,6 +74,12 @@ public final class Nodespace {
 		}
 	}
 
+	/**
+	 * Returns an {@link EmptyNode}. If the node does not exist, it is created and added to the
+	 * {@link Nodespace#nodeStore}.
+	 *
+	 * @see EmptyNode#EmptyNode()
+	 */
 	public EmptyNode emptyOf() {
 		if (nodeStore.containsKey(EMPTY_SET)) {
 			return (EmptyNode) nodeStore.get(EMPTY_SET);
@@ -61,20 +90,42 @@ public final class Nodespace {
 		}
 	}
 
+	/**
+	 * Adds the given node to the {@link Nodespace#nodeStore} based on the node's datum names.
+	 *
+	 * @param node the node
+	 */
 	public void add(Node node) {
 		nodeStore.put(node.datumNames, node);
 	}
 
+	/**
+	 * Adds all the given nodes to the {@link Nodespace#nodeStore} based on the node's datum names.
+	 *
+	 * @param nodes the nodes
+	 */
 	public void addAll(Collection<Node> nodes) {
 		for (Node node : nodes) {
 			nodeStore.put(node.datumNames, node);
 		}
 	}
 
+	/**
+	 * Removes the given node from the {@link Nodespace#nodeStore} based on the node's datum names. The node given and
+	 * the node removed may not necessarily be the same object.
+	 *
+	 * @param node the node
+	 */
 	public void remove(Node node) {
 		nodeStore.remove(node.datumNames);
 	}
 
+	/**
+	 * Removes all the given nodes from the {@link Nodespace#nodeStore} based on the node's datum names. The node given
+	 * and the node removed may not necessarily be the same object.
+	 *
+	 * @param nodes the nodes
+	 */
 	public void removeAll(Collection<Node> nodes) {
 		for (Node node : nodes) {
 			nodeStore.remove(node.datumNames);
