@@ -116,7 +116,9 @@ public final class Overseer {
 		// check population of startingNodes
 		for (Node startingNode : g.startingNodes) {
 			if (!startingNode.isUsable()) {
-				throw new IllegalStateException("Starting nodes not fully populated; unable to start!");
+				throw new IllegalStateException(
+						"Starting node " + startingNode + " is not fully populated! All unfilled datums: " +
+								getUnfilledStartingDatumNames());
 			}
 		}
 		// check that overseer and .start() are called in the same thread
@@ -200,6 +202,11 @@ public final class Overseer {
 		ticktock(caller);
 	}
 
+	/**
+	 * Returns the names of datums that are required to start the graph, belonging to the starting nodes.
+	 *
+	 * @return the names of datums that are required to start the graph
+	 */
 	public Set<String> getStartingDatumNames() {
 		Set<String> startingDatumNames = new HashSet<>();
 		for (Node startingNode : g.startingNodes) {
@@ -208,6 +215,12 @@ public final class Overseer {
 		return startingDatumNames;
 	}
 
+	/**
+	 * Returns the names of datums that are required to start the graph, belonging to the starting nodes, but which have
+	 * not been filled.
+	 *
+	 * @return the names of datums that are required to start the graph but have not been filled
+	 */
 	public Set<String> getUnfilledStartingDatumNames() {
 		Set<String> startingDatumNames = new HashSet<>();
 		for (Node startingNode : g.startingNodes) {
@@ -220,6 +233,13 @@ public final class Overseer {
 		return startingDatumNames;
 	}
 
+	/**
+	 * Convenience method for adding a starting datum to the overseer's cache. The datum must belong to a starting node.
+	 * Equivalent to calling {@link Node#addDatum(String, Object)} on the starting node directly.
+	 *
+	 * @param datumName the name of the datum
+	 * @param datum     the datum
+	 */
 	public void addStartingDatum(String datumName, Object datum) {
 		Node node = g.nodeOfDatum.get(datumName);
 		if (!g.startingNodes.contains(node)) {
@@ -229,6 +249,12 @@ public final class Overseer {
 		node.addDatum(datumName, datum);
 	}
 
+	/**
+	 * Fills the remainder of the starting datums with the given cache. If a starting datum has already been filled
+	 * manually with {@link #addStartingDatum(String, Object)}, this method will not override it.
+	 *
+	 * @param cache the cache to fill the starting datums with
+	 */
 	public void fillStartingDatums(Map<String, Object> cache) {
 		Set<String> unfilled = getUnfilledStartingDatumNames();
 		for (Map.Entry<String, Object> entry : cache.entrySet()) {

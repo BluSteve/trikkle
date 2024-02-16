@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Steve Cao
  * @see AutoArc
  * @see Arc
+ * @see Link
+ * @see Graph
  * @since 0.1.0
  */
 public final class StreamNode extends Node {

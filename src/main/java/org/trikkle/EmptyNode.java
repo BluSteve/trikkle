@@ -4,7 +4,12 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
+ * A {@link Node} that has no datums. Useful for when you want to connect two arcs without any datums.
+ *
  * @author Steve Cao
+ * @see Arc
+ * @see Link
+ * @see Graph
  * @since 0.1.0
  */
 public final class EmptyNode extends Node {

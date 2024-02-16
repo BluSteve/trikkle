@@ -6,7 +6,12 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * A {@link Node} that contains a defined positive number of datums.
+ *
  * @author Steve Cao
+ * @see Arc
+ * @see Link
+ * @see Graph
  * @since 0.1.0
  */
 public final class DiscreteNode extends Node {

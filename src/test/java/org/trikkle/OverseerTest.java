@@ -141,7 +141,9 @@ class OverseerTest {
 		assertTrue(e1.getMessage().contains("Datum result2 does not belong to a starting node!"));
 
 		Exception e = assertThrows(IllegalStateException.class, overseer::start);
-		assertTrue(e.getMessage().contains("Starting nodes not fully populated; unable to start!"));
+		assertTrue(e.getMessage().contains(
+				"Starting node Node[finalExponent, finalMultiplier] is not fully populated! All unfilled datums: " +
+						"[finalExponent]"));
 
 		overseer.addStartingDatum("finalExponent", 1.2);
 

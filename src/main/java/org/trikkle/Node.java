@@ -4,7 +4,12 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * A vertex in the execution graph representing datums to be filled.
+ *
  * @author Steve Cao
+ * @see Arc
+ * @see Link
+ * @see Graph
  * @since 0.1.0
  */
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class

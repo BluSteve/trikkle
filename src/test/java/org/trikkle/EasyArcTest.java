@@ -123,9 +123,10 @@ public class EasyArcTest {
 			}
 		};
 
+		Node x = new DiscreteNode("x");
 		Node y = new DiscreteNode("y");
 		Node z = new DiscreteNode("z");
-		HalfLink halfLink = new HalfLink(arc, Set.of(y, z));
+		HalfLink halfLink = new Link(Set.of(x), arc, Set.of(y, z));
 
 		Arc arc2 = new AutoArc("printy") {
 			@Input

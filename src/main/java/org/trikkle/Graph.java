@@ -27,11 +27,21 @@ public final class Graph implements Congruent<Graph> {
 	public final MultiMap<Node, Node> dependenciesOfNode = new MultiHashMap<>();
 	public final Map<String, Node> nodeOfDatum = new HashMap<>();
 
+	/**
+	 * Create a graph with the given links. If the type of the given links is not a set, it will be converted into a
+	 * set, otherwise the set object will be used without copying.
+	 *
+	 * @param links the links of the graph
+	 */
 	public Graph(Collection<Link> links) {
 		if (links == null || links.isEmpty()) {
 			throw new IllegalArgumentException("Graph must have at least one link!");
 		}
-		this.links = new HashSet<>(links);
+		if (links instanceof Set) {
+			this.links = (Set<Link>) links;
+		} else {
+			this.links = new HashSet<>(links);
+		}
 
 		Set<Node> dependencies = new HashSet<>();
 		for (Link link : links) {
@@ -88,7 +98,8 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	/**
-	 * Merges the graphs into one optimized graph, using the {@code endingNodes} as the ending nodes of the merged graph.
+	 * Merges the graphs into one optimized graph, using the {@code endingNodes} as the ending nodes of the merged
+	 * graph.
 	 *
 	 * @param graphs      Graphs to merge in descending order of priority
 	 * @param endingNodes the ending Nodes of the merged Graph

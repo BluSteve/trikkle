@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * A wrapper for a function that can be run by an overseer.
+ *
  * @author Steve Cao
  * @since 0.1.0
  */

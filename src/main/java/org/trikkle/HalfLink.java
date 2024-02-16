@@ -3,7 +3,7 @@ package org.trikkle;
 import java.util.*;
 
 /**
- * A half link is a link that has not yet been connected to its dependencies. Dependencies may be inferred through
+ * A {@link Link} that has not yet been connected to its dependencies. Dependencies may be inferred through
  * the method {@link #toFullLinks(List)}, where HalfLinks are converted into full links by using each other as context.
  *
  * @author Steve Cao
