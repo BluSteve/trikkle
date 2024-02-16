@@ -18,7 +18,7 @@ import java.util.Set;
  * @since 0.1.0
  */
 public final class Link extends HalfLink implements Congruent<Link> {
-	private final Set<Node> dependencies;
+	private Set<Node> dependencies;
 
 	/**
 	 * Create a link with the given dependencies, arc, and output nodes.
@@ -93,24 +93,8 @@ public final class Link extends HalfLink implements Congruent<Link> {
 		return dependencies;
 	}
 
-	public Arc getArc() {
-		return arc;
-	}
-
-	/**
-	 * Convenience method to get the single output node of the link. If there are multiple output nodes, an exception is
-	 * thrown.
-	 *
-	 * @return the output node of the link
-	 * @throws IllegalStateException if there are multiple output nodes
-	 */
-	public Node getOutputNode() {
-		if (outputNodes.size() > 1) throw new IllegalStateException("Link has multiple output nodes!");
-		return outputNodes.iterator().next();
-	}
-
-	public Set<Node> getOutputNodes() {
-		return outputNodes;
+	public void setDependencies(Set<Node> dependencies) {
+		this.dependencies = dependencies;
 	}
 
 	@Override

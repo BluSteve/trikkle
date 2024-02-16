@@ -10,9 +10,8 @@ import java.util.*;
  * @since 0.1.0
  */
 public class HalfLink {
-	protected final Arc arc;
-	protected final Set<Node> outputNodes;
-	private final Set<String> inputNames;
+	protected Arc arc;
+	protected Set<Node> outputNodes;
 
 	/**
 	 * Create a half link with the given arc and output nodes.
@@ -26,7 +25,6 @@ public class HalfLink {
 		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
 		this.arc = arc;
 		this.outputNodes = outputNodes;
-		inputNames = arc.inputFields.keySet();
 	}
 
 	public HalfLink(Arc arc, Node outputNode) {
@@ -65,7 +63,7 @@ public class HalfLink {
 
 			Set<Node> dependencies = new HashSet<>();
 			Set<String> danglingInputs = new HashSet<>();
-			for (String inputName : halfLink.inputNames) {
+			for (String inputName : halfLink.arc.inputFields.keySet()) {
 				if (!nodeOfDatum.containsKey(inputName)) {
 					danglingInputs.add(inputName);
 					continue;
@@ -82,5 +80,33 @@ public class HalfLink {
 		}
 
 		return fullLinks;
+	}
+
+	public Arc getArc() {
+		return arc;
+	}
+
+	public void setArc(Arc arc) {
+		this.arc = arc;
+	}
+
+	/**
+	 * Convenience method to get the single output node of the link. If there are multiple output nodes, an exception is
+	 * thrown.
+	 *
+	 * @return the output node of the link
+	 * @throws IllegalStateException if there are multiple output nodes
+	 */
+	public Node getOutputNode() {
+		if (outputNodes.size() > 1) throw new IllegalStateException("Link has multiple output nodes!");
+		return outputNodes.iterator().next();
+	}
+
+	public Set<Node> getOutputNodes() {
+		return outputNodes;
+	}
+
+	public void setOutputNodes(Set<Node> outputNodes) {
+		this.outputNodes = outputNodes;
 	}
 }
