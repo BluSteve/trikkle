@@ -3,7 +3,6 @@ package org.trikkle;
 import org.trikkle.annotations.Input;
 import org.trikkle.annotations.Output;
 
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -70,26 +69,8 @@ public final class Link implements Congruent<Link> {
 		this.arc = arc;
 		outputNodes = new HashSet<>();
 
-		Field[] fields = arc.getClass().getDeclaredFields();
-		Set<String> inputNames = new HashSet<>();
-		Set<String> outputNames = new HashSet<>();
-		for (Field field : fields) {
-			if (field.isAnnotationPresent(Input.class)) {
-				String name = field.getAnnotation(Input.class).name();
-				if (name.isEmpty()) {
-					inputNames.add(field.getName());
-				} else {
-					inputNames.add(name);
-				}
-			} else if (field.isAnnotationPresent(Output.class)) {
-				String name = field.getAnnotation(Output.class).name();
-				if (name.isEmpty()) {
-					outputNames.add(field.getName());
-				} else {
-					outputNames.add(name);
-				}
-			}
-		}
+		Set<String> inputNames = new HashSet<>(arc.inputFields.keySet());
+		Set<String> outputNames = new HashSet<>(arc.outputFields.keySet());
 
 		dependencies.add(inputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(inputNames));
 		outputNodes.add(outputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(outputNames));

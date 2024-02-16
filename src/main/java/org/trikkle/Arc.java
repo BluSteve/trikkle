@@ -4,6 +4,8 @@ import org.trikkle.annotations.Input;
 import org.trikkle.annotations.Output;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -12,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 0.1.0
  */
 public abstract class Arc implements Primable {
+	final Map<String, Field> inputFields, outputFields;
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
 	protected Overseer overseer;
@@ -23,6 +26,27 @@ public abstract class Arc implements Primable {
 	// without this there are ways to get a ticktock by for example having a phantom stream node it outputs to
 	public Arc(boolean safe) {
 		this.safe = safe;
+
+		Field[] fields = getClass().getDeclaredFields();
+		inputFields = new HashMap<>();
+		outputFields = new HashMap<>();
+		for (Field field : fields) {
+			if (field.isAnnotationPresent(Input.class)) {
+				String name = field.getAnnotation(Input.class).name();
+				if (!name.isEmpty()) {
+					inputFields.put(name, field);
+				} else {
+					inputFields.put(field.getName(), field);
+				}
+			} else if (field.isAnnotationPresent(Output.class)) {
+				String name = field.getAnnotation(Output.class).name();
+				if (!name.isEmpty()) {
+					outputFields.put(name, field);
+				} else {
+					outputFields.put(field.getName(), field);
+				}
+			}
+		}
 	}
 
 	public Arc(String name, boolean safe) {
@@ -57,36 +81,29 @@ public abstract class Arc implements Primable {
 	}
 
 	private void autoFill() {
-		Field[] fields = getClass().getDeclaredFields();
-		try {
-			for (Field field : fields) {
-				if (field.isAnnotationPresent(Input.class)) {
-					String name = field.getAnnotation(Input.class).name();
-					if (name.isEmpty()) {
-						name = field.getName();
-					}
-					field.set(this, getDatum(name));
-				}
+		for (Map.Entry<String, Field> inputEntry : inputFields.entrySet()) {
+			String datumName = inputEntry.getKey();
+			Field field = inputEntry.getValue();
+			Object datum = getDatum(datumName);
+			try {
+				field.set(this, datum);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
 			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
 	private void autoReturn() {
-		Field[] fields = getClass().getDeclaredFields();
-		try {
-			for (Field field : fields) {
-				if (field.isAnnotationPresent(Output.class)) {
-					String name = field.getAnnotation(Output.class).name();
-					if (name.isEmpty()) {
-						name = field.getName();
-					}
-					returnDatum(name, field.get(this));
-				}
+		for (Map.Entry<String, Field> outputEntry : outputFields.entrySet()) {
+			String datumName = outputEntry.getKey();
+			Field field = outputEntry.getValue();
+			Object datum;
+			try {
+				datum = field.get(this);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
 			}
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+			returnDatum(datumName, datum);
 		}
 	}
 

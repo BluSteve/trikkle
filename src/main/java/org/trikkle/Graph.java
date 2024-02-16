@@ -27,11 +27,11 @@ public final class Graph implements Congruent<Graph> {
 	public final MultiMap<Node, Node> dependenciesOfNode = new MultiHashMap<>();
 	public final Map<String, Node> nodeOfDatum = new HashMap<>();
 
-	public Graph(Set<Link> links) {
+	public Graph(Collection<Link> links) {
 		if (links == null || links.isEmpty()) {
 			throw new IllegalArgumentException("Graph must have at least one link!");
 		}
-		this.links = links;
+		this.links = new HashSet<>(links);
 
 		Set<Node> dependencies = new HashSet<>();
 		for (Link link : links) {

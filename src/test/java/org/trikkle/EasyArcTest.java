@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.trikkle.annotations.Input;
 import org.trikkle.annotations.Output;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -105,6 +106,49 @@ public class EasyArcTest {
 		overseer.start();
 
 		assertTrue(ran.get());
+	}
+
+	@Test
+	void halfLinkTest() {
+		Arc arc = new AutoArc("getyz") {
+			@Input
+			double x;
+			@Output
+			double y, z;
+
+			@Override
+			public void run() {
+				y = x * 2;
+//				z = x * 3; // todo this returns 0 and progress is 1
+			}
+		};
+
+		Node y = new DiscreteNode("y");
+		Node z = new DiscreteNode("z");
+		HalfLink halfLink = new HalfLink(arc, Set.of(y, z));
+
+		Arc arc2 = new AutoArc("printy") {
+			@Input
+			double y;
+
+			@Override
+			public void run() {
+				System.out.println("y = " + y);
+			}
+		};
+
+		HalfLink halfLink2 = new HalfLink(arc2, Set.of());
+
+		List<Link> links = HalfLink.toFullLinks(List.of(halfLink, halfLink2));
+
+		System.out.println(links);
+
+		Graph graph = new Graph(links);
+		Overseer overseer = new Overseer(graph);
+		overseer.addStartingDatum("x", 2.5);
+		overseer.start();
+
+		System.out.println(overseer.getResultCache());
 	}
 
 	@Test
