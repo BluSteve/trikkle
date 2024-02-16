@@ -115,6 +115,12 @@ public final class Link extends HalfLink implements Congruent<Link> {
 				Congruent.setsCongruent(outputNodes, link.outputNodes);
 	}
 
+	/**
+	 * Two links are equal if they have the same dependencies, arc, and output nodes.
+	 *
+	 * @param o the object to compare to
+	 * @return true if the links are equal
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

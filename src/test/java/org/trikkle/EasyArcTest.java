@@ -10,8 +10,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EasyArcTest {
 	@Test
@@ -126,9 +125,15 @@ public class EasyArcTest {
 		Node x = new DiscreteNode("x");
 		Node y = new DiscreteNode("y");
 		Node z = new DiscreteNode("z");
-		HalfLink halfLink = new Link(Set.of(x), arc, Set.of(y, z));
+		Node empty = new EmptyNode();
+		HalfLink halfLink = new Link(Set.of(x, empty), arc, Set.of(y, z));
+		HalfLink actualHalfLink = new HalfLink(arc, Set.of(y, z));
 
-		Arc arc2 = new AutoArc("printy") {
+		Link first = HalfLink.toFullLinks(List.of(actualHalfLink)).getFirst();
+		System.out.println(first);
+		assertEquals(1, first.getDependencies().size());
+
+		Arc arc2 = new AutoArc("") {
 			@Input
 			double y;
 
@@ -142,11 +147,14 @@ public class EasyArcTest {
 
 		List<Link> links = HalfLink.toFullLinks(List.of(halfLink, halfLink2));
 
+		assertSame(halfLink, links.getFirst());
+
 		System.out.println(links);
 
 		Graph graph = new Graph(links);
 		Overseer overseer = new Overseer(graph);
 		overseer.addStartingDatum("x", 2.5);
+		empty.setUsable();
 		overseer.start();
 
 		assertEquals(5.0, overseer.getDatum("y"));

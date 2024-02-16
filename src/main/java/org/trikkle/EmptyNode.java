@@ -33,4 +33,9 @@ public final class EmptyNode extends Node {
 			}
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "EmptyNode@" + Integer.toHexString(hashCode());
+	}
 }

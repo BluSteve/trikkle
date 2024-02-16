@@ -36,7 +36,7 @@ public class HalfLink {
 	/**
 	 * Converts a list of half links into a list of full links by using one another as context. All starting datums (i.e
 	 * ., those that are not returned by any other half links in the list) will be combined into a single starting
-	 * {@link DiscreteNode}.
+	 * {@link DiscreteNode}. Any half link that is already a full link will be added to the list as is.
 	 *
 	 * @param halfLinks the half links to convert
 	 * @return a list of full links
@@ -58,6 +58,11 @@ public class HalfLink {
 
 		List<Link> fullLinks = new ArrayList<>(halfLinks.size());
 		for (HalfLink halfLink : halfLinks) {
+			if (halfLink instanceof Link) {
+				fullLinks.add((Link) halfLink);
+				continue;
+			}
+
 			Set<Node> dependencies = new HashSet<>();
 			Set<String> danglingInputs = new HashSet<>();
 			for (String inputName : halfLink.inputNames) {

@@ -75,4 +75,9 @@ public final class StreamNode extends Node {
 		super.reset();
 		count.set(0);
 	}
+
+	@Override
+	public String toString() {
+		return "StreamNode" + datumNames;
+	}
 }
