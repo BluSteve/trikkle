@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 /**
  * A GraphViz that visualizes a graph using the Mermaid syntax.
  *
- * @author Steve Cao
  * @since 0.1.0
  */
 public class MermaidGraphViz implements GraphViz {

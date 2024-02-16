@@ -10,7 +10,6 @@ import java.util.*;
  * An execution graph. Graph never modifies the links, nodes, or arcs that are passed to it. It only uses them to
  * create data structures.
  *
- * @author Steve Cao
  * @since 0.1.0
  */
 public final class Graph implements Congruent<Graph> {

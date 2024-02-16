@@ -5,7 +5,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * A class that can be primed with an {@link Overseer}. Used for {@link Arc}s and {@link Node}s.
  *
- * @author Steve Cao
  * @since 0.1.0
  */
 public interface Primable {

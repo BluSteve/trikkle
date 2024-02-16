@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A {@link Node} that contains a defined positive number of datums.
  *
- * @author Steve Cao
  * @see Arc
  * @see Link
  * @see Graph

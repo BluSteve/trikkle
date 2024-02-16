@@ -12,7 +12,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * A wrapper for a function that can be run by an overseer.
  *
- * @author Steve Cao
  * @since 0.1.0
  */
 public abstract class Arc implements Primable {
@@ -177,6 +176,7 @@ public abstract class Arc implements Primable {
 
 	/**
 	 * Gets the dependencies of this arc. Same as {@link Link#getDependencies()}. Only available after the arc is primed.
+
 	 *
 	 * @return the dependencies of this arc
 	 */
@@ -186,6 +186,7 @@ public abstract class Arc implements Primable {
 
 	/**
 	 * Gets the output nodes of this arc. Same as {@link Link#getOutputNodes()}. Only available after the arc is primed.
+
 	 *
 	 * @return the output nodes of this arc
 	 */

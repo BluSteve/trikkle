@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p> An attempt was made to allow {@code usable} to be unset for {@code StreamNode}s, but it led to many
  * concurrency issues.
  *
- * @author Steve Cao
  * @see AutoArc
  * @see Arc
  * @see Link

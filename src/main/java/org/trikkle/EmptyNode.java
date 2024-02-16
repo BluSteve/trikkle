@@ -6,7 +6,6 @@ import java.util.Set;
 /**
  * A {@link Node} that has no datums. Useful for when you want to connect two arcs without any datums.
  *
- * @author Steve Cao
  * @see Arc
  * @see Link
  * @see Graph

@@ -13,7 +13,6 @@ import java.lang.annotation.Target;
  * Marks a field in an arc as an input datum. These are filled by {@link Arc#getDatum(String)} before the
  * arc's run method starts. Input streams (see {@link StreamNode}) are generally supported.
  *
- * @author Steve Cao
  * @see Arc
  * @see Link
  * @since 0.1.0

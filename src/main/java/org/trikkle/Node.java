@@ -6,7 +6,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * A vertex in the execution graph representing datums to be filled.
  *
- * @author Steve Cao
  * @see Arc
  * @see Link
  * @see Graph

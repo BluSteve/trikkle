@@ -12,7 +12,6 @@ import java.util.function.Function;
  * result
  * that comes back first.
  *
- * @author Steve Cao
  * @since 0.1.0
  */
 public final class FunctionRacer {

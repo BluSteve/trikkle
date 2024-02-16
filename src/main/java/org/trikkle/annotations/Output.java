@@ -19,7 +19,6 @@ import java.lang.annotation.Target;
  * field will be returned. If the field is a primitive, the default value might be 0 or false. If the field is
  * an object, the default value will be null.
  *
- * @author Steve Cao
  * @see Arc
  * @see Arc#run()
  * @see Link

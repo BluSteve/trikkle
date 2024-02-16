@@ -7,7 +7,6 @@ import java.util.Set;
  * logically equivalent but not necessarily the same object.
  *
  * @param <T> the type of the class to compare to
- * @author Steve Cao
  * @since 0.1.0
  */
 public interface Congruent<T> {

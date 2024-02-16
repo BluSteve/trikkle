@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * This allows the overseer to tick only when needed and avoids the overhead of polling.
  *
- * @author Steve Cao
  * @see Graph
  * @see Node
  * @see Arc

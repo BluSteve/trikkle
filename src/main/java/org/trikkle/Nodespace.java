@@ -19,7 +19,6 @@ import static org.trikkle.EmptyNode.EMPTY_SET;
  * <p>
  * This class is thread-safe.
  *
- * @author Steve Cao
  * @see Node
  * @since 0.1.0
  */

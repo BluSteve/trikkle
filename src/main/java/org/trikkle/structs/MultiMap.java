@@ -6,7 +6,6 @@ import java.util.Set;
 /**
  * A {@link Map} that allows multiple values to be associated with a single key.
  *
- * @author Steve Cao
  * @since 0.1.0
  */
 public interface MultiMap<K, V> extends Map<K, Set<V>> {
