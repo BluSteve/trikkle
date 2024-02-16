@@ -97,6 +97,15 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	/**
+	 * Calls {@link HalfLink#toFullLinks(List)} and then calls {@link #Graph(Collection)} with the result.
+	 *
+	 * @param halfLinks the half links to convert and then use to create the graph
+	 */
+	public Graph(List<HalfLink> halfLinks) {
+		this(HalfLink.toFullLinks(halfLinks));
+	}
+
+	/**
 	 * Merges the graphs into one optimized graph, using the {@code endingNodes} as the ending nodes of the merged
 	 * graph.
 	 *
