@@ -1,17 +1,21 @@
 package org.trikkle.annotations;
 
+import org.trikkle.Arc;
+import org.trikkle.Link;
+import org.trikkle.StreamNode;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a field in an arc as an input datum. These are filled by {@link org.trikkle.Arc#getDatum(String)} before the
- * arc's run method starts. Input streams (see {@link org.trikkle.StreamNode}) are generally supported.
+ * Marks a field in an arc as an input datum. These are filled by {@link Arc#getDatum(String)} before the
+ * arc's run method starts. Input streams (see {@link StreamNode}) are generally supported.
  *
  * @author Steve Cao
- * @see org.trikkle.Arc
- * @see org.trikkle.Link
+ * @see Arc
+ * @see Link
  * @since 0.1.0
  */
 @Retention(RetentionPolicy.RUNTIME)

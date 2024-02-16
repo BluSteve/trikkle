@@ -18,10 +18,8 @@ import java.util.Set;
  * @see Graph
  * @since 0.1.0
  */
-public final class Link implements Congruent<Link> {
+public final class Link extends HalfLink implements Congruent<Link> {
 	private final Set<Node> dependencies;
-	private final Arc arc;
-	private final Set<Node> outputNodes;
 
 	/**
 	 * Create a link with the given dependencies, arc, and output nodes.
@@ -33,9 +31,8 @@ public final class Link implements Congruent<Link> {
 	 * @throws IllegalArgumentException if a StreamNode is the input of an AutoArc
 	 */
 	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
+		super(arc, outputNodes);
 		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
-		if (arc == null) throw new NullPointerException("Arc cannot be null!");
-		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
 
 		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
 		boolean autoArc = arc instanceof AutoArc;
@@ -44,8 +41,6 @@ public final class Link implements Congruent<Link> {
 		}
 
 		this.dependencies = dependencies;
-		this.arc = arc;
-		this.outputNodes = outputNodes;
 	}
 
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
@@ -65,9 +60,8 @@ public final class Link implements Congruent<Link> {
 	 * @see EmptyNode
 	 */
 	public Link(Arc arc) {
+		super(arc, new HashSet<>());
 		dependencies = new HashSet<>();
-		this.arc = arc;
-		outputNodes = new HashSet<>();
 
 		Set<String> inputNames = new HashSet<>(arc.inputFields.keySet());
 		Set<String> outputNames = new HashSet<>(arc.outputFields.keySet());

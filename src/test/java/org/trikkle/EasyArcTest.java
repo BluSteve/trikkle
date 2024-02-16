@@ -119,7 +119,7 @@ public class EasyArcTest {
 			@Override
 			public void run() {
 				y = x * 2;
-//				z = x * 3; // todo this returns 0 and progress is 1
+				z = x * 3;
 			}
 		};
 
@@ -148,7 +148,8 @@ public class EasyArcTest {
 		overseer.addStartingDatum("x", 2.5);
 		overseer.start();
 
-		System.out.println(overseer.getResultCache());
+		assertEquals(5.0, overseer.getDatum("y"));
+		assertEquals(7.5, overseer.getDatum("z"));
 	}
 
 	@Test
