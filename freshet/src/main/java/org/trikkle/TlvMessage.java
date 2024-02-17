@@ -1,5 +1,8 @@
 package org.trikkle;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -16,7 +19,7 @@ public class TlvMessage {
 
 	public static TlvMessage readFrom(InputStream in) throws IOException {
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(in));
-		char dataType = (char) dis.read();
+		char dataType = (char) dis.read(); // dis.readChar() doesn't work fsr
 		int length = dis.readInt();
 		byte[] data = new byte[length];
 		dis.readFully(data);
@@ -28,6 +31,26 @@ public class TlvMessage {
 		dos.write(dataType);
 		dos.writeInt(length);
 		dos.write(data);
+	}
+
+	public TlvMessage encrypted(Cipher cipher) {
+		byte[] encryptedData;
+		try {
+			encryptedData = cipher.doFinal(data);
+		} catch (IllegalBlockSizeException | BadPaddingException e) {
+			throw new RuntimeException(e);
+		}
+		return new TlvMessage(dataType, encryptedData);
+	}
+
+	public TlvMessage decrypted(Cipher cipher) {
+		byte[] decryptedData;
+		try {
+			decryptedData = cipher.doFinal(data);
+		} catch (IllegalBlockSizeException | BadPaddingException e) {
+			throw new RuntimeException(e);
+		}
+		return new TlvMessage(dataType, decryptedData);
 	}
 
 	@Override

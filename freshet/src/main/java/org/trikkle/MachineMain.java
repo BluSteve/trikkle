@@ -2,25 +2,30 @@ package org.trikkle;
 
 import org.trikkle.cluster.MachineInfo;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MachineMain {
-	public String ownIp;
 	public int ownPort;
 	public KeyPair keyPair;
-	public List<MachineInfo> machines;
+	public Cipher encryptCipher, decryptCipher;
+	public List<MachineInfo> machines = new ArrayList<>();
+	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
 	public MachineInfo myself;
 
-	public MachineMain(String ownIp, int ownPort) {
-		this.ownIp = ownIp;
+	public MachineMain(int ownPort) {
 		this.ownPort = ownPort;
 
 		KeyPairGenerator generator;
@@ -32,12 +37,38 @@ public class MachineMain {
 		generator.initialize(2048);
 
 		keyPair = generator.generateKeyPair();
+
+		// encrypt and decrypt ciphers
+		try {
+			encryptCipher = Cipher.getInstance("RSA");
+			encryptCipher.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
+			decryptCipher = Cipher.getInstance("RSA");
+			decryptCipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public Cipher getCipher(MachineInfo machine) {
+		if (machineCiphers.containsKey(machine)) {
+			return machineCiphers.get(machine);
+		} else {
+			try {
+				Cipher cipher = Cipher.getInstance("RSA");
+				cipher.init(Cipher.ENCRYPT_MODE, machine.publicKey);
+				machineCiphers.put(machine, cipher);
+				return cipher;
+			} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	public void sendToMachine(MachineInfo machine, TlvMessage message) {
 		try (Socket socket = new Socket()) {
 			socket.connect(new InetSocketAddress(machine.ip, machine.port));
-			message.writeTo(socket.getOutputStream());
+
+			message.encrypted(getCipher(machine)).writeTo(socket.getOutputStream());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -47,7 +78,7 @@ public class MachineMain {
 		InitialData initialData = new InitialData();
 		initialData.password = password;
 		initialData.publicKey = keyPair.getPublic();
-		initialData.ip = ownIp;
+		initialData.ip = "";
 		initialData.port = ownPort;
 
 		try (Socket socket = new Socket()) {
@@ -79,7 +110,8 @@ public class MachineMain {
 			while (true) {
 				Socket socket = serverSocket.accept();
 				// new machine connected
-				TlvMessage message = TlvMessage.readFrom(socket.getInputStream());
+				TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
+
 				System.out.println("message = " + message);
 			}
 		} catch (IOException e) {

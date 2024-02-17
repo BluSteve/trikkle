@@ -29,6 +29,11 @@ public class ClusterManager {
 		this.password = password;
 	}
 
+	public static void main(String[] args) {
+		ClusterManager clusterManager = new ClusterManager(995, "password");
+		clusterManager.start();
+	}
+
 	public void start() {
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 			while (true) {
@@ -40,7 +45,8 @@ public class ClusterManager {
 					InitialData initialData = (InitialData) Serializer.deserialize(message.data);
 
 					if (initialData.password.equals(password)) {
-						MachineInfo machine = new MachineInfo(initialData.publicKey, initialData.ip, initialData.port);
+						String ip = initialData.ip.isEmpty() ? socket.getInetAddress().getHostAddress() : initialData.ip;
+						MachineInfo machine = new MachineInfo(initialData.publicKey, ip, initialData.port);
 						System.out.println("machine = " + machine);
 						machines.add(machine);
 

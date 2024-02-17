@@ -3,6 +3,8 @@ package org.trikkle;
 import org.junit.jupiter.api.Test;
 import org.trikkle.cluster.ClusterManager;
 
+import java.util.concurrent.TimeUnit;
+
 class MachineMainTest {
 	@Test
 	void testMain() {
@@ -11,13 +13,24 @@ class MachineMainTest {
 			clusterManager.start();
 		});
 		thread.start();
-		MachineMain machineMain = new MachineMain("localhost", 999);
+		System.out.println("here");
+		MachineMain machineMain = new MachineMain(999);
 		machineMain.register("localhost", 995, "password");
-		MachineMain machineMain2 = new MachineMain("localhost", 992);
+		MachineMain machineMain2 = new MachineMain(992);
 		machineMain2.register("localhost", 995, "password");
 
 		new Thread(machineMain::startListening).start();
 
-		MachineMain.sendToMachine(
+		extracted();
+		machineMain2.sendToMachine(machineMain2.machines.getFirst(), new TlvMessage('t', "test".getBytes()));
+		extracted();
+	}
+
+	private void extracted() {
+		try {
+			TimeUnit.MILLISECONDS.sleep(100);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
