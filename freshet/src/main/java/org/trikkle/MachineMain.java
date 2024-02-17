@@ -1,25 +1,25 @@
 package org.trikkle;
 
-import java.io.DataOutputStream;
+import org.trikkle.cluster.MachineInfo;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 
 public class MachineMain {
-	public String managerIp;
-	public int managerPort;
-
-	public String password;
 	public String ownIp;
 	public int ownPort;
-
 	public KeyPair keyPair;
+	public List<MachineInfo> machines;
+	public MachineInfo myself;
 
-	public MachineMain(String managerIp, int managerPort, String password, String ownIp, int ownPort) {
-		this.managerIp = managerIp;
-		this.managerPort = managerPort;
-		this.password = password;
+	public MachineMain(String ownIp, int ownPort) {
 		this.ownIp = ownIp;
 		this.ownPort = ownPort;
 
@@ -34,12 +34,16 @@ public class MachineMain {
 		keyPair = generator.generateKeyPair();
 	}
 
-	public static void main(String[] args) {
-		MachineMain machineMain = new MachineMain("localhost", 995, "password", "localhost", 999);
-		machineMain.start();
+	public void sendToMachine(MachineInfo machine, TlvMessage message) {
+		try (Socket socket = new Socket()) {
+			socket.connect(new InetSocketAddress(machine.ip, machine.port));
+			message.writeTo(socket.getOutputStream());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public void start() {
+	public void register(String managerIp, int managerPort, String password) {
 		InitialData initialData = new InitialData();
 		initialData.password = password;
 		initialData.publicKey = keyPair.getPublic();
@@ -50,10 +54,34 @@ public class MachineMain {
 			socket.connect(new InetSocketAddress(managerIp, managerPort));
 			char type = 'a';
 			byte[] data = Serializer.serialize(initialData);
-			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-			out.writeChar(type);
-			out.writeInt(data.length);
-			out.write(data);
+			TlvMessage message = new TlvMessage(type, data);
+			message.writeTo(socket.getOutputStream());
+
+			// add other machines to machines list
+			TlvMessage response = TlvMessage.readFrom(socket.getInputStream());
+			MachineInfo[] machineArray = (MachineInfo[]) Serializer.deserialize(response.data);
+			for (MachineInfo machineInfo : machineArray) {
+				if (machineInfo.publicKey.equals(keyPair.getPublic())) {
+					myself = machineInfo;
+				} else {
+					machines.add(machineInfo);
+				}
+			}
+
+			System.out.println("machines = " + machines);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void startListening() {
+		try (ServerSocket serverSocket = new ServerSocket(ownPort)) {
+			while (true) {
+				Socket socket = serverSocket.accept();
+				// new machine connected
+				TlvMessage message = TlvMessage.readFrom(socket.getInputStream());
+				System.out.println("message = " + message);
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

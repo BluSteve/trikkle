@@ -3,7 +3,7 @@ package org.trikkle;
 import java.io.*;
 
 public class Serializer {
-	public static byte[] serialize(Object object) {
+	public static byte[] serialize(Serializable object) {
 		try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				 ObjectOutputStream out = new ObjectOutputStream(bos)) {
 			out.writeObject(object);

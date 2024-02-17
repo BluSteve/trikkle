@@ -1,16 +1,17 @@
 package org.trikkle.cluster;
 
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.Objects;
 
 // a machine has an ip address and some port that other machines can connect to it via.
 // also has a rsa public key
-public class Machine {
+public class MachineInfo implements Serializable {
 	public PublicKey publicKey;
 	public String ip;
 	public int port;
 
-	public Machine(PublicKey publicKey, String ip, int port) {
+	public MachineInfo(PublicKey publicKey, String ip, int port) {
 		this.publicKey = publicKey;
 		this.ip = ip;
 		this.port = port;
@@ -20,7 +21,7 @@ public class Machine {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		Machine machine = (Machine) o;
+		MachineInfo machine = (MachineInfo) o;
 		return Objects.equals(publicKey, machine.publicKey);
 	}
 
