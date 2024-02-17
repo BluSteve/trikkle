@@ -17,8 +17,9 @@ import java.util.Set;
  * @see Graph
  * @since 0.1.0
  */
-public final class Link extends HalfLink implements Congruent<Link> {
-	private Set<Node> dependencies;
+public final class Link implements Congruent<Link> {
+	private Set<Node> dependencies, outputNodes;
+	private Arc arc;
 
 	/**
 	 * Create a link with the given dependencies, arc, and output nodes.
@@ -30,8 +31,9 @@ public final class Link extends HalfLink implements Congruent<Link> {
 	 * @throws IllegalArgumentException if a StreamNode is the input of an AutoArc
 	 */
 	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
-		super(arc, outputNodes);
 		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
+		if (arc == null) throw new NullPointerException("Arc cannot be null!");
+		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
 
 		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
 		boolean autoArc = arc instanceof AutoArc;
@@ -40,6 +42,8 @@ public final class Link extends HalfLink implements Congruent<Link> {
 		}
 
 		this.dependencies = dependencies;
+		this.arc = arc;
+		this.outputNodes = outputNodes;
 	}
 
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
@@ -63,11 +67,12 @@ public final class Link extends HalfLink implements Congruent<Link> {
 	 * @see EmptyNode
 	 */
 	public Link(Arc arc) {
-		super(arc, new HashSet<>());
 		dependencies = new HashSet<>();
+		this.arc = arc;
+		outputNodes = new HashSet<>();
 
-		Set<String> inputNames = new HashSet<>(arc.inputFields.keySet());
-		Set<String> outputNames = new HashSet<>(arc.outputFields.keySet());
+		Set<String> inputNames = new HashSet<>(arc.getInputFields().keySet());
+		Set<String> outputNames = new HashSet<>(arc.getOutputFields().keySet());
 
 		dependencies.add(inputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(inputNames));
 		outputNodes.add(outputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(outputNames));
@@ -94,7 +99,38 @@ public final class Link extends HalfLink implements Congruent<Link> {
 	}
 
 	public void setDependencies(Set<Node> dependencies) {
+		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
 		this.dependencies = dependencies;
+	}
+
+	public Arc getArc() {
+		return arc;
+	}
+
+	public void setArc(Arc arc) {
+		if (arc == null) throw new NullPointerException("Arc cannot be null!");
+		this.arc = arc;
+	}
+
+	/**
+	 * Convenience method to get the single output node of the link. If there are multiple output nodes, an exception is
+	 * thrown.
+	 *
+	 * @return the output node of the link
+	 * @throws IllegalStateException if there are multiple output nodes
+	 */
+	public Node getOutputNode() {
+		if (outputNodes.size() > 1) throw new IllegalStateException("Link has multiple output nodes!");
+		return outputNodes.iterator().next();
+	}
+
+	public Set<Node> getOutputNodes() {
+		return outputNodes;
+	}
+
+	public void setOutputNodes(Set<Node> outputNodes) {
+		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
+		this.outputNodes = outputNodes;
 	}
 
 	@Override

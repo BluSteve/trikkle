@@ -180,7 +180,7 @@ class OverseerTest {
 			@Override
 			public void run() {
 				Queue<Double> queue = (Queue<Double>) getDatum("stream1");
-				Node stream1Node = overseer.getNodeOfDatum("stream1");
+				Node stream1Node = getOverseer().getNodeOfDatum("stream1");
 
 				double sum = 0;
 				synchronized (queue) {

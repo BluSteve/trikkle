@@ -1,6 +1,7 @@
 package org.trikkle;
 
 import org.junit.jupiter.api.Test;
+import org.trikkle.annotations.HalfLink;
 import org.trikkle.annotations.Input;
 import org.trikkle.annotations.Output;
 
@@ -126,10 +127,11 @@ public class EasyArcTest {
 		Node y = new DiscreteNode("y");
 		Node z = new DiscreteNode("z");
 		Node empty = new EmptyNode();
-		HalfLink halfLink = new Link(Set.of(x, empty), arc, Set.of(y, z));
-		HalfLink actualHalfLink = new HalfLink(arc, Set.of(y, z));
+		Link link = new Link(Set.of(x, empty), arc, Set.of(y, z));
 
-		Link first = HalfLink.toFullLinks(List.of(actualHalfLink)).getFirst();
+		// test halfLink to fullLink
+		HalfLink halfLink = new HalfLink(arc, Set.of(y, z));
+		Link first = HalfLink.toFullLinks(List.of(halfLink)).getFirst();
 		System.out.println(first);
 		assertEquals(1, first.getDependencies().size());
 
@@ -145,13 +147,11 @@ public class EasyArcTest {
 
 		HalfLink halfLink2 = new HalfLink(arc2, Set.of());
 
-		List<Link> links = HalfLink.toFullLinks(List.of(halfLink, halfLink2));
-
-		assertSame(halfLink, links.getFirst());
+		List<Link> links = HalfLink.toFullLinks(List.of(new HalfLink(link), halfLink2));
 
 		System.out.println(links);
 
-		Graph graph = Graph.ofHalfLinks(List.of(halfLink, halfLink2));
+		Graph graph = new Graph(links);
 		Overseer overseer = new Overseer(graph);
 		overseer.addStartingDatum("x", 2.5);
 		empty.setUsable();
@@ -186,7 +186,7 @@ public class EasyArcTest {
 
 			@Override
 			public void run() {
-				Node stream1Node = overseer.getNodeOfDatum("stream1");
+				Node stream1Node = getOverseer().getNodeOfDatum("stream1");
 
 				double sum = 0;
 				synchronized (queue) {

@@ -15,18 +15,19 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 0.1.0
  */
 public abstract class Arc implements Primable {
-	final Map<String, Field> inputFields, outputFields;
+	private final Map<String, Field> inputFields, outputFields;
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
-	protected Overseer overseer;
-	private Link link;
-	private ArcStatus status = ArcStatus.IDLE;
 	private String name;
+	private ArcStatus status = ArcStatus.IDLE;
+
+	private Overseer overseer;
+	private Link link;
 
 	/**
 	 * A safe arc is one that cannot be set to a status that is less than its current status. This means it can only be
 	 * run once. This is useful for preventing deadlocks and livelocks, as even though arcs cannot directly
-	 * {@link Overseer#ticktock(Node)} an overseer, it can easily do so indirectly by leveraging nodes and safe arcs.
+	 * ticktock an overseer, it can easily do so indirectly by leveraging nodes and safe arcs.
 	 *
 	 * @param safe true if this arc is safe
 	 */
@@ -34,22 +35,27 @@ public abstract class Arc implements Primable {
 		this.safe = safe;
 
 		Field[] fields = getClass().getDeclaredFields();
-		inputFields = new HashMap<>();
-		outputFields = new HashMap<>();
-		for (Field field : fields) {
-			if (field.isAnnotationPresent(Input.class)) {
-				String name = field.getAnnotation(Input.class).name();
-				if (!name.isEmpty()) {
-					inputFields.put(name, field);
-				} else {
-					inputFields.put(field.getName(), field);
-				}
-			} else if (field.isAnnotationPresent(Output.class)) {
-				String name = field.getAnnotation(Output.class).name();
-				if (!name.isEmpty()) {
-					outputFields.put(name, field);
-				} else {
-					outputFields.put(field.getName(), field);
+		if (fields.length == 0) {
+			inputFields = null;
+			outputFields = null;
+		} else {
+			inputFields = new HashMap<>();
+			outputFields = new HashMap<>();
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(Input.class)) {
+					String name = field.getAnnotation(Input.class).name();
+					if (!name.isEmpty()) {
+						inputFields.put(name, field);
+					} else {
+						inputFields.put(field.getName(), field);
+					}
+				} else if (field.isAnnotationPresent(Output.class)) {
+					String name = field.getAnnotation(Output.class).name();
+					if (!name.isEmpty()) {
+						outputFields.put(name, field);
+					} else {
+						outputFields.put(field.getName(), field);
+					}
 				}
 			}
 		}
@@ -58,7 +64,7 @@ public abstract class Arc implements Primable {
 	/**
 	 * A safe arc is one that cannot be set to a status that is less than its current status. This means it can only be
 	 * run once. This is useful for preventing deadlocks and livelocks, as even though arcs cannot directly
-	 * {@link Overseer#ticktock(Node)} an overseer, it can easily do so indirectly by leveraging nodes and safe arcs.
+	 * ticktock an overseer, it can easily do so indirectly by leveraging nodes and safe arcs.
 	 *
 	 * @param name the name of this arc
 	 * @param safe true if this arc is safe
@@ -78,9 +84,9 @@ public abstract class Arc implements Primable {
 	protected abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {
-		autoFill();
+		if (inputFields != null) autoFill();
 		run();
-		autoReturn();
+		if (outputFields != null) autoReturn();
 	}
 
 	/**
@@ -209,6 +215,14 @@ public abstract class Arc implements Primable {
 		link = overseer.g.arcMap.get(this);
 	}
 
+	public Map<String, Field> getInputFields() {
+		return inputFields;
+	}
+
+	public Map<String, Field> getOutputFields() {
+		return outputFields;
+	}
+
 	/**
 	 * Gets the link this arc is a part of. Only available after the arc is primed.
 	 *
@@ -243,6 +257,10 @@ public abstract class Arc implements Primable {
 	 */
 	protected Node getOutputNode() {
 		return link.getOutputNode();
+	}
+
+	protected Overseer getOverseer() {
+		return overseer;
 	}
 
 	/**
