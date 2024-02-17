@@ -12,10 +12,10 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MachineMain {
 	public int ownPort;
@@ -24,6 +24,7 @@ public class MachineMain {
 	public List<MachineInfo> machines = new ArrayList<>();
 	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
 	public MachineInfo myself;
+	public BlockingQueue<Boolean> listening = new ArrayBlockingQueue<>(1);
 
 	public MachineMain(int ownPort) {
 		this.ownPort = ownPort;
@@ -106,16 +107,52 @@ public class MachineMain {
 	}
 
 	public void startListening() {
-		try (ServerSocket serverSocket = new ServerSocket(ownPort)) {
-			while (true) {
-				Socket socket = serverSocket.accept();
-				// new machine connected
-				TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
+		new Thread(() -> {
+			try (ServerSocket serverSocket = new ServerSocket(ownPort)) {
+				listening.add(true);
 
-				System.out.println("message = " + message);
+				// check for acknowledgement from all machines
+				Set<MachineInfo> ackSet = new HashSet<>();
+				while (ackSet.size() < machines.size()) {
+					Socket socket = serverSocket.accept();
+					TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
+					if (message.dataType != 'N') {
+						throw new RuntimeException("Expected 'N' but got " + message.dataType);
+					}
+					MachineInfo machine = (MachineInfo) Serializer.deserialize(message.data);
+					// if machine is not in machines then something is very wrong.
+					ackSet.add(machine);
+				}
+
+				System.out.println(ownPort + " All machines acknowledged. Starting to listen for messages.");
+
+				while (!Thread.currentThread().isInterrupted()) {
+					Socket socket = serverSocket.accept();
+					TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
+
+					switch (message.dataType) {
+						case 'n': // new machine added
+							MachineInfo machine = (MachineInfo) Serializer.deserialize(message.data);
+							machines.add(machine);
+							System.out.println(ownPort + " updated machines = " + machines);
+							sendToMachine(machine, new TlvMessage('N', Serializer.serialize(myself)));
+							break;
+						default:
+							throw new RuntimeException("Unknown message type: " + message.dataType);
+					}
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
-		} catch (IOException e) {
+		}).start();
+
+		try {
+			listening.take();
+		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
+		}
+		for (MachineInfo machine : machines) {
+			sendToMachine(machine, new TlvMessage('n', Serializer.serialize(myself)));
 		}
 	}
 }

@@ -19,7 +19,8 @@ class MachineMainTest {
 		MachineMain machineMain2 = new MachineMain(992);
 		machineMain2.register("localhost", 995, "password");
 
-		new Thread(machineMain::startListening).start();
+		machineMain.startListening();
+		machineMain2.startListening();
 
 		extracted();
 		machineMain2.sendToMachine(machineMain2.machines.getFirst(), new TlvMessage('t', "test".getBytes()));

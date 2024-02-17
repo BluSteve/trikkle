@@ -1,12 +1,24 @@
 package org.trikkle;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class TlvMessage {
+	private static final KeyGenerator keyGen;
+
+	static {
+		try {
+			keyGen = KeyGenerator.getInstance("AES");
+			keyGen.init(128);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public char dataType;
 	public int length;
 	public byte[] data;
@@ -34,20 +46,41 @@ public class TlvMessage {
 	}
 
 	public TlvMessage encrypted(Cipher cipher) {
+		SecretKey key = keyGen.generateKey();
 		byte[] encryptedData;
+		byte[] encryptedKey;
 		try {
-			encryptedData = cipher.doFinal(data);
-		} catch (IllegalBlockSizeException | BadPaddingException e) {
+			Cipher aesCipher = Cipher.getInstance("AES");
+			aesCipher.init(Cipher.ENCRYPT_MODE, key);
+			encryptedData = aesCipher.doFinal(data);
+			encryptedKey = cipher.doFinal(key.getEncoded());
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalBlockSizeException | BadPaddingException e) { // todo handle these better. bad key leads to it
 			throw new RuntimeException(e);
 		}
-		return new TlvMessage(dataType, encryptedData);
+
+		byte[] combined = new byte[encryptedKey.length + encryptedData.length];
+		System.arraycopy(encryptedKey, 0, combined, 0, encryptedKey.length);
+		System.arraycopy(encryptedData, 0, combined, encryptedKey.length, encryptedData.length);
+		return new TlvMessage(dataType, combined);
 	}
 
 	public TlvMessage decrypted(Cipher cipher) {
+		byte[] encryptedKey = new byte[256];
+		byte[] encryptedData = new byte[data.length - 256];
+		System.arraycopy(data, 0, encryptedKey, 0, 256);
+		System.arraycopy(data, 256, encryptedData, 0, data.length - 256);
+
 		byte[] decryptedData;
 		try {
-			decryptedData = cipher.doFinal(data);
-		} catch (IllegalBlockSizeException | BadPaddingException e) {
+			SecretKey key = new SecretKeySpec(cipher.doFinal(encryptedKey), "AES");
+			Cipher aesCipher = Cipher.getInstance("AES");
+			aesCipher.init(Cipher.DECRYPT_MODE, key);
+			decryptedData = aesCipher.doFinal(encryptedData);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalBlockSizeException | BadPaddingException e) { // todo handle these better. bad key leads to it
 			throw new RuntimeException(e);
 		}
 		return new TlvMessage(dataType, decryptedData);

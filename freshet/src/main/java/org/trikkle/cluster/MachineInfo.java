@@ -32,10 +32,6 @@ public class MachineInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Machine{" +
-				"publicKey=" + publicKey +
-				", ip='" + ip + '\'' +
-				", port=" + port +
-				'}';
+		return "Machine{" + Integer.toHexString(publicKey.hashCode()) + "}(" + ip + ":" + port + ")";
 	}
 }

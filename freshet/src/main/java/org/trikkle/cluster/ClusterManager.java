@@ -36,7 +36,7 @@ public class ClusterManager {
 
 	public void start() {
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
-			while (true) {
+			while (!Thread.currentThread().isInterrupted()) {
 				Socket socket = serverSocket.accept();
 				// new machine connected
 				TlvMessage message = TlvMessage.readFrom(socket.getInputStream());
