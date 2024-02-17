@@ -14,9 +14,9 @@ class MachineMainTest {
 		});
 		thread.start();
 		System.out.println("here");
-		MachineMain machineMain = new MachineMain(999);
+		MachineMain machineMain = new MachineMain("0.0.0.0", 999);
 		machineMain.register("localhost", 995, "password");
-		MachineMain machineMain2 = new MachineMain(992);
+		MachineMain machineMain2 = new MachineMain("0.0.0.0", 992);
 		machineMain2.register("localhost", 995, "password");
 
 		machineMain.startListening();

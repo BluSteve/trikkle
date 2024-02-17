@@ -17,6 +17,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class MachineMain {
+	public String ownIp;
 	public int ownPort;
 	public KeyPair keyPair;
 	public Cipher encryptCipher, decryptCipher;
@@ -25,7 +26,8 @@ public class MachineMain {
 	public MachineInfo myself;
 	public BlockingQueue<Boolean> listening = new ArrayBlockingQueue<>(1);
 
-	public MachineMain(int ownPort) {
+	public MachineMain(String ownIp, int ownPort) {
+		this.ownIp = ownIp; // this is the ip of the machine to be used for communication with other machines
 		this.ownPort = ownPort;
 
 		KeyPairGenerator generator;
@@ -78,7 +80,7 @@ public class MachineMain {
 		InitialData initialData = new InitialData();
 		initialData.password = password;
 		initialData.publicKey = keyPair.getPublic();
-		initialData.ip = "";
+		initialData.ip = ownIp;
 		initialData.port = ownPort;
 
 		try (Socket socket = new Socket()) {
