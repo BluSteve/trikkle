@@ -12,6 +12,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * A wrapper for a function that can be run by an overseer.
  *
+ * @see Input
+ * @see Output
  * @since 0.1.0
  */
 public abstract class Arc implements Primable {
@@ -215,10 +217,22 @@ public abstract class Arc implements Primable {
 		link = overseer.g.arcMap.get(this);
 	}
 
+	/**
+	 * Gets the input fields of this arc as declared through {@link Input}. The keys are the names of the fields and the
+	 * values are the fields themselves.
+	 *
+	 * @return the input fields of this arc
+	 */
 	public Map<String, Field> getInputFields() {
 		return inputFields;
 	}
 
+	/**
+	 * Gets the output fields of this arc as declared through {@link Output}. The keys are the names of the fields and
+	 * the values are the fields themselves.
+	 *
+	 * @return the output fields of this arc
+	 */
 	public Map<String, Field> getOutputFields() {
 		return outputFields;
 	}

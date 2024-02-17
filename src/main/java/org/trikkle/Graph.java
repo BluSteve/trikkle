@@ -13,6 +13,9 @@ import java.util.*;
  * @since 0.1.0
  */
 public final class Graph implements Congruent<Graph> {
+	/**
+	 * If true, the graph will allow cycles. If false, the graph will throw an exception if it has a cycle.
+	 */
 	@SuppressWarnings("CanBeFinal")
 	public static boolean ALLOW_CYCLES = false;
 	public final Set<Link> links;
