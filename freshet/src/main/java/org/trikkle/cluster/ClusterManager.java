@@ -4,7 +4,7 @@ import org.trikkle.InitialData;
 import org.trikkle.Serializer;
 import org.trikkle.TlvMessage;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Queue;
