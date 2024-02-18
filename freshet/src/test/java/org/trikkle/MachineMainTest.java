@@ -14,17 +14,17 @@ class MachineMainTest {
 		});
 		thread.start();
 		System.out.println("here");
+
 		MachineMain machineMain = new MachineMain("0.0.0.0", 999);
 		machineMain.register("localhost", 995, "password");
+		machineMain.startListening();
+
 		MachineMain machineMain2 = new MachineMain("0.0.0.0", 992);
 		machineMain2.register("localhost", 995, "password");
-
-		machineMain.startListening();
 		machineMain2.startListening();
 
-		extracted();
-		machineMain2.sendToMachine(machineMain2.machines.getFirst(), new TlvMessage('t', "test".getBytes()));
-		extracted();
+		System.out.println("machineMain = " + machineMain.machines);
+		System.out.println("machineMain2 = " + machineMain2.machines);
 	}
 
 	private void extracted() {

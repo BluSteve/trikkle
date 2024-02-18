@@ -16,7 +16,10 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -102,7 +105,7 @@ public class MachineMain {
 			message.writeTo(socket.getOutputStream());
 
 			// add other machines to machines list
-			TlvMessage response = TlvMessage.readFrom(socket.getInputStream());
+			TlvMessage response = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
 			MachineInfo[] machineArray = (MachineInfo[]) Serializer.deserialize(response.data);
 			for (MachineInfo machineInfo : machineArray) {
 				if (machineInfo.publicKey.equals(keyPair.getPublic())) {
@@ -123,21 +126,6 @@ public class MachineMain {
 			try (ServerSocket serverSocket = new ServerSocket(ownPort)) {
 				listening.add(true);
 
-				// check for acknowledgement from all machines
-				Set<MachineInfo> ackSet = new HashSet<>();
-				while (ackSet.size() < machines.size()) {
-					Socket socket = serverSocket.accept();
-					TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
-					if (message.dataType != 'N') {
-						throw new RuntimeException("Expected 'N' but got " + message.dataType);
-					}
-					MachineInfo machine = (MachineInfo) Serializer.deserialize(message.data);
-					// if machine is not in machines then something is very wrong.
-					ackSet.add(machine);
-				}
-
-				System.out.println(ownPort + " All machines acknowledged. Starting to listen for messages.");
-
 				while (!Thread.currentThread().isInterrupted()) {
 					Socket socket = serverSocket.accept();
 					TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
@@ -147,7 +135,6 @@ public class MachineMain {
 							MachineInfo machine = (MachineInfo) Serializer.deserialize(message.data);
 							machines.add(machine);
 							System.out.println(ownPort + " updated machines = " + machines);
-							sendToMachine(machine, new TlvMessage('N', Serializer.serialize(myself)));
 							break;
 						case 'j': // received jar
 							System.out.println("Received jar.");
@@ -198,9 +185,6 @@ public class MachineMain {
 			listening.take();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
-		}
-		for (MachineInfo machine : machines) {
-			sendToMachine(machine, new TlvMessage('n', Serializer.serialize(myself)));
 		}
 	}
 }
