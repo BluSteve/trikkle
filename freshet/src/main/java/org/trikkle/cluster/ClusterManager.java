@@ -2,7 +2,6 @@ package org.trikkle.cluster;
 
 import org.trikkle.Serializer;
 import org.trikkle.TlvMessage;
-import org.trikkle.Utils;
 import org.trikkle.serial.InitialData;
 import org.trikkle.serial.MachineInfo;
 

@@ -1,4 +1,4 @@
-package org.trikkle;
+package org.trikkle.cluster;
 
 public class Utils {
 	public static void sleep(long millis) {
