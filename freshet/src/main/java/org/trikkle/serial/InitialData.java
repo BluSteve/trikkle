@@ -1,4 +1,4 @@
-package org.trikkle;
+package org.trikkle.serial;
 
 import java.io.Serializable;
 import java.security.PublicKey;

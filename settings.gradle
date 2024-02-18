@@ -1,2 +1,4 @@
 rootProject.name = 'trikkle'
 include 'freshet'
+include 'client'
+

@@ -1,8 +1,9 @@
 package org.trikkle.cluster;
 
-import org.trikkle.InitialData;
 import org.trikkle.Serializer;
 import org.trikkle.TlvMessage;
+import org.trikkle.serial.InitialData;
+import org.trikkle.serial.MachineInfo;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -36,6 +37,7 @@ public class ClusterManager {
 
 	public void start() {
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
+			System.out.println("ClusterManager started on port " + port + " with password \"" + password + "\"");
 			while (!Thread.currentThread().isInterrupted()) {
 				Socket socket = serverSocket.accept();
 				// new machine connected

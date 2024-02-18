@@ -1,13 +1,17 @@
 package org.trikkle;
 
-import org.trikkle.cluster.MachineInfo;
+import org.trikkle.serial.InitialData;
+import org.trikkle.serial.JarInfo;
+import org.trikkle.serial.MachineInfo;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.*;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -25,6 +29,13 @@ public class MachineMain {
 	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
 	public MachineInfo myself;
 	public BlockingQueue<Boolean> listening = new ArrayBlockingQueue<>(1);
+	public Map<Character, Method> handlers = new HashMap<>();
+
+	public static void main(String[] args) {
+		MachineMain machineMain = new MachineMain("localhost", 999);
+		machineMain.register("localhost", 995, "password");
+		machineMain.startListening();
+	}
 
 	public MachineMain(String ownIp, int ownPort) {
 		this.ownIp = ownIp; // this is the ip of the machine to be used for communication with other machines
@@ -138,8 +149,44 @@ public class MachineMain {
 							System.out.println(ownPort + " updated machines = " + machines);
 							sendToMachine(machine, new TlvMessage('N', Serializer.serialize(myself)));
 							break;
+						case 'j': // received jar
+							System.out.println("Received jar.");
+							JarInfo jarInfo = (JarInfo) Serializer.deserialize(message.data);
+
+							String jarName = ".cache.jar";
+							FileOutputStream fos = new FileOutputStream(jarName);
+							fos.write(jarInfo.jar);
+							fos.close();
+
+							URL url = Paths.get(jarName).toUri().toURL();
+							URLClassLoader child = new URLClassLoader(new URL[]{url}, MachineMain.class.getClassLoader());
+							Class<?> classToLoad;
+							try {
+								classToLoad = Class.forName(jarInfo.className, false, child);
+							} catch (ClassNotFoundException e) {
+								throw new RuntimeException(e);
+							}
+
+							Method[] methods = classToLoad.getMethods();
+							for (Method method : methods) {
+								if (!method.isAnnotationPresent(Handler.class)) continue;
+
+								Handler handler = method.getAnnotation(Handler.class);
+								handlers.put(handler.dataType(), method);
+							}
+
+							break;
 						default:
-							throw new RuntimeException("Unknown message type: " + message.dataType);
+							if (handlers.containsKey(message.dataType)) {
+								Method method = handlers.get(message.dataType);
+								try {
+									method.invoke(null, (Object) message.data);
+								} catch (IllegalAccessException | InvocationTargetException e) {
+									throw new RuntimeException(e);
+								}
+							} else {
+								throw new IllegalArgumentException("Unknown message type: " + message.dataType);
+							}
 					}
 				}
 			} catch (IOException e) {
