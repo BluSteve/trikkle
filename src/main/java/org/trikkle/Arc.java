@@ -85,7 +85,7 @@ public abstract class Arc implements Primable {
 	 */
 	protected abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
-	void runWrapper() {
+	public void runWrapper() {
 		if (inputFields != null) autoFill();
 		run();
 		if (outputFields != null) autoReturn();
