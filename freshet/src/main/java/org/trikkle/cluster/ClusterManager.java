@@ -72,7 +72,7 @@ public class ClusterManager {
 						try {
 							announceRemove(machine);
 						} catch (IOException ioException) {
-							throw new RuntimeException(ioException);
+							ioException.printStackTrace();
 						}
 					}
 				}
@@ -109,7 +109,7 @@ public class ClusterManager {
 				}
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 	}
 

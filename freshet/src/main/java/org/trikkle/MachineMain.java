@@ -83,7 +83,7 @@ public class MachineMain {
 
 			message.encrypted(getCipher(machine)).writeTo(socket.getOutputStream());
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			System.err.println("Could not send message to " + machine);
 		}
 	}
 
@@ -182,7 +182,7 @@ public class MachineMain {
 				}
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 	}
 }
