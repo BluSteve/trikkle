@@ -40,19 +40,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see Primable
  * @since 0.1.0
  */
-public final class Overseer {
+public class Overseer {
 	final Graph g;
-	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
-	private final Collection<Link> links = new ConcurrentLinkedQueue<>();
-	private AtomicInteger tick;
-	private Queue<Collection<Link>> linkTrace;
-	private boolean started = false;
+	protected final Map<String, Object> cache = new StrictConcurrentHashMap<>();
+	protected final Collection<Link> links = new ConcurrentLinkedQueue<>();
+	protected AtomicInteger tick;
+	protected Queue<Collection<Link>> linkTrace;
+	protected boolean started = false;
 
-	private boolean unsafeOnRecursive = false;
-	private boolean logging = true;
-	private Observer observer = null;
-	private boolean parallel = true;
-	private int parallelThreshold = 2;
+	protected boolean unsafeOnRecursive = false;
+	protected boolean logging = true;
+	protected Observer observer = null;
+	protected boolean parallel = true;
+	protected int parallelThreshold = 2;
 
 	/**
 	 * Constructs an overseer with the given graph. The initial cache is empty. All {@link Primable}s will be locked and
@@ -139,7 +139,7 @@ public final class Overseer {
 		onEnd();
 	}
 
-	private void ticktock(Node caller) {
+	protected void ticktock(Node caller) {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
@@ -194,7 +194,7 @@ public final class Overseer {
 		}
 	}
 
-	void unsafeTicktock(Node caller) {
+	protected void unsafeTicktock(Node caller) {
 		if (caller == null) {
 			throw new NullPointerException("Caller cannot be null!");
 		}
@@ -262,7 +262,7 @@ public final class Overseer {
 		}
 	}
 
-	private boolean hasEnded() {
+	protected boolean hasEnded() {
 		for (Node endingNode : g.endingNodes) {
 			if (endingNode.getProgress() != 1) {
 				return false;
@@ -276,13 +276,13 @@ public final class Overseer {
 		return true;
 	}
 
-	private void onEnd() {
+	protected void onEnd() {
 		for (Primable primable : g.primables) {
 			primable.getLock().unlock();
 		}
 	}
 
-	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
+	protected Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
 		return cache;
 	}
 
