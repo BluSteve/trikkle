@@ -12,14 +12,28 @@ distributed methods:
 1. get datum
 2. update graph with local changes
 3. request consensus to execute arc
+
+datatypes needed:
+g: broadcast graph state
+d: request for a datum
+c: request permission to run arc
+C: reply. content contains yes or no. another possibility is no response. all must respond with yes to run arc.
  */
 public class DistributedOverseer extends Overseer {
+	MachineMain machine;
+
 	public DistributedOverseer(MachineMain machine, Graph graph) {
-		super(graph);
+		this(machine, graph, null);
 	}
 
 	public DistributedOverseer(MachineMain machine, Graph graph, Map<String, Object> initialCache) {
 		super(graph, initialCache);
+		this.machine = machine;
+
+		// add handlers for the datatypes
+
+
+
 	}
 
 	@Override

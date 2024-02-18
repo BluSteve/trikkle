@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.function.Consumer;
 
 public class MachineMain {
 	public String ownIp;
@@ -30,7 +31,7 @@ public class MachineMain {
 	public Set<MachineInfo> machines = ConcurrentHashMap.newKeySet();
 	public Map<MachineInfo, Cipher> machineCiphers = new ConcurrentHashMap<>();
 	public MachineInfo myself;
-	public Map<Character, Method> handlers = new HashMap<>();
+	public Map<Character, Consumer<byte[]>> handlers = new HashMap<>();
 	public ServerSocket serverSocket;
 	public Semaphore listening = new Semaphore(0);
 
@@ -176,18 +177,22 @@ public class MachineMain {
 							if (!method.isAnnotationPresent(Handler.class)) continue;
 
 							Handler handler = method.getAnnotation(Handler.class);
-							handlers.put(handler.dataType(), method);
+
+							// adapt method to consumer
+							Consumer<byte[]> consumer = (byte[] data) -> {
+								try {
+									method.invoke(null, (Object) data);
+								} catch (IllegalAccessException | InvocationTargetException e) {
+									throw new RuntimeException(e);
+								}
+							};
+							handlers.put(handler.dataType(), consumer);
 						}
 						break;
 
 					default:
 						if (handlers.containsKey(message.dataType)) {
-							Method method = handlers.get(message.dataType);
-							try {
-								method.invoke(null, (Object) message.data);
-							} catch (IllegalAccessException | InvocationTargetException e) {
-								throw new RuntimeException(e);
-							}
+							handlers.get(message.dataType).accept(message.data);
 						} else {
 							System.err.println("Unknown message type: " + message.dataType);
 						}
