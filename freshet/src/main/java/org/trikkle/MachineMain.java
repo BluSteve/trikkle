@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class MachineMain {
 	public String ownIp;
@@ -31,14 +29,7 @@ public class MachineMain {
 	public List<MachineInfo> machines = new ArrayList<>();
 	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
 	public MachineInfo myself;
-	public BlockingQueue<Boolean> listening = new ArrayBlockingQueue<>(1);
 	public Map<Character, Method> handlers = new HashMap<>();
-
-	public static void main(String[] args) {
-		MachineMain machineMain = new MachineMain("localhost", 999);
-		machineMain.register("localhost", 995, "password");
-		machineMain.startListening();
-	}
 
 	public MachineMain(String ownIp, int ownPort) {
 		this.ownIp = ownIp; // this is the ip of the machine to be used for communication with other machines
@@ -63,6 +54,12 @@ public class MachineMain {
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static void main(String[] args) {
+		MachineMain machineMain = new MachineMain("localhost", 999);
+		machineMain.register("localhost", 995, "password");
+		machineMain.startListening();
 	}
 
 	public Cipher getCipher(MachineInfo machine) {
@@ -122,68 +119,69 @@ public class MachineMain {
 	}
 
 	public void startListening() {
-		new Thread(() -> {
-			try (ServerSocket serverSocket = new ServerSocket(ownPort)) {
-				listening.add(true);
+		try (ServerSocket serverSocket = new ServerSocket(ownPort)) {
+			while (!Thread.currentThread().isInterrupted()) {
+				Socket socket = serverSocket.accept();
+				TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
 
-				while (!Thread.currentThread().isInterrupted()) {
-					Socket socket = serverSocket.accept();
-					TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
+				switch (message.dataType) {
+					// sent by manager
+					case 'n': // new machine added
+						MachineInfo machine = (MachineInfo) Serializer.deserialize(message.data);
+						machines.add(machine);
+						System.out.println(ownPort + " updated machines = " + machines);
+						break;
+					case 'r': // machine removed
+						MachineInfo removedMachine = (MachineInfo) Serializer.deserialize(message.data);
+						machines.remove(removedMachine);
+						System.out.println(ownPort + " updated machines = " + machines);
+						break;
+					case 'p':
+						System.out.println("Received ping.");
+						break;
 
-					switch (message.dataType) {
-						case 'n': // new machine added
-							MachineInfo machine = (MachineInfo) Serializer.deserialize(message.data);
-							machines.add(machine);
-							System.out.println(ownPort + " updated machines = " + machines);
-							break;
-						case 'j': // received jar
-							System.out.println("Received jar.");
-							JarInfo jarInfo = (JarInfo) Serializer.deserialize(message.data);
+					// sent by other machines
+					case 'j': // received jar
+						System.out.println("Received jar.");
+						JarInfo jarInfo = (JarInfo) Serializer.deserialize(message.data);
 
-							String jarName = ".cache.jar";
-							FileOutputStream fos = new FileOutputStream(jarName);
-							fos.write(jarInfo.jar);
-							fos.close();
+						String jarName = ".cache.jar";
+						FileOutputStream fos = new FileOutputStream(jarName);
+						fos.write(jarInfo.jar);
+						fos.close();
 
-							URL url = Paths.get(jarName).toUri().toURL();
-							URLClassLoader child = new URLClassLoader(new URL[]{url}, MachineMain.class.getClassLoader());
-							Class<?> classToLoad;
+						URL url = Paths.get(jarName).toUri().toURL();
+						URLClassLoader child = new URLClassLoader(new URL[]{url}, MachineMain.class.getClassLoader());
+						Class<?> classToLoad;
+						try {
+							classToLoad = Class.forName(jarInfo.className, false, child);
+						} catch (ClassNotFoundException e) {
+							throw new RuntimeException(e);
+						}
+
+						Method[] methods = classToLoad.getMethods();
+						for (Method method : methods) {
+							if (!method.isAnnotationPresent(Handler.class)) continue;
+
+							Handler handler = method.getAnnotation(Handler.class);
+							handlers.put(handler.dataType(), method);
+						}
+
+						break;
+					default:
+						if (handlers.containsKey(message.dataType)) {
+							Method method = handlers.get(message.dataType);
 							try {
-								classToLoad = Class.forName(jarInfo.className, false, child);
-							} catch (ClassNotFoundException e) {
+								method.invoke(null, (Object) message.data);
+							} catch (IllegalAccessException | InvocationTargetException e) {
 								throw new RuntimeException(e);
 							}
-
-							Method[] methods = classToLoad.getMethods();
-							for (Method method : methods) {
-								if (!method.isAnnotationPresent(Handler.class)) continue;
-
-								Handler handler = method.getAnnotation(Handler.class);
-								handlers.put(handler.dataType(), method);
-							}
-
-							break;
-						default:
-							if (handlers.containsKey(message.dataType)) {
-								Method method = handlers.get(message.dataType);
-								try {
-									method.invoke(null, (Object) message.data);
-								} catch (IllegalAccessException | InvocationTargetException e) {
-									throw new RuntimeException(e);
-								}
-							} else {
-								throw new IllegalArgumentException("Unknown message type: " + message.dataType);
-							}
-					}
+						} else {
+							System.err.println("Unknown message type: " + message.dataType);
+						}
 				}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
 			}
-		}).start();
-
-		try {
-			listening.take();
-		} catch (InterruptedException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

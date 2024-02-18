@@ -3,8 +3,6 @@ package org.trikkle;
 import org.junit.jupiter.api.Test;
 import org.trikkle.cluster.ClusterManager;
 
-import java.util.concurrent.TimeUnit;
-
 class MachineMainTest {
 	@Test
 	void testMain() {
@@ -27,11 +25,10 @@ class MachineMainTest {
 		System.out.println("machineMain2 = " + machineMain2.machines);
 	}
 
-	private void extracted() {
-		try {
-			TimeUnit.MILLISECONDS.sleep(100);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
+	@Test
+	void secondMachine() {
+		MachineMain machineMain2 = new MachineMain("0.0.0.0", 992);
+		machineMain2.register("localhost", 995, "password");
+		machineMain2.startListening();
 	}
 }

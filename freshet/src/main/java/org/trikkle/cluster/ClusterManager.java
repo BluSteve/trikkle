@@ -2,6 +2,7 @@ package org.trikkle.cluster;
 
 import org.trikkle.Serializer;
 import org.trikkle.TlvMessage;
+import org.trikkle.Utils;
 import org.trikkle.serial.InitialData;
 import org.trikkle.serial.MachineInfo;
 
@@ -55,6 +56,30 @@ public class ClusterManager {
 	}
 
 	public void start() {
+		new Thread(() -> {
+			// poll machines
+			while (!Thread.currentThread().isInterrupted()) {
+				for (MachineInfo machine : machines) {
+					// if machine is not reachable, remove it from the list
+					try (Socket socket = new Socket(machine.ip, machine.port)) {
+						TlvMessage message = new TlvMessage('p', new byte[0]).encrypted(machineCiphers.get(machine));
+						message.writeTo(socket.getOutputStream());
+					} catch (IOException e) {
+						System.out.println("Machine " + machine + " is not reachable. Removing from list.");
+						machines.remove(machine);
+						machineCiphers.remove(machine);
+						System.out.println("machines = " + machines);
+						try {
+							announceRemove(machine);
+						} catch (IOException ioException) {
+							throw new RuntimeException(ioException);
+						}
+					}
+				}
+				Utils.sleep(10000); // poll every ten seconds
+			}
+		}).start();
+
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 			System.out.println("ClusterManager started on port " + port + " with password \"" + password + "\"");
 			while (!Thread.currentThread().isInterrupted()) {
@@ -68,6 +93,7 @@ public class ClusterManager {
 					if (initialData.password.equals(password)) {
 						String ip = initialData.ip.isEmpty() ? socket.getInetAddress().getHostAddress() : initialData.ip;
 						MachineInfo machine = new MachineInfo(initialData.publicKey, ip, initialData.port);
+						System.out.println("New machine " + machine + " connected!");
 						machines.add(machine);
 						machineCiphers.put(machine, getEncryptCipher(initialData.publicKey));
 
@@ -78,20 +104,36 @@ public class ClusterManager {
 						response.writeTo(socket.getOutputStream());
 
 						// tells other machines about the new machine
-						for (MachineInfo otherMachine : machines) {
-							if (!otherMachine.equals(machine)) {
-								try (Socket otherSocket = new Socket(otherMachine.ip, otherMachine.port)) {
-									TlvMessage updateMessage =
-											new TlvMessage('n', Serializer.serialize(machine)).encrypted(machineCiphers.get(otherMachine));
-									updateMessage.writeTo(otherSocket.getOutputStream());
-								}
-							}
-						}
+						announceNew(machine);
 					}
 				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private void announceNew(MachineInfo machine) throws IOException {
+		for (MachineInfo otherMachine : machines) {
+			if (!otherMachine.equals(machine)) {
+				try (Socket otherSocket = new Socket(otherMachine.ip, otherMachine.port)) {
+					TlvMessage updateMessage =
+							new TlvMessage('n', Serializer.serialize(machine)).encrypted(machineCiphers.get(otherMachine));
+					updateMessage.writeTo(otherSocket.getOutputStream());
+				}
+			}
+		}
+	}
+
+	private void announceRemove(MachineInfo machine) throws IOException {
+		for (MachineInfo otherMachine : machines) {
+			if (!otherMachine.equals(machine)) {
+				try (Socket otherSocket = new Socket(otherMachine.ip, otherMachine.port)) {
+					TlvMessage updateMessage =
+							new TlvMessage('r', Serializer.serialize(machine)).encrypted(machineCiphers.get(otherMachine));
+					updateMessage.writeTo(otherSocket.getOutputStream());
+				}
+			}
 		}
 	}
 }
