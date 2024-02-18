@@ -41,8 +41,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 0.1.0
  */
 public class Overseer {
-	final Graph g;
-	protected final Map<String, Object> cache = new StrictConcurrentHashMap<>();
+	protected final Graph g;
+	protected final Map<String, Object> cache = new StrictConcurrentHashMap<>(); // only to be accessed by subclasses
 	protected final Collection<Link> links = new ConcurrentLinkedQueue<>();
 	protected AtomicInteger tick;
 	protected Queue<Collection<Link>> linkTrace;

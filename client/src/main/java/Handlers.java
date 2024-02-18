@@ -1,10 +1,11 @@
 import org.trikkle.*;
 
+import java.net.Socket;
 import java.util.Set;
 
 public class Handlers {
 	@Handler(dataType = 't')
-	public static void handleData(byte[] data) {
+	public static void handleData(byte[] data, Socket socket) {
 		System.out.println("data = " + new String(data));
 	}
 
@@ -14,7 +15,7 @@ public class Handlers {
 	// you can't serialize lambdas so you have to send over the graph within the jar.
 	// future graph "state" updates can be done with a serialized graph
 	@Handler(dataType = 's')
-	public static void handleStart(byte[] jarBytes) {
+	public static void handleStart(byte[] jarBytes, Socket socket) {
 		Node inputNode = new DiscreteNode("x");
 		Node outputNode = new DiscreteNode("y");
 		Arc arc = new AutoArc() {
@@ -34,6 +35,6 @@ public class Handlers {
 	}
 
 	public static void main(String[] args) {
-		handleStart(null);
+		handleStart(null, null);
 	}
 }

@@ -166,7 +166,7 @@ public abstract class Arc implements Primable {
 	 * @throws IllegalStateException    if the arc is already finished
 	 * @throws IllegalArgumentException if the arc is safe and the status is less than the current status
 	 */
-	protected synchronized void setStatus(ArcStatus status) {
+	public synchronized void setStatus(ArcStatus status) {
 		if (status == null) {
 			throw new NullPointerException("Status cannot be null!");
 		}

@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 
 public class TlvMessage {
 	private static final KeyGenerator keyGen;
@@ -36,6 +37,17 @@ public class TlvMessage {
 		byte[] data = new byte[length];
 		dis.readFully(data);
 		return new TlvMessage(dataType, data);
+	}
+
+	public static Cipher getEncryptCipher(PublicKey publicKey) {
+		Cipher encryptCipher;
+		try {
+			encryptCipher = Cipher.getInstance("RSA");
+			encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+			throw new RuntimeException(e);
+		}
+		return encryptCipher;
 	}
 
 	public void writeTo(OutputStream out) throws IOException {

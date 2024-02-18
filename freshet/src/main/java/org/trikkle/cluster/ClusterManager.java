@@ -6,13 +6,9 @@ import org.trikkle.serial.InitialData;
 import org.trikkle.serial.MachineInfo;
 
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,17 +40,6 @@ public class ClusterManager {
 	public static void main(String[] args) {
 		ClusterManager clusterManager = new ClusterManager(995, "password");
 		clusterManager.start();
-	}
-
-	private static Cipher getEncryptCipher(PublicKey publicKey) {
-		Cipher encryptCipher;
-		try {
-			encryptCipher = Cipher.getInstance("RSA");
-			encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
-			throw new RuntimeException(e);
-		}
-		return encryptCipher;
 	}
 
 	public void start() {
@@ -99,7 +84,7 @@ public class ClusterManager {
 						MachineInfo machine = new MachineInfo(initialData.publicKey, ip, initialData.port);
 						System.out.println("New machine " + machine + " connected!");
 						machines.add(machine);
-						machineCiphers.put(machine, getEncryptCipher(initialData.publicKey));
+						machineCiphers.put(machine, TlvMessage.getEncryptCipher(initialData.publicKey));
 
 						// replies with current list of machines
 						MachineInfo[] machinesArray = machines.toArray(new MachineInfo[0]);
