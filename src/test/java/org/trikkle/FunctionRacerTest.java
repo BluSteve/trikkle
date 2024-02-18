@@ -43,7 +43,7 @@ class FunctionRacerTest {
 		Arc arc = new AutoArc() {
 			@Override
 			public void run() {
-				Map<String, Object> resultMap = functionRacer.apply(getOverseer().getCache());
+				Map<String, Object> resultMap = functionRacer.apply(getOverseer().getCacheCopy());
 				for (Map.Entry<String, Object> entry : resultMap.entrySet()) {
 					returnDatum(entry.getKey(), entry.getValue());
 				}

@@ -99,10 +99,7 @@ public abstract class Arc implements Primable {
 	 * @throws NullPointerException if there is no datum with the given name in the cache
 	 */
 	protected Object getDatum(String datumName) {
-		if (!overseer.getCache().containsKey(datumName)) {
-			throw new NullPointerException("No datum with name " + datumName + " is in the cache!");
-		}
-		return overseer.getCache().get(datumName);
+		return overseer.getDatumLocal(datumName);
 	}
 
 	/**

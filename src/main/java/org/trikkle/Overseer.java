@@ -282,8 +282,12 @@ public class Overseer {
 		}
 	}
 
-	protected Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
-		return cache;
+	protected Object getDatumLocal(String datumName) { // for local classes to use, may be different from getDatum
+		return cache.get(datumName);
+	}
+
+	protected void putDatum(String datumName, Object datum) {
+		cache.put(datumName, datum);
 	}
 
 	public Map<String, Object> getResultCache() {

@@ -16,18 +16,18 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MachineMain {
 	public String ownIp;
 	public int ownPort;
 	public KeyPair keyPair;
 	public Cipher encryptCipher, decryptCipher;
-	public List<MachineInfo> machines = new ArrayList<>();
-	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
+	public Set<MachineInfo> machines = ConcurrentHashMap.newKeySet();
+	public Map<MachineInfo, Cipher> machineCiphers = new ConcurrentHashMap<>();
 	public MachineInfo myself;
 	public Map<Character, Method> handlers = new HashMap<>();
 	public ServerSocket serverSocket;
@@ -85,6 +85,13 @@ public class MachineMain {
 			message.encrypted(getCipher(machine)).writeTo(socket.getOutputStream());
 		} catch (IOException e) {
 			System.err.println("Could not send message to " + machine);
+		}
+	}
+
+	public void broadcast(TlvMessage message) {
+		// todo maybe copy machines to avoid concurrent modification exception
+		for (MachineInfo machine : machines) {
+			sendToMachine(machine, message);
 		}
 	}
 

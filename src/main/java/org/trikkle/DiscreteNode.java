@@ -35,7 +35,7 @@ public final class DiscreteNode extends Node {
 
 	@Override
 	protected void uncheckedAddDatum(String datumName, Object datum) {
-		overseer.getCache().put(datumName, datum);
+		overseer.putDatum(datumName, datum);
 
 		int i = datumsFilled.incrementAndGet();
 		if (i == datumNames.size()) { // all datums filled

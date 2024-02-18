@@ -78,8 +78,8 @@ class OverseerTest {
 		inputNode.addDatum("toSquare", 2.0);
 		overseer.start();
 
-		assertEquals(overseer.getCacheCopy(), overseer.getCache());
-		assertNotSame(overseer.getCacheCopy(), overseer.getCache());
+		assertEquals(overseer.getCacheCopy(), overseer.cache);
+		assertNotSame(overseer.getCacheCopy(), overseer.cache);
 		Map<String, Object> results = overseer.getResultCache();
 		assertEquals(4.0, results.get("squared"));
 	}

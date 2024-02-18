@@ -34,7 +34,7 @@ public final class StreamNode extends Node {
 	@Override
 	// Assumes that all datums of a particular name are of the same type
 	protected void uncheckedAddDatum(String datumName, Object datum) {
-		((Queue) overseer.getCache().get(datumName)).add(datum);
+		((Queue) overseer.getDatum(datumName)).add(datum); // todo this won't work for distributed overseer
 		setUsable();
 		if (limit != -1) {
 			int c = count.getAndIncrement();
@@ -71,7 +71,10 @@ public final class StreamNode extends Node {
 	@Override
 	public void primeWith(Overseer overseer) {
 		super.primeWith(overseer);
-		overseer.getCache().putIfAbsent(datumNames.iterator().next(), new ConcurrentLinkedQueue<>());
+		try {
+			overseer.putDatum(datumNames.iterator().next(), new ConcurrentLinkedQueue<>());
+		} catch (IllegalArgumentException ignored) {
+		}
 	}
 
 	@Override
