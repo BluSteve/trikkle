@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.function.BiConsumer;
@@ -158,7 +159,7 @@ public class MachineMain {
 						System.out.println("Received jar.");
 						JarInfo jarInfo = (JarInfo) Serializer.deserialize(message.data);
 
-						String jarName = ".cache.jar";
+						String jarName = UUID.randomUUID() + ".jar";
 						FileOutputStream fos = new FileOutputStream(jarName);
 						fos.write(jarInfo.jar);
 						fos.close();

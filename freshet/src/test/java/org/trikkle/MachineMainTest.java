@@ -26,7 +26,6 @@ class MachineMainTest {
 	void testMain() throws IOException {
 		ClusterManager clusterManager = new ClusterManager(MANAGER_PORT, "password");
 		new Thread(() -> {
-			clusterManager.pollingInterval = 10;
 			clusterManager.start();
 		}).start();
 
@@ -38,7 +37,7 @@ class MachineMainTest {
 
 		List<MachineMain> instances = new ArrayList<>();
 		List<Thread> threads = new ArrayList<>();
-		for (int i = 19100; i < 19105; i++) {
+		for (int i = 28100; i < 28103; i++) {
 			var pair = newMachine(i);
 			instances.add(pair.key);
 			threads.add(pair.value);
