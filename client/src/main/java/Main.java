@@ -10,11 +10,15 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		// join a cluster and then upload a jar to all the machines in the cluster
 		MachineMain machineMain = new MachineMain("localhost", 9999);
-		machineMain.register("localhost", 995, "password");
-		machineMain.startListening();
+		new Thread(() -> {
+			machineMain.register("localhost", 995, "password");
+			machineMain.startListening();
+		}).start();
+
+		machineMain.listening.acquire();
 
 		JarInfo jarInfo = new JarInfo("Handlers", Files.readAllBytes(Paths.get("client/build/libs/client.jar")));
 		for (MachineInfo machine : machineMain.machines) {
@@ -34,6 +38,9 @@ public class Main {
 					TlvMessage tlvMessage = new TlvMessage('t', "hello world".getBytes());
 					machineMain.sendToMachine(machine, tlvMessage);
 				}
+			} else if (line.equals("s")) {
+				System.out.println("starting overseer");
+				machineMain.broadcast(new TlvMessage('s', new byte[0]));
 			}
 		}
 	}

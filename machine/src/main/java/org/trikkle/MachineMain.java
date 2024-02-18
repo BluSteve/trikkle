@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 public class MachineMain {
 	public String ownIp;
@@ -31,6 +32,7 @@ public class MachineMain {
 	public MachineInfo myself;
 	public Map<Character, Method> handlers = new HashMap<>();
 	public ServerSocket serverSocket;
+	public Semaphore listening = new Semaphore(0);
 
 	public MachineMain(String ownIp, int ownPort) {
 		this.ownIp = ownIp; // this is the ip of the machine to be used for communication with other machines
@@ -129,6 +131,7 @@ public class MachineMain {
 	public void startListening() {
 		try {
 			serverSocket = new ServerSocket(ownPort);
+			listening.release();
 
 			while (!Thread.currentThread().isInterrupted()) {
 				Socket socket = serverSocket.accept();
@@ -190,10 +193,12 @@ public class MachineMain {
 						}
 				}
 			}
+		} catch (BindException e) {
+			e.printStackTrace();
+		} catch (SocketException e) {
+			System.err.println(ownPort + " stopped listening");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		System.err.println(ownPort + " stopped listening");
 	}
 }

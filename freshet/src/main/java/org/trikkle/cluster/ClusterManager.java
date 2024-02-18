@@ -34,6 +34,7 @@ public class ClusterManager {
 	public Collection<MachineInfo> machines = new ConcurrentLinkedQueue<>();
 	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
 	public long pollingInterval = 10000;
+	public Semaphore started = new Semaphore(0);
 
 	public ClusterManager(int port, String password) {
 		this.port = port;
@@ -42,7 +43,7 @@ public class ClusterManager {
 
 	public static void main(String[] args) {
 		ClusterManager clusterManager = new ClusterManager(995, "password");
-		clusterManager.start(null);
+		clusterManager.start();
 	}
 
 	private static Cipher getEncryptCipher(PublicKey publicKey) {
@@ -56,7 +57,7 @@ public class ClusterManager {
 		return encryptCipher;
 	}
 
-	public void start(Semaphore onStart) {
+	public void start() {
 		new Thread(() -> {
 			// poll machines
 			while (!Thread.currentThread().isInterrupted()) {
@@ -83,7 +84,7 @@ public class ClusterManager {
 
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 			System.out.println("ClusterManager started on port " + port + " with password \"" + password + "\"");
-			if (onStart != null) onStart.release();
+			started.release();
 
 			while (!Thread.currentThread().isInterrupted()) {
 				Socket socket = serverSocket.accept();

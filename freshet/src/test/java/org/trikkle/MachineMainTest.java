@@ -7,7 +7,6 @@ import org.trikkle.cluster.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 class MachineMainTest {
 	private static final int MANAGER_PORT = 995;
@@ -19,36 +18,34 @@ class MachineMainTest {
 			machineMain.startListening();
 		});
 		thread.start();
+		machineMain.listening.acquireUninterruptibly();
 		return new Pair<>(machineMain, thread);
 	}
 
 	@Test
 	void testMain() throws IOException {
-		Semaphore semaphore = new Semaphore(0);
-
+		ClusterManager clusterManager = new ClusterManager(MANAGER_PORT, "password");
 		new Thread(() -> {
-			ClusterManager clusterManager = new ClusterManager(MANAGER_PORT, "password");
 			clusterManager.pollingInterval = 10;
-			clusterManager.start(semaphore);
+			clusterManager.start();
 		}).start();
 
 		try {
-			semaphore.acquire();
+			clusterManager.started.acquire();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 
 		List<MachineMain> instances = new ArrayList<>();
 		List<Thread> threads = new ArrayList<>();
-		for (int i = 9000; i < 9005; i++) {
+		for (int i = 19100; i < 19105; i++) {
 			var pair = newMachine(i);
 			instances.add(pair.key);
 			threads.add(pair.value);
 		}
 
-		Utils.sleep(500);
 		instances.getFirst().serverSocket.close();
-		Utils.sleep(10000);
+		Utils.sleep(60000);
 	}
 
 	@Test
