@@ -282,7 +282,7 @@ public class Overseer {
 		}
 	}
 
-	protected Object getDatumLocal(String datumName) { // for local classes to use, may be different from getDatum
+	protected Object getDatumProtected(String datumName) { // for local classes to use, may be different from getDatum
 		return cache.get(datumName);
 	}
 

@@ -1,4 +1,5 @@
 import org.trikkle.Graph;
+import org.trikkle.MachineMain;
 import org.trikkle.Node;
 import org.trikkle.Overseer;
 
@@ -13,11 +14,11 @@ distributed methods:
 3. request consensus to execute arc
  */
 public class DistributedOverseer extends Overseer {
-	public DistributedOverseer(Graph graph) {
+	public DistributedOverseer(MachineMain machine, Graph graph) {
 		super(graph);
 	}
 
-	public DistributedOverseer(Graph graph, Map<String, Object> initialCache) {
+	public DistributedOverseer(MachineMain machine, Graph graph, Map<String, Object> initialCache) {
 		super(graph, initialCache);
 	}
 
@@ -31,13 +32,13 @@ public class DistributedOverseer extends Overseer {
 	}
 
 	// this is when some other DO sends a graph update. probably need to ticktock yourself
-	public void foreignUpdate() {
+	public void foreignUpdate(SerializableGraph sGraph) {
 
 	}
 
 	// return datum doesn't need to be overriden
 	// get datum needs to be overriden definitely. all requests to get datum should go through that method
-	protected Object getDatumLocal(String datumName) {
+	protected Object getDatumProtected(String datumName) {
 		return null;
 	}
 }

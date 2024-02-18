@@ -2,6 +2,7 @@ import org.trikkle.ArcStatus;
 import org.trikkle.Graph;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class SerializableGraph implements Serializable {
 	public ArcStatus[] arcsStatus;
@@ -22,5 +23,14 @@ public class SerializableGraph implements Serializable {
 			nodesProgress[i] = graph.nodeArray[i].getProgress();
 			nodesUsable[i] = graph.nodeArray[i].isUsable();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "SerializableGraph{" +
+				"arcsStatus=" + Arrays.toString(arcsStatus) +
+				", nodesProgress=" + Arrays.toString(nodesProgress) +
+				", nodesUsable=" + Arrays.toString(nodesUsable) +
+				'}';
 	}
 }
