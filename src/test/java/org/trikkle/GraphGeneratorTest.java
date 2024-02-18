@@ -2,6 +2,7 @@ package org.trikkle;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,7 +30,7 @@ class GraphGeneratorTest {
 		};
 		arc2.setName("2");
 
-		Graph manualGraph = new Graph(Set.of(
+		Graph manualGraph = new Graph(List.of(
 				new Link(Set.of(node2, node3), arc1, node1),
 				new Link(Set.of(node2), arc2, node3)
 		));

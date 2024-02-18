@@ -34,7 +34,7 @@ public final class StreamNode extends Node {
 	@Override
 	// Assumes that all datums of a particular name are of the same type
 	protected void uncheckedAddDatum(String datumName, Object datum) {
-		((Queue) overseer.getDatum(datumName)).add(datum); // todo this won't work for distributed overseer
+		((Queue) overseer.getDatumLocal(datumName)).add(datum); // todo this won't work for distributed overseer
 		setUsable();
 		if (limit != -1) {
 			int c = count.getAndIncrement();

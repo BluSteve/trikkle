@@ -87,7 +87,7 @@ public class GraphGenerator {
 			links.get(random.nextInt(numArcs)).getDependencies().add(node);
 		}
 
-		return new Graph(new HashSet<>(links));
+		return new Graph(links);
 	}
 
 	private static String intToExcelColumn(int n) {

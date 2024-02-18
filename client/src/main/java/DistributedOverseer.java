@@ -37,4 +37,7 @@ public class DistributedOverseer extends Overseer {
 
 	// return datum doesn't need to be overriden
 	// get datum needs to be overriden definitely. all requests to get datum should go through that method
+	protected Object getDatumLocal(String datumName) {
+		return null;
+	}
 }

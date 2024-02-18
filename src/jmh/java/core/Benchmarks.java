@@ -4,7 +4,8 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import org.trikkle.*;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +37,7 @@ public class Benchmarks {
 
 		@Setup(Level.Invocation)
 		public void setup() {
-			Set<Link> manyLinks = new HashSet<>();
+			List<Link> manyLinks = new ArrayList<>();
 			for (int i = 0; i < 10000; i++) {
 				Arc arc = new AutoArc() {
 					@Override

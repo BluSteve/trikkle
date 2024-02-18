@@ -1,12 +1,13 @@
 import org.trikkle.*;
 import org.trikkle.viz.LogUtils;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class Profiling {
 	public static void main(String[] args) {
-		Set<Link> manyLinks = new HashSet<>();
+		List<Link> manyLinks = new ArrayList<>();
 		for (int i = 0; i < 10000; i++) {
 			int finalI = i;
 			Arc arc = new AutoArc() {

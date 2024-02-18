@@ -5,10 +5,7 @@ import org.trikkle.viz.GraphViz;
 import org.trikkle.viz.LogUtils;
 import org.trikkle.viz.MermaidGraphViz;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.TimeUnit;
@@ -267,7 +264,7 @@ class OverseerTest {
 	void stressTest() {
 		StreamNode streamNode = Nodespace.DEFAULT.streamOf("numberStream");
 		streamNode.setLimit(1000);
-		Set<Link> links = new HashSet<>();
+		List<Link> links = new ArrayList<>();
 		for (int i = 0; i < 100; i++) {
 			Arc inputArc = new AutoArc() {
 				@Override
@@ -489,7 +486,7 @@ class OverseerTest {
 
 	@Test
 	void economyTest() {
-		Set<Link> manyLinks = new HashSet<>();
+		List<Link> manyLinks = new ArrayList<>();
 		for (int i = 0; i < 10000; i++) {
 			int finalI = i;
 			Arc arc = new AutoArc() {
