@@ -30,6 +30,7 @@ public class MachineMain {
 	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
 	public MachineInfo myself;
 	public Map<Character, Method> handlers = new HashMap<>();
+	public ServerSocket serverSocket;
 
 	public MachineMain(String ownIp, int ownPort) {
 		this.ownIp = ownIp; // this is the ip of the machine to be used for communication with other machines
@@ -112,14 +113,16 @@ public class MachineMain {
 				}
 			}
 
-			System.out.println("machines = " + machines);
+			System.out.println(ownPort + " initial machines = " + machines);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public void startListening() {
-		try (ServerSocket serverSocket = new ServerSocket(ownPort)) {
+		try {
+			serverSocket = new ServerSocket(ownPort);
+
 			while (!Thread.currentThread().isInterrupted()) {
 				Socket socket = serverSocket.accept();
 				TlvMessage message = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
@@ -136,8 +139,7 @@ public class MachineMain {
 						machines.remove(removedMachine);
 						System.out.println(ownPort + " updated machines = " + machines);
 						break;
-					case 'p':
-						System.out.println("Received ping.");
+					case 'p': // alive check
 						break;
 
 					// sent by other machines
@@ -184,5 +186,7 @@ public class MachineMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		System.err.println(ownPort + " stopped listening");
 	}
 }

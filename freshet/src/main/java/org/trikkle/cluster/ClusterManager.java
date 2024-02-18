@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Semaphore;
 // web frontend with a manually opened port that potential new machines can connect to.
 // kind of like an admissions officer or bouncer
 // requires a password to enter
@@ -32,6 +33,7 @@ public class ClusterManager {
 	public String password;
 	public Collection<MachineInfo> machines = new ConcurrentLinkedQueue<>();
 	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
+	public long pollingInterval = 10000;
 
 	public ClusterManager(int port, String password) {
 		this.port = port;
@@ -40,7 +42,7 @@ public class ClusterManager {
 
 	public static void main(String[] args) {
 		ClusterManager clusterManager = new ClusterManager(995, "password");
-		clusterManager.start();
+		clusterManager.start(null);
 	}
 
 	private static Cipher getEncryptCipher(PublicKey publicKey) {
@@ -54,7 +56,7 @@ public class ClusterManager {
 		return encryptCipher;
 	}
 
-	public void start() {
+	public void start(Semaphore onStart) {
 		new Thread(() -> {
 			// poll machines
 			while (!Thread.currentThread().isInterrupted()) {
@@ -75,12 +77,14 @@ public class ClusterManager {
 						}
 					}
 				}
-				Utils.sleep(10000); // poll every ten seconds
+				Utils.sleep(pollingInterval); // poll every x milliseconds
 			}
 		}).start();
 
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 			System.out.println("ClusterManager started on port " + port + " with password \"" + password + "\"");
+			if (onStart != null) onStart.release();
+
 			while (!Thread.currentThread().isInterrupted()) {
 				Socket socket = serverSocket.accept();
 				// new machine connected
