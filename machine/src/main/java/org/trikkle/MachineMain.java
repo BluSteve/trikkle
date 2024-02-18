@@ -166,8 +166,8 @@ public class MachineMain {
 							Handler handler = method.getAnnotation(Handler.class);
 							handlers.put(handler.dataType(), method);
 						}
-
 						break;
+
 					default:
 						if (handlers.containsKey(message.dataType)) {
 							Method method = handlers.get(message.dataType);

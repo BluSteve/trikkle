@@ -88,7 +88,7 @@ public class TlvMessage {
 
 	@Override
 	public String toString() {
-		return "TlvMessage{" +
+		return "org.trikkle.TlvMessage{" +
 				"dataType=" + dataType +
 				", length=" + length +
 				", data=" + new String(data, StandardCharsets.UTF_8) +

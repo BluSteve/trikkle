@@ -22,5 +22,6 @@ repositories {
 }
 
 dependencies {
-    implementation project(':freshet')
+    implementation rootProject
+    implementation project(':machine')
 }
