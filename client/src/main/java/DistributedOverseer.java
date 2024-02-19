@@ -141,6 +141,8 @@ public class DistributedOverseer extends Overseer {
 			}
 		}
 
+		System.out.println("running " + linksNow);
+
 		if (logging) {
 			int t = tick.incrementAndGet();
 			linkTrace.add(linksNow);
@@ -181,17 +183,19 @@ public class DistributedOverseer extends Overseer {
 		}
 
 		for (int i = 0; i < sGraph.nodesProgress.length; i++) {
-			g.nodeArray[i].setProgress(sGraph.nodesProgress[i]);
+			g.nodeArray[i].setProgress(sGraph.nodesProgress[i]); // this may cause a ticktock if there's been a change
 			if (sGraph.nodesUsable[i]) g.nodeArray[i].setUsable();
 		}
 	}
 
 	public void broadcastLocalGraph() {
+		System.out.println("broadcasting graph");
 		TlvMessage tlvMessage = new TlvMessage('g', Serializer.serialize(new SerializableGraph(g)));
 		machine.broadcast(tlvMessage);
 	}
 
 	public boolean requestToRunArc(Arc arc) {
+		System.out.println("requesting to run arc " + arc);
 		int index = g.arcIndex.get(arc);
 		ArcRequest arcRequest = new ArcRequest(index, new Date().getTime());
 		pendingRequests.put(index, arcRequest); // todo figure out when to remove this
@@ -201,7 +205,7 @@ public class DistributedOverseer extends Overseer {
 		for (MachineInfo machineInfo : machine.machines) {
 			try (Socket socket = new Socket()) {
 				socket.connect(new InetSocketAddress(machineInfo.ip, machineInfo.port));
-				tlvMessage.encrypted(machine.getCipher(machineInfo)).writeTo(socket.getOutputStream());
+				tlvMessage.encrypted(machineInfo.getCipher()).writeTo(socket.getOutputStream());
 
 				// get response
 				TlvMessage response = TlvMessage.readFrom(socket.getInputStream());
@@ -232,7 +236,7 @@ public class DistributedOverseer extends Overseer {
 			for (MachineInfo machineInfo : machine.machines) {
 				try (Socket socket = new Socket()) {
 					socket.connect(new InetSocketAddress(machineInfo.ip, machineInfo.port));
-					message.encrypted(machine.getCipher(machineInfo)).writeTo(socket.getOutputStream());
+					message.encrypted(machineInfo.getCipher()).writeTo(socket.getOutputStream());
 
 					// get response
 					TlvMessage response = TlvMessage.readFrom(socket.getInputStream());

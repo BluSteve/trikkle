@@ -1,6 +1,6 @@
-import org.trikkle.MachineMain;
 import org.trikkle.Serializer;
 import org.trikkle.TlvMessage;
+import org.trikkle.cluster.ClusterManager;
 import org.trikkle.serial.JarInfo;
 import org.trikkle.serial.MachineInfo;
 
@@ -12,19 +12,10 @@ import java.util.Scanner;
 public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		// join a cluster and then upload a jar to all the machines in the cluster
-		MachineMain machineMain = new MachineMain("localhost", 9999);
-		new Thread(() -> {
-			machineMain.register("localhost", 995, "password");
-			machineMain.startListening();
-		}).start();
+		ClusterManager clusterManager = new ClusterManager(995, "password");
+		new Thread(clusterManager::start).start();
 
-		machineMain.listening.acquire();
-
-		JarInfo jarInfo = new JarInfo("Handlers", Files.readAllBytes(Paths.get("client/build/libs/client.jar")));
-		for (MachineInfo machine : machineMain.machines) {
-			TlvMessage tlvMessage = new TlvMessage('j', Serializer.serialize(jarInfo));
-			machineMain.sendToMachine(machine, tlvMessage);
-		}
+		clusterManager.started.acquire();
 
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
@@ -34,13 +25,23 @@ public class Main {
 			}
 			if (line.equals("t")) {
 				System.out.println("sending test message");
-				for (MachineInfo machine : machineMain.machines) {
+				for (MachineInfo machine : clusterManager.machines) {
 					TlvMessage tlvMessage = new TlvMessage('t', "hello world".getBytes());
-					machineMain.sendToMachine(machine, tlvMessage);
+					machine.sendMessage(tlvMessage);
 				}
 			} else if (line.equals("s")) {
 				System.out.println("starting overseer");
-				machineMain.broadcast(new TlvMessage('s', new byte[0]));
+//				Handlers.handleStart(null, null);
+				for (MachineInfo machine : clusterManager.machines) {
+					TlvMessage tlvMessage = new TlvMessage('s', new byte[0]);
+					machine.sendMessage(tlvMessage);
+				}
+			} else if (line.equals("j")) {
+				JarInfo jarInfo = new JarInfo("Handlers", Files.readAllBytes(Paths.get("client/build/libs/client.jar")));
+				for (MachineInfo machine : clusterManager.machines) {
+					TlvMessage tlvMessage = new TlvMessage('j', Serializer.serialize(jarInfo));
+					machine.sendMessage(tlvMessage);
+				}
 			}
 		}
 	}

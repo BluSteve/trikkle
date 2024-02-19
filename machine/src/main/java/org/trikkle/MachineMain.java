@@ -25,6 +25,7 @@ import java.util.concurrent.Semaphore;
 import java.util.function.BiConsumer;
 
 public class MachineMain {
+	public static MachineMain instance;
 	public String ownIp;
 	public int ownPort;
 	public KeyPair keyPair;
@@ -59,6 +60,8 @@ public class MachineMain {
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
 			throw new RuntimeException(e);
 		}
+
+		instance = this;
 	}
 
 	public static void main(String[] args) {
@@ -67,35 +70,10 @@ public class MachineMain {
 		machineMain.startListening();
 	}
 
-	public Cipher getCipher(MachineInfo machine) {
-		if (machineCiphers.containsKey(machine)) {
-			return machineCiphers.get(machine);
-		} else {
-			try {
-				Cipher cipher = Cipher.getInstance("RSA");
-				cipher.init(Cipher.ENCRYPT_MODE, machine.publicKey);
-				machineCiphers.put(machine, cipher);
-				return cipher;
-			} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	public void sendToMachine(MachineInfo machine, TlvMessage message) {
-		try (Socket socket = new Socket()) {
-			socket.connect(new InetSocketAddress(machine.ip, machine.port));
-
-			message.encrypted(getCipher(machine)).writeTo(socket.getOutputStream());
-		} catch (IOException e) {
-			System.err.println("Could not send message to " + machine);
-		}
-	}
-
 	public void broadcast(TlvMessage message) {
 		// todo maybe copy machines to avoid concurrent modification exception
 		for (MachineInfo machine : machines) {
-			sendToMachine(machine, message);
+			machine.sendMessage(message);
 		}
 	}
 
@@ -193,7 +171,8 @@ public class MachineMain {
 
 					default:
 						if (handlers.containsKey(message.dataType)) {
-							handlers.get(message.dataType).accept(message.data, socket);
+							// starts a new thread to handle the message
+							new Thread(() -> handlers.get(message.dataType).accept(message.data, socket)).start();
 						} else {
 							System.err.println("Unknown message type: " + message.dataType);
 						}

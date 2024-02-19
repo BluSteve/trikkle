@@ -27,7 +27,8 @@ public class Handlers {
 		};
 		Link link = new Link(Set.of(inputNode), arc, Set.of(outputNode));
 		Graph graph = new Graph(link);
-		Overseer overseer = new Overseer(graph);
+
+		DistributedOverseer overseer = new DistributedOverseer(MachineMain.instance, graph);
 		overseer.addStartingDatum("x", 5.0);
 		overseer.start();
 		System.out.println(new SerializableGraph(graph));
