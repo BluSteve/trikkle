@@ -3,6 +3,7 @@ package org.trikkle.cluster;
 import org.trikkle.Serializer;
 import org.trikkle.TlvMessage;
 import org.trikkle.serial.InitialData;
+import org.trikkle.serial.JarInfo;
 import org.trikkle.serial.MachineInfo;
 
 import javax.crypto.Cipher;
@@ -99,6 +100,13 @@ public class ClusterManager {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void uploadJar(JarInfo jarInfo) {
+		for (MachineInfo machine : machines) {
+			TlvMessage message = new TlvMessage('j', Serializer.serialize(jarInfo));
+			machine.sendMessage(message);
 		}
 	}
 

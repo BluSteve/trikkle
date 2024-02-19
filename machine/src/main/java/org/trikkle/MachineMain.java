@@ -162,7 +162,7 @@ public class MachineMain {
 						if (handlers.containsKey(message.dataType)) {
 							Method method = handlers.get(message.dataType);
 							try {
-								method.invoke(null, (Object) message.data);
+								method.invoke(null, (Object) message.data, socket);
 							} catch (IllegalAccessException | InvocationTargetException e) {
 								throw new RuntimeException(e);
 							}
