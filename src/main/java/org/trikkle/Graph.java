@@ -21,7 +21,12 @@ public final class Graph implements Congruent<Graph> {
 	public final Set<Link> links;
 	public final Set<Primable> primables;
 	public final Set<Arc> arcs;
-	public final Set<Node> nodes = new HashSet<>();
+	public final Set<Node> nodes;
+	public final Map<Arc, Integer> arcIndex = new HashMap<>();
+	public final Map<Node, Integer> nodeIndex = new HashMap<>();
+	public final Arc[] arcArray;
+	public final Node[] nodeArray;
+
 	public final Set<Node> startingNodes = new HashSet<>();
 	public final Set<Node> endingNodes = new HashSet<>();
 	public final Map<Arc, Link> arcMap = new HashMap<>();
@@ -35,24 +40,36 @@ public final class Graph implements Congruent<Graph> {
 	 *
 	 * @param links the links of the graph
 	 */
-	public Graph(Collection<Link> links) {
+	public Graph(List<Link> links) {
 		if (links == null || links.isEmpty()) {
 			throw new IllegalArgumentException("Graph must have at least one link!");
 		}
-		if (links instanceof Set) {
-			this.links = (Set<Link>) links;
-		} else {
-			this.links = new HashSet<>(links);
-		}
+		this.links = new HashSet<>(links);
 
-		Set<Node> dependencies = new HashSet<>();
+		arcs = arcIndex.keySet();
+		nodes = nodeIndex.keySet();
+
+		int nodeI = 0, arcI = 0;
+		Set<Node> dependencyNodes = new HashSet<>(); // all nodes that have been dependencies
 		for (Link link : links) {
 			if (arcMap.containsKey(link.getArc())) {
 				throw new IllegalArgumentException("The same arc cannot be used for two links!");
 			}
 
-			nodes.addAll(link.getDependencies());
-			nodes.addAll(link.getOutputNodes());
+			// indexing data structures. the order of traversal is constant
+			for (Node dependency : link.getDependencies()) {
+				if (!nodeIndex.containsKey(dependency)) {
+					nodeIndex.put(dependency, nodeI++);
+				}
+			}
+			for (Node outputNode : link.getOutputNodes()) {
+				if (!nodeIndex.containsKey(outputNode)) {
+					nodeIndex.put(outputNode, nodeI++);
+				}
+			}
+			arcIndex.put(link.getArc(), arcI++);
+
+			// assistant data structures
 			arcMap.put(link.getArc(), link);
 			for (Node outputNode : link.getOutputNodes()) {
 				outputNodeMap.putOne(outputNode, link);
@@ -61,12 +78,22 @@ public final class Graph implements Congruent<Graph> {
 				}
 			}
 
-			dependencies.addAll(link.getDependencies());
+			dependencyNodes.addAll(link.getDependencies());
 		}
-		arcs = arcMap.keySet();
 		primables = new HashSet<>(nodes);
 		primables.addAll(arcs);
 
+		// create arrays
+		arcArray = new Arc[arcs.size()];
+		nodeArray = new Node[nodes.size()];
+		for (Map.Entry<Arc, Integer> entry : arcIndex.entrySet()) {
+			arcArray[entry.getValue()] = entry.getKey();
+		}
+		for (Map.Entry<Node, Integer> entry : nodeIndex.entrySet()) {
+			nodeArray[entry.getValue()] = entry.getKey();
+		}
+
+		// check for no duplicate datum names
 		for (Node node : nodes) {
 			for (String datumName : node.datumNames) {
 				Node rnode = nodeOfDatum.put(datumName, node);
@@ -78,7 +105,7 @@ public final class Graph implements Congruent<Graph> {
 
 		// find ending nodes
 		for (Node node : nodes) {
-			if (!dependencies.contains(node)) {
+			if (!dependencyNodes.contains(node)) {
 				endingNodes.add(node);
 			}
 		}
@@ -96,7 +123,7 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	public Graph(Link... links) {
-		this(new HashSet<>(Arrays.asList(links)));
+		this(Arrays.asList(links));
 	}
 
 	/**
@@ -122,7 +149,7 @@ public final class Graph implements Congruent<Graph> {
 			throw new IllegalArgumentException("Not all ending nodes are reachable by the given graphs!");
 		}
 
-		Set<Link> finalLinks = new HashSet<>();
+		List<Link> finalLinks = new ArrayList<>();
 		for (Map.Entry<Node, Graph> nodeGraphEntry : graphUsedOfNode.entrySet()) {
 			Node node = nodeGraphEntry.getKey();
 			Graph graph = nodeGraphEntry.getValue().findPrunedGraphFor(Collections.singleton(node));
@@ -138,13 +165,13 @@ public final class Graph implements Congruent<Graph> {
 	 * @param graphs the Graphs to concatenate
 	 * @return the combined Graph
 	 */
-	public static Graph concatGraphs(Set<Graph> graphs) {
+	public static Graph concatGraphs(Collection<Graph> graphs) {
 		Set<Link> finalLinks = new HashSet<>();
 		for (Graph graph : graphs) {
 			finalLinks.addAll(graph.links);
 		}
 
-		return new Graph(finalLinks);
+		return new Graph(new ArrayList<>(finalLinks));
 	}
 
 	public static Graph concatGraphs(Graph... graphs) {
@@ -210,7 +237,7 @@ public final class Graph implements Congruent<Graph> {
 		 for each dependency find link which creates it
 		*/
 
-		Set<Link> finalLinks = new HashSet<>();
+		List<Link> finalLinks = new ArrayList<>();
 
 		Stack<Node> nodeStack = new Stack<>();
 		for (Node targetEndingNode : targetEndingNodes) {

@@ -26,7 +26,7 @@ class GraphTest {
 	@Test
 	void twoLinksSameArc() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			new Graph(Set.of(
+			new Graph(List.of(
 					new Link(Set.of(paramNode), arcs.get(0), magicNode),
 					new Link(Set.of(magicNode), arcs.get(0), hfNode)
 			));
@@ -37,7 +37,7 @@ class GraphTest {
 	@Test
 	void hasCycle() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			new Graph(Set.of(
+			new Graph(List.of(
 					new Link(Set.of(paramNode), arcs.get(0), magicNode),
 					new Link(Set.of(magicNode), arcs.get(1), hfNode),
 					new Link(Set.of(hfNode), arcs.get(2), paramNode)
@@ -117,7 +117,7 @@ class GraphTest {
 
 		Graph graph3 = Graph.concatGraphs(graph1, graph2, graph4);
 
-		Graph manualGraph = new Graph(Set.of(
+		Graph manualGraph = new Graph(List.of(
 				new Link(Set.of(nodeB), arc1, nodeF),
 				new Link(Set.of(nodeA, nodeB), arc2, nodeC),
 				new Link(Set.of(nodeC, nodeE), arc3, nodeD),
@@ -135,7 +135,7 @@ class GraphTest {
 
 	@Test
 	void congruentTo() {
-		Graph graph = new Graph(Set.of(
+		Graph graph = new Graph(List.of(
 				new Link(Set.of(matrixNode), arcs.get(2), hfNode),
 				new Link(Set.of(matrixNode), arcs.get(3), dipoleNode)
 		));
@@ -239,7 +239,7 @@ class GraphTest {
 		Node paramNode2 = new DiscreteNode("param", "smth else");
 		// add two different nodes but with the same datum name into a graph. should throw an error
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-			new Graph(Set.of(
+			new Graph(List.of(
 					new Link(Set.of(paramNode), arcs.get(0), magicNode),
 					new Link(Set.of(paramNode2), arcs.get(1), matrixNode)
 			));

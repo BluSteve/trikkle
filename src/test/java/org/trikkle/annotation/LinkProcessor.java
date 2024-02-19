@@ -153,7 +153,7 @@ public class LinkProcessor {
 	}
 
 	public Graph getGraph() {
-		return new Graph(new HashSet<>(getLinks().values()));
+		return new Graph(new ArrayList<>(getLinks().values()));
 	}
 
 	private static class Method {
