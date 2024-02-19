@@ -6,13 +6,10 @@ import org.trikkle.serial.InitialData;
 import org.trikkle.serial.JarInfo;
 import org.trikkle.serial.MachineInfo;
 
-import javax.crypto.Cipher;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 // web frontend with a manually opened port that potential new machines can connect to.
@@ -29,9 +26,9 @@ public class ClusterManager {
 	public int port;
 	public String password;
 	public Collection<MachineInfo> machines = new ConcurrentLinkedQueue<>();
-	public Map<MachineInfo, Cipher> machineCiphers = new HashMap<>();
 	public long pollingInterval = 10000;
 	public Semaphore started = new Semaphore(0);
+	public JarInfo currentJar;
 
 	public ClusterManager(int port, String password) {
 		this.port = port;
@@ -50,12 +47,11 @@ public class ClusterManager {
 				for (MachineInfo machine : machines) {
 					// if machine is not reachable, remove it from the list
 					try (Socket socket = new Socket(machine.ip, machine.port)) {
-						TlvMessage message = new TlvMessage('p', new byte[0]).encrypted(machineCiphers.get(machine));
+						TlvMessage message = new TlvMessage('p', new byte[0]).encrypted(machine.getCipher());
 						message.writeTo(socket.getOutputStream());
 					} catch (IOException e) {
 						System.out.println("Machine " + machine + " is not reachable. Removing from list.");
 						machines.remove(machine);
-						machineCiphers.remove(machine);
 						System.out.println("machines = " + machines);
 						try {
 							announceRemove(machine);
@@ -85,13 +81,19 @@ public class ClusterManager {
 						MachineInfo machine = new MachineInfo(initialData.publicKey, ip, initialData.port);
 						System.out.println("New machine " + machine + " connected!");
 						machines.add(machine);
-						machineCiphers.put(machine, TlvMessage.getEncryptCipher(initialData.publicKey));
 
 						// replies with current list of machines
 						MachineInfo[] machinesArray = machines.toArray(new MachineInfo[0]);
 						TlvMessage response =
-								new TlvMessage('u', Serializer.serialize(machinesArray)).encrypted(machineCiphers.get(machine));
+								new TlvMessage('u', Serializer.serialize(machinesArray)).encrypted(machine.getCipher());
 						response.writeTo(socket.getOutputStream());
+						socket.close();
+
+						// give the machine the latest jar with a new socket, can put elsewhere
+						if (currentJar != null) {
+							TlvMessage jarMessage = new TlvMessage('j', Serializer.serialize(currentJar));
+							machine.sendMessage(jarMessage);
+						}
 
 						// tells other machines about the new machine
 						announceNew(machine);
@@ -104,6 +106,7 @@ public class ClusterManager {
 	}
 
 	public void uploadJar(JarInfo jarInfo) {
+		currentJar = jarInfo;
 		for (MachineInfo machine : machines) {
 			TlvMessage message = new TlvMessage('j', Serializer.serialize(jarInfo));
 			machine.sendMessage(message);
@@ -115,7 +118,7 @@ public class ClusterManager {
 			if (!otherMachine.equals(machine)) {
 				try (Socket otherSocket = new Socket(otherMachine.ip, otherMachine.port)) {
 					TlvMessage updateMessage =
-							new TlvMessage('n', Serializer.serialize(machine)).encrypted(machineCiphers.get(otherMachine));
+							new TlvMessage('n', Serializer.serialize(machine)).encrypted(otherMachine.getCipher());
 					updateMessage.writeTo(otherSocket.getOutputStream());
 				}
 			}
@@ -127,7 +130,7 @@ public class ClusterManager {
 			if (!otherMachine.equals(machine)) {
 				try (Socket otherSocket = new Socket(otherMachine.ip, otherMachine.port)) {
 					TlvMessage updateMessage =
-							new TlvMessage('r', Serializer.serialize(machine)).encrypted(machineCiphers.get(otherMachine));
+							new TlvMessage('r', Serializer.serialize(machine)).encrypted(otherMachine.getCipher());
 					updateMessage.writeTo(otherSocket.getOutputStream());
 				}
 			}
