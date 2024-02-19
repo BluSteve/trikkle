@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-import java.util.function.BiConsumer;
 
 public class MachineMain {
 	public static MachineMain instance;
@@ -31,9 +30,8 @@ public class MachineMain {
 	public KeyPair keyPair;
 	public Cipher encryptCipher, decryptCipher;
 	public Set<MachineInfo> machines = ConcurrentHashMap.newKeySet();
-	public Map<MachineInfo, Cipher> machineCiphers = new ConcurrentHashMap<>();
 	public MachineInfo myself;
-	public Map<Character, BiConsumer<byte[], Socket>> handlers = new HashMap<>();
+	public Map<Character, Method> handlers = new HashMap<>();
 	public ServerSocket serverSocket;
 	public Semaphore listening = new Semaphore(0);
 
@@ -156,23 +154,18 @@ public class MachineMain {
 							if (!method.isAnnotationPresent(Handler.class)) continue;
 
 							Handler handler = method.getAnnotation(Handler.class);
-
-							// adapt method to consumer
-							BiConsumer<byte[], Socket> consumer = (byte[] data, Socket senderSocket) -> {
-								try {
-									method.invoke(null, (Object) data, senderSocket);
-								} catch (IllegalAccessException | InvocationTargetException e) {
-									throw new RuntimeException(e);
-								}
-							};
-							handlers.put(handler.dataType(), consumer);
+							handlers.put(handler.dataType(), method);
 						}
 						break;
 
 					default:
 						if (handlers.containsKey(message.dataType)) {
-							// starts a new thread to handle the message
-							new Thread(() -> handlers.get(message.dataType).accept(message.data, socket)).start();
+							Method method = handlers.get(message.dataType);
+							try {
+								method.invoke(null, (Object) message.data);
+							} catch (IllegalAccessException | InvocationTargetException e) {
+								throw new RuntimeException(e);
+							}
 						} else {
 							System.err.println("Unknown message type: " + message.dataType);
 						}

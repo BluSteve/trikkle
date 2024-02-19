@@ -1,5 +1,5 @@
-import org.trikkle.Serializer;
-import org.trikkle.TlvMessage;
+package org.trikkle;
+
 import org.trikkle.cluster.ClusterManager;
 import org.trikkle.serial.JarInfo;
 import org.trikkle.serial.MachineInfo;
@@ -31,13 +31,14 @@ public class Main {
 				}
 			} else if (line.equals("s")) {
 				System.out.println("starting overseer");
-//				Handlers.handleStart(null, null);
+//				org.trikkle.Handlers.handleStart(null, null);
 				for (MachineInfo machine : clusterManager.machines) {
 					TlvMessage tlvMessage = new TlvMessage('s', new byte[0]);
 					machine.sendMessage(tlvMessage);
 				}
 			} else if (line.equals("j")) {
-				JarInfo jarInfo = new JarInfo("Handlers", Files.readAllBytes(Paths.get("client/build/libs/client.jar")));
+				JarInfo jarInfo =
+						new JarInfo("org.trikkle.Handlers", Files.readAllBytes(Paths.get("client/build/libs/client.jar")));
 				for (MachineInfo machine : clusterManager.machines) {
 					TlvMessage tlvMessage = new TlvMessage('j', Serializer.serialize(jarInfo));
 					machine.sendMessage(tlvMessage);
