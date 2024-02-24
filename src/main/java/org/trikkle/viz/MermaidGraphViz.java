@@ -90,6 +90,14 @@ public class MermaidGraphViz implements GraphViz {
 		return sb.toString();
 	}
 
+	/**
+	 * Visualize the given graphs using Mermaid. The done nodes (by object equivalence, not .equals()) will be colored
+	 * green.
+	 *
+	 * @param doneNodes which nodes are done
+	 * @param graphs    the graphs to visualize
+	 * @return the Mermaid visualization
+	 */
 	public String visualize(Set<Node> doneNodes, Graph... graphs) {
 		boolean single = graphs.length == 1;
 
@@ -161,6 +169,12 @@ public class MermaidGraphViz implements GraphViz {
 		return String.join(System.lineSeparator(), lines);
 	}
 
+	/**
+	 * Visualize the given graphs using Mermaid without any done nodes.
+	 *
+	 * @param graphs the graphs to visualize
+	 * @return the Mermaid visualization
+	 */
 	@Override
 	public String visualize(Graph... graphs) {
 		return visualize(Collections.emptySet(), graphs);
