@@ -174,6 +174,7 @@ public abstract class Arc implements Primable {
 			String datumName = inputEntry.getKey();
 			Field field = inputEntry.getValue();
 			Object datum = getDatum(datumName);
+			field.setAccessible(true);
 			try {
 				field.set(this, datum);
 			} catch (IllegalAccessException e) {
@@ -187,6 +188,7 @@ public abstract class Arc implements Primable {
 			String datumName = outputEntry.getKey();
 			Field field = outputEntry.getValue();
 			Object datum;
+			field.setAccessible(true);
 			try {
 				datum = field.get(this);
 			} catch (IllegalAccessException e) {
