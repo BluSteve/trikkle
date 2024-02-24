@@ -159,6 +159,10 @@ public class EasyArcTest {
 
 		assertEquals(5.0, overseer.getDatum("y"));
 		assertEquals(7.5, overseer.getDatum("z"));
+
+		HalfLink hl = new HalfLink(arc);
+		assertEquals(1, hl.getOutputNodes().size());
+		System.out.println(hl);
 	}
 
 	@Test

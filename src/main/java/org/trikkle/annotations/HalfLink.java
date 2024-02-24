@@ -137,4 +137,12 @@ public final class HalfLink {
 	public void setDependencies(Set<Node> dependencies) {
 		this.dependencies = dependencies;
 	}
+
+	@Override
+	public String toString() {
+		if (dependencies == null) {
+			return arc + " -> " + outputNodes;
+		}
+		return dependencies + " -> " + arc + " -> " + outputNodes;
+	}
 }
