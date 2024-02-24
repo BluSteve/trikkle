@@ -38,6 +38,8 @@ have getting started create the demo
 
 ### Manual Arcs and Unsafe Arcs
 
+mention reset()
+
 ### Follow-up Overseers
 
 ### Mermaid "Animations"

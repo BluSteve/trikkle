@@ -228,4 +228,59 @@ public class EasyArcTest {
 		Map<String, Object> results = overseer.getResultCache();
 		assertEquals(45.0, results.get("result1"));
 	}
+
+	@Test
+	void testAlias() {
+		String input1name = "input1";
+		String input2name = "input2";
+		Arc arc = new AutoArc() {
+			@Input
+			double asdf1;
+			@Input(name = "asdf2")
+			double smth;
+			@Output
+			double output;
+
+			{
+				assertThrows(IllegalArgumentException.class, () -> alias("asdfasdf", input1name));
+				alias("asdf1", input1name);
+				alias("asdf2", input2name);
+			}
+
+			@Override
+			public void run() {
+				output = asdf1 + smth;
+			}
+		};
+		Node input1 = new DiscreteNode(input1name, input2name);
+		Node output = new DiscreteNode("output");
+		Link link = new Link(Set.of(input1), arc, Set.of(output));
+
+		Graph graph = new Graph(link);
+		Overseer overseer = new Overseer(graph);
+		overseer.addStartingDatum(input1name, 2.5);
+		overseer.addStartingDatum(input2name, 3.6);
+		overseer.start();
+
+		assertEquals(6.1, overseer.getResultCache().get("output"));
+	}
+
+	@Test
+	void testSameNameThrow() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Arc arc = new AutoArc() {
+				@Input(name = "input1")
+				double input1;
+				@Input(name = "input1")
+				String input2;
+				@Output
+				int output;
+
+				@Override
+				protected void run() {
+
+				}
+			};
+		});
+	}
 }
