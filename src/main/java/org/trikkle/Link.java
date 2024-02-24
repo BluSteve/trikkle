@@ -51,11 +51,10 @@ public final class Link implements Congruent<Link> {
 	}
 
 	/**
-	 * Create a link with the given arc. The dependency and output node are automatically generated from the arc via
-	 * annotations {@link Input} and {@link Output}. All input datums will be added to a single dependency node, and all
-	 * output datums will be added to a
-	 * single output node. The nodes created will either be a {@link DiscreteNode} or an {@link EmptyNode}, if there are
-	 * no datums.
+	 * Create a link with the given arc. The dependency and output node are generated from the arc via
+	 * {@link Arc#getInputFields()} and {@link Arc#getOutputFields()}. All input datums will be added to a single
+	 * dependency node, and all output datums will be added to a single output node. The nodes created will either be a
+	 * {@link DiscreteNode} or an {@link EmptyNode}, if there are no datums.
 	 * <p>
 	 * This constructor is ideal for graphs without partial dependencies- that is, an arc that only uses a subset of the
 	 * datums of its dependency.
@@ -63,8 +62,8 @@ public final class Link implements Congruent<Link> {
 	 * @param arc the arc of the link, should have annotations {@link Input} and {@link Output}
 	 * @see Input
 	 * @see Output
-	 * @see DiscreteNode
-	 * @see EmptyNode
+	 * @see Arc#getInputFields()
+	 * @see Arc#getOutputFields()
 	 */
 	public Link(Arc arc) {
 		dependencies = new HashSet<>();

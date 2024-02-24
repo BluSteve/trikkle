@@ -1,9 +1,6 @@
 package org.trikkle.annotations;
 
-import org.trikkle.Arc;
-import org.trikkle.DiscreteNode;
-import org.trikkle.Link;
-import org.trikkle.Node;
+import org.trikkle.*;
 
 import java.util.*;
 
@@ -36,6 +33,18 @@ public final class HalfLink {
 
 	public HalfLink(Arc arc, Node outputNode) {
 		this(arc, Collections.singleton(outputNode));
+	}
+
+	/**
+	 * Create a half link with the given arc. The output node is generated from {@link Arc#getOutputFields()}.
+	 *
+	 * @param arc the arc of the half link, should have annotations {@link Input} and {@link Output}
+	 * @see Link#Link(Arc)
+	 * @see Arc#getOutputFields()
+	 */
+	public HalfLink(Arc arc) {
+		this(arc, Collections.singleton(arc.getOutputFields().keySet().isEmpty() ? new EmptyNode() :
+				new DiscreteNode(new HashSet<>(arc.getOutputFields().keySet()))));
 	}
 
 	/**

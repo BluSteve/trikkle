@@ -10,9 +10,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a field in an arc as a return datum. These are only returned via
- * {@link Arc#returnDatum(String, Object)} after the arc's {@link Arc#run()} method finishes.
- * Output streams (see
+ * Marks a field in an arc as a return datum. These are only returned via {@link Arc#returnDatum(String, Object)}
+ * after the arc's {@link Arc#run()} method finishes.
+ * <p>
+ * Dynamic datum names are supported by the {@link Arc#alias(String, String)} method. Output streams (see
  * {@link StreamNode}) are supported but strongly not recommended due to lack of clarity.
  * <p>
  * If you do not assign a value to the field in the arc's run method, the default value of the
@@ -21,6 +22,7 @@ import java.lang.annotation.Target;
  *
  * @see Arc
  * @see Arc#run()
+ * @see Arc#alias(String, String)
  * @see Link
  * @since 0.1.0
  */

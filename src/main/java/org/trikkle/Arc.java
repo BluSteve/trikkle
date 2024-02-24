@@ -259,8 +259,8 @@ public abstract class Arc implements Primable {
 	}
 
 	/**
-	 * Gets the input fields of this arc as declared through {@link Input}. The keys are the names of the fields and the
-	 * values are the fields themselves.
+	 * Gets the input fields of this arc as declared through {@link Input} and {@link Arc#alias(String, String)}. The
+	 * keys are the names of the fields and the values are the fields themselves.
 	 *
 	 * @return the input fields of this arc
 	 */
@@ -269,8 +269,8 @@ public abstract class Arc implements Primable {
 	}
 
 	/**
-	 * Gets the output fields of this arc as declared through {@link Output}. The keys are the names of the fields and
-	 * the values are the fields themselves.
+	 * Gets the output fields of this arc as declared through {@link Output} and {@link Arc#alias(String, String)}. The
+	 * keys are the names of the fields and the values are the fields themselves.
 	 *
 	 * @return the output fields of this arc
 	 */
