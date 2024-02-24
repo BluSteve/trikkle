@@ -394,12 +394,14 @@ public final class Overseer {
 
 	/**
 	 * A functional interface for observing the overseer's progress. The observer is called every time the overseer
-	 * ticks. The observer is called with the following parameters:
+	 * ticks. If logging ({@link #setLogging(boolean)}) is set to true, the observer is called with the following
+	 * parameters:
 	 * <ol>
 	 * <li>the node that called the tick</li>
 	 * <li>the current tick number</li>
 	 * <li>the links that are runnable at the current tick</li>
 	 * </ol>
+	 * Otherwise, it is called with {@code (node, 0, null)}.
 	 */
 	@FunctionalInterface
 	public interface Observer {
