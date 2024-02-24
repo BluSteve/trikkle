@@ -59,7 +59,7 @@ public final class Link implements Congruent<Link> {
 	 * This constructor is ideal for graphs without partial dependencies- that is, an arc that only uses a subset of the
 	 * datums of its dependency.
 	 *
-	 * @param arc the arc of the link, should have annotations {@link Input} and {@link Output}
+	 * @param arc the arc of the link
 	 * @see Input
 	 * @see Output
 	 * @see Arc#getInputDatumNames()
