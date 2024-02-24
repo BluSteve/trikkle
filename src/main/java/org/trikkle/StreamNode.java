@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A {@link Node} that can have an unlimited number of datums of one name added to it. Upon the first datum added,
+ * A {@link Node} that can have an unlimited number of datums of one pointer added to it. Upon the first datum added,
  * the {@code StreamNode} will be irreversibly set to {@code usable}. ({@link Node#setUsable()}) Arcs dependent on
  * this node will thus be called every single tick after the first datum is added.
  * <p>
@@ -26,15 +26,15 @@ public final class StreamNode extends Node {
 	private final AtomicInteger count = new AtomicInteger(0);
 	private int limit = -1;
 
-	public StreamNode(String datumName) {
-		super(Collections.singleton(datumName));
+	public StreamNode(String pointer) {
+		super(Collections.singleton(pointer));
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	@Override
-	// Assumes that all datums of a particular name are of the same type
-	protected void uncheckedAddDatum(String datumName, Object datum) {
-		((Queue) overseer.getCache().get(datumName)).add(datum);
+	// Assumes that all datums of a particular pointer are of the same type
+	protected void uncheckedAddDatum(String pointer, Object datum) {
+		((Queue) overseer.getCache().get(pointer)).add(datum);
 		setUsable();
 		if (limit != -1) {
 			int c = count.getAndIncrement();
@@ -71,7 +71,7 @@ public final class StreamNode extends Node {
 	@Override
 	public void primeWith(Overseer overseer) {
 		super.primeWith(overseer);
-		overseer.getCache().putIfAbsent(datumNames.iterator().next(), new ConcurrentLinkedQueue<>());
+		overseer.getCache().putIfAbsent(pointers.iterator().next(), new ConcurrentLinkedQueue<>());
 	}
 
 	@Override
@@ -82,6 +82,6 @@ public final class StreamNode extends Node {
 
 	@Override
 	public String toString() {
-		return "StreamNode" + datumNames;
+		return "StreamNode" + pointers;
 	}
 }

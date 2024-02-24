@@ -32,7 +32,7 @@ public final class Graph implements Congruent<Graph> {
 	public final Map<Arc, Link> arcMap = new HashMap<>();
 	public final MultiMap<Node, Link> outputNodeMap = new MultiHashMap<>();
 	public final MultiMap<Node, Node> dependenciesOfNode = new MultiHashMap<>();
-	public final Map<String, Node> nodeOfDatum = new HashMap<>();
+	public final Map<String, Node> nodeOfPointer = new HashMap<>();
 
 	/**
 	 * Create a graph with the given links. If the type of the given links is not a set, it will be converted into a
@@ -93,12 +93,12 @@ public final class Graph implements Congruent<Graph> {
 			nodeArray[entry.getValue()] = entry.getKey();
 		}
 
-		// check for no duplicate datum names
+		// check for no duplicate pointers
 		for (Node node : nodes) {
-			for (String datumName : node.datumNames) {
-				Node rnode = nodeOfDatum.put(datumName, node);
+			for (String pointer : node.pointers) {
+				Node rnode = nodeOfPointer.put(pointer, node);
 				if (rnode != null) {
-					throw new IllegalArgumentException("Two nodes cannot have the same datum name " + datumName + "!");
+					throw new IllegalArgumentException("Two nodes cannot have the same pointer " + pointer + "!");
 				}
 			}
 		}

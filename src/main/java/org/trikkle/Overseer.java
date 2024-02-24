@@ -117,7 +117,7 @@ public final class Overseer {
 			if (!startingNode.isUsable()) {
 				throw new IllegalStateException(
 						"Starting node " + startingNode + " is not fully populated! All unfilled datums: " +
-								getUnfilledStartingDatumNames());
+								getUnfilledStartingPointers());
 			}
 		}
 		// check that overseer and .start() are called in the same thread
@@ -202,50 +202,51 @@ public final class Overseer {
 	}
 
 	/**
-	 * Returns the names of datums that are required to start the graph, belonging to the starting nodes.
+	 * Returns the pointers to datums that are required to start the graph, belonging to the starting nodes.
 	 *
-	 * @return the names of datums that are required to start the graph
+	 * @return the pointers to datums that are required to start the graph
 	 */
-	public Set<String> getStartingDatumNames() {
-		Set<String> startingDatumNames = new HashSet<>();
+	public Set<String> getStartingPointers() {
+		Set<String> startingPointers = new HashSet<>();
 		for (Node startingNode : g.startingNodes) {
-			startingDatumNames.addAll(startingNode.datumNames);
+			startingPointers.addAll(startingNode.pointers);
 		}
-		return startingDatumNames;
+		return startingPointers;
 	}
 
 	/**
-	 * Returns the names of datums that are required to start the graph, belonging to the starting nodes, but which have
+	 * Returns the pointers to datums that are required to start the graph, belonging to the starting nodes, but which
+	 * have
 	 * not been filled.
 	 *
-	 * @return the names of datums that are required to start the graph but have not been filled
+	 * @return the pointers to datums that are required to start the graph but have not been filled
 	 */
-	public Set<String> getUnfilledStartingDatumNames() {
-		Set<String> startingDatumNames = new HashSet<>();
+	public Set<String> getUnfilledStartingPointers() {
+		Set<String> startingPointers = new HashSet<>();
 		for (Node startingNode : g.startingNodes) {
-			for (String datumName : startingNode.datumNames) {
-				if (!cache.containsKey(datumName)) {
-					startingDatumNames.add(datumName);
+			for (String pointer : startingNode.pointers) {
+				if (!cache.containsKey(pointer)) {
+					startingPointers.add(pointer);
 				}
 			}
 		}
-		return startingDatumNames;
+		return startingPointers;
 	}
 
 	/**
 	 * Convenience method for adding a starting datum to the overseer's cache. The datum must belong to a starting node.
 	 * Equivalent to calling {@link Node#addDatum(String, Object)} on the starting node directly.
 	 *
-	 * @param datumName the name of the datum
-	 * @param datum     the datum
+	 * @param pointer the pointer to the datum
+	 * @param datum   the datum
 	 */
-	public void addStartingDatum(String datumName, Object datum) {
-		Node node = g.nodeOfDatum.get(datumName);
+	public void addStartingDatum(String pointer, Object datum) {
+		Node node = g.nodeOfPointer.get(pointer);
 		if (!g.startingNodes.contains(node)) {
 			throw new IllegalArgumentException(
-					"Datum " + datumName + " does not belong to a starting node!");
+					"Datum " + pointer + " does not belong to a starting node!");
 		}
-		node.addDatum(datumName, datum);
+		node.addDatum(pointer, datum);
 	}
 
 	/**
@@ -255,7 +256,7 @@ public final class Overseer {
 	 * @param cache the cache to fill the starting datums with
 	 */
 	public void fillStartingDatums(Map<String, Object> cache) {
-		Set<String> unfilled = getUnfilledStartingDatumNames();
+		Set<String> unfilled = getUnfilledStartingPointers();
 		for (Map.Entry<String, Object> entry : cache.entrySet()) {
 			if (!unfilled.contains(entry.getKey())) continue;
 			addStartingDatum(entry.getKey(), entry.getValue());
@@ -289,9 +290,9 @@ public final class Overseer {
 	public Map<String, Object> getResultCache() {
 		Map<String, Object> resultCache = new HashMap<>();
 		for (Node endingNode : g.endingNodes) {
-			for (String datumName : endingNode.datumNames) {
-				Object datum = cache.get(datumName);
-				resultCache.put(datumName, datum);
+			for (String pointer : endingNode.pointers) {
+				Object datum = cache.get(pointer);
+				resultCache.put(pointer, datum);
 			}
 		}
 		return resultCache;
@@ -301,12 +302,12 @@ public final class Overseer {
 		return new HashMap<>(cache);
 	}
 
-	public Object getDatum(String datumName) {
-		return cache.get(datumName);
+	public Object getDatum(String pointer) {
+		return cache.get(pointer);
 	}
 
-	public Node getNodeOfDatum(String datumName) {
-		return g.nodeOfDatum.get(datumName);
+	public Node getNodeOfPointer(String pointer) {
+		return g.nodeOfPointer.get(pointer);
 	}
 
 	public int getTick() {

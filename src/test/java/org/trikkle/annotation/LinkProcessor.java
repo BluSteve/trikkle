@@ -57,12 +57,12 @@ public class LinkProcessor {
 				}
 
 				for (Map.Entry<String, List<TrikkleFunction>> entry : tfOfLinkId.entrySet()) {
-					// check that all tfs in the group have the same outputDatumName
-					String outputDatumName = null;
+					// check that all tfs in the group have the same outputPointer
+					String outputPointer = null;
 					for (TrikkleFunction tf : entry.getValue()) {
-						if (outputDatumName == null) {
-							outputDatumName = tf.output();
-						} else if (!outputDatumName.equals(tf.output())) {
+						if (outputPointer == null) {
+							outputPointer = tf.output();
+						} else if (!outputPointer.equals(tf.output())) {
 							throw new IllegalArgumentException(
 									"All TrikkleFunctions with the same linkId must have the same output!");
 						}
@@ -80,7 +80,7 @@ public class LinkProcessor {
 		// for each link, for each method in link, for each annotation on method.
 
 		// this has to be for each method, then for each annotation on the method
-		// then the inputDatumNames on the annotations on one method must add up to the total number of parameters
+		// then the inputPointers on the annotations on one method must add up to the total number of parameters
 		// of the method.
 
 		Set<String> linkIds2 = linkIds.length == 0 ? methodsOfLinkId.keySet() :
@@ -90,7 +90,7 @@ public class LinkProcessor {
 
 			Set<Node> dependencies = new HashSet<>();
 			Map<Method, Map<String, List<String>>> inputsOfOutput = new HashMap<>();
-			Set<String> outputDatumNames = new HashSet<>();
+			Set<String> outputPointers = new HashSet<>();
 
 			for (Method method : methods) {
 				Set<Node> localDependencies = new HashSet<>();
@@ -103,17 +103,17 @@ public class LinkProcessor {
 					if (!mm.containsKey(tf.output())) {
 						mm.put(tf.output(), new ArrayList<>());
 					}
-					for (String inputDatumName : tf.inputs()) {
-						mm.get(tf.output()).add(inputDatumName);
+					for (String inputPointer : tf.inputs()) {
+						mm.get(tf.output()).add(inputPointer);
 					}
 
-					outputDatumNames.add(tf.output());
+					outputPointers.add(tf.output());
 				}
 				inputsOfOutput.put(method, mm);
 				dependencies.addAll(localDependencies);
 			}
 
-			Node outputNode = Nodespace.DEFAULT.discreteOf(outputDatumNames);
+			Node outputNode = Nodespace.DEFAULT.discreteOf(outputPointers);
 
 			Arc arc = new AutoArc() {
 				@Override

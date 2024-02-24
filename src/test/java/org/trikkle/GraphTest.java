@@ -48,7 +48,7 @@ class GraphTest {
 
 	@Test
 	void concatGraphs() {
-		// make nodes with datumNames A to F
+		// make nodes with pointers A to F
 		Node nodeA = new DiscreteNode("A");
 		Node nodeB = new DiscreteNode("B");
 		Node nodeC = new DiscreteNode("C");
@@ -186,7 +186,7 @@ class GraphTest {
 
 	@Test
 	void softEquals() {
-		// generate 4 nodes, with two having the same datumNames
+		// generate 4 nodes, with two having the same pointers
 		Nodespace ns = new Nodespace();
 		Node nodeA = ns.discreteOf("A");
 		Node nodeC1 = ns.discreteOf("C", "a");
@@ -237,7 +237,7 @@ class GraphTest {
 	void twoNodesSameName() {
 		// make a new node with the same name as paramNode
 		Node paramNode2 = new DiscreteNode("param", "smth else");
-		// add two different nodes but with the same datum name into a graph. should throw an error
+		// add two different nodes but with the same pointer into a graph. should throw an error
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(List.of(
 					new Link(Set.of(paramNode), arcs.get(0), magicNode),
@@ -245,7 +245,7 @@ class GraphTest {
 			));
 		});
 
-		assertTrue(exception.getMessage().contains("Two nodes cannot have the same datum name param!"));
+		assertTrue(exception.getMessage().contains("Two nodes cannot have the same pointer param!"));
 	}
 
 	@Test

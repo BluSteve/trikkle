@@ -28,7 +28,7 @@ public class TrikkleMethodGroupTest {
 		Graph graph = linkProcessor.getGraph();
 		Overseer overseer = new Overseer(graph);
 
-		System.out.println(overseer.getStartingDatumNames());
+		System.out.println(overseer.getStartingPointers());
 		overseer.addStartingDatum("a", 5);
 		overseer.addStartingDatum("b", 3);
 		overseer.start();
@@ -55,7 +55,7 @@ public class TrikkleMethodGroupTest {
 		Graph graph = new Graph(linkProcessor.getLinks().get("pow"));
 		Overseer overseer = new Overseer(graph);
 
-		System.out.println(overseer.getStartingDatumNames());
+		System.out.println(overseer.getStartingPointers());
 		overseer.addStartingDatum("a", 5);
 		overseer.addStartingDatum("b", 3);
 		overseer.start();
@@ -111,7 +111,7 @@ public class TrikkleMethodGroupTest {
 
 		assertEquals(2, graph.startingNodes.size());
 
-		System.out.println(overseer.getStartingDatumNames());
+		System.out.println(overseer.getStartingPointers());
 		overseer.addStartingDatum("X", 5);
 		overseer.addStartingDatum("Y", 3);
 		overseer.addStartingDatum("Z", 2);

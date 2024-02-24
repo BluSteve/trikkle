@@ -12,40 +12,40 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 0.1.0
  */
 public abstract class Node implements Primable, Congruent<Node> { // Generics are too restricting for this class
-	public final Set<String> datumNames; // unique identifies a node
+	public final Set<String> pointers; // unique identifies a node
 	private final ReentrantLock lock = new ReentrantLock();
 	protected Overseer overseer;
 	private boolean usable = false; // once true cannot be false
 	private double progress = 0; // monotonically increasing
 
-	protected Node(Set<String> datumNames) {
-		for (String datumName : datumNames) {
-			if (datumName == null) {
-				throw new NullPointerException("Datum name cannot be null!");
+	protected Node(Set<String> pointers) {
+		for (String pointer : pointers) {
+			if (pointer == null) {
+				throw new NullPointerException("Pointer cannot be null!");
 			}
 		}
-		this.datumNames = datumNames;
+		this.pointers = pointers;
 	}
 
 	/**
 	 * Adds a datum to the overseer cache of this node. The datum must have been declared by this node.
 	 *
-	 * @param datumName the name of the datum
-	 * @param datum     the datum
+	 * @param pointer the pointer to the datum
+	 * @param datum   the datum
 	 * @throws IllegalStateException    if the node is not primed with an overseer
 	 * @throws IllegalArgumentException if the datum was not declared by the node
 	 */
-	public final void addDatum(String datumName, Object datum) {
+	public final void addDatum(String pointer, Object datum) {
 		if (overseer == null) {
 			throw new IllegalStateException("Node " + this + " is not primed with an overseer!");
 		}
-		if (!datumNames.contains(datumName)) {
-			throw new IllegalArgumentException("Datum " + datumName + " was not declared by this node!");
+		if (!pointers.contains(pointer)) {
+			throw new IllegalArgumentException("Datum " + pointer + " was not declared by this node!");
 		}
-		uncheckedAddDatum(datumName, datum);
+		uncheckedAddDatum(pointer, datum);
 	}
 
-	protected abstract void uncheckedAddDatum(String datumName, Object datum);
+	protected abstract void uncheckedAddDatum(String pointer, Object datum);
 
 	public boolean isUsable() {
 		return usable;
@@ -87,14 +87,14 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 	}
 
 	/**
-	 * Two nodes are equal if they are the same object. They are congruent if they have the same datum names.
+	 * Two nodes are equal if they are the same object. They are congruent if they have the same pointers.
 	 *
 	 * @param node the node to compare to
 	 * @return true if the nodes are congruent
 	 */
 	@Override
 	public boolean congruentTo(Node node) {
-		return datumNames.equals(node.datumNames);
+		return pointers.equals(node.pointers);
 	}
 
 	@Override
@@ -121,6 +121,6 @@ public abstract class Node implements Primable, Congruent<Node> { // Generics ar
 
 	@Override
 	public String toString() {
-		return "Node" + datumNames;
+		return "Node" + pointers;
 	}
 }

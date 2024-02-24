@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 public @interface TrikkleFunction {
 	String[] inputs();
 
-	// if two functions have the same nodeId, they will be used to make one outputNode with all their outputDatumNames
+	// if two functions have the same nodeId, they will be used to make one outputNode with all their outputPointers
 	// 1:1 correspondence with link
 	String linkId();
 

@@ -17,31 +17,31 @@ public final class DiscreteNode extends Node {
 	private final AtomicInteger datumsFilled = new AtomicInteger(0);
 
 	/**
-	 * Creates a new DiscreteNode with the given datum names.
+	 * Creates a new DiscreteNode with the given pointers.
 	 *
-	 * @param datumNames the names of the datums
-	 * @throws IllegalArgumentException if the set of datum names is empty
+	 * @param pointers the pointers to the datums
+	 * @throws IllegalArgumentException if the set of pointers is empty
 	 */
-	public DiscreteNode(Set<String> datumNames) {
-		super(datumNames);
-		if (datumNames.isEmpty()) {
+	public DiscreteNode(Set<String> pointers) {
+		super(pointers);
+		if (pointers.isEmpty()) {
 			throw new IllegalArgumentException("DiscreteNode must have at least one datum");
 		}
 	}
 
-	public DiscreteNode(String... datumNames) {
-		this(new HashSet<>(Arrays.asList(datumNames)));
+	public DiscreteNode(String... pointers) {
+		this(new HashSet<>(Arrays.asList(pointers)));
 	}
 
 	@Override
-	protected void uncheckedAddDatum(String datumName, Object datum) {
-		overseer.getCache().put(datumName, datum);
+	protected void uncheckedAddDatum(String pointer, Object datum) {
+		overseer.getCache().put(pointer, datum);
 
 		int i = datumsFilled.incrementAndGet();
-		if (i == datumNames.size()) { // all datums filled
+		if (i == pointers.size()) { // all datums filled
 			setProgress(1);
 		} else {
-			setProgress((double) i / datumNames.size());
+			setProgress((double) i / pointers.size());
 		}
 	}
 
@@ -52,8 +52,9 @@ public final class DiscreteNode extends Node {
 	 */
 	@Override
 	public void setUsable() {
-		if (datumsFilled.get() < datumNames.size()) {
-			throw new IllegalStateException("DiscreteNode " + this + " is not fully filled and cannot be set to usable.");
+		if (datumsFilled.get() < pointers.size()) {
+			throw new IllegalStateException("DiscreteNode " + this + " is not fully filled and cannot be set to usable.
+					");
 		}
 		super.setUsable();
 		if (!overseer.g.endingNodes.contains(this)) {

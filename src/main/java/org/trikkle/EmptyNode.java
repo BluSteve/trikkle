@@ -19,12 +19,13 @@ public final class EmptyNode extends Node {
 	}
 
 	@Override
-	protected void uncheckedAddDatum(String datumName, Object datum) {
+	protected void uncheckedAddDatum(String pointer, Object datum) {
 		throw new UnsupportedOperationException("EmptyNode cannot have any datums!");
 	}
 
 	/**
-	 * Irreversibly sets the node to {@code usable}. Also sets the progress to 1 and ticktocks the overseer if this node
+	 * Irreversibly sets the node to {@code usable}. Also sets the progress to 1 and ticktocks the overseer if this n
+	 ode
 	 * is not an ending node.
 	 *
 	 * @see #setProgress(double)

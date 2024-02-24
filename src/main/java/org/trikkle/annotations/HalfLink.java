@@ -36,15 +36,15 @@ public final class HalfLink {
 	}
 
 	/**
-	 * Create a half link with the given arc. The output node is generated from {@link Arc#getOutputDatumNames()}.
+	 * Create a half link with the given arc. The output node is generated from {@link Arc#getOutputPointers()}.
 	 *
 	 * @param arc the arc of the half link, should have annotations {@link Input} and {@link Output}
 	 * @see Link#Link(Arc)
-	 * @see Arc#getOutputDatumNames()
+	 * @see Arc#getOutputPointers()
 	 */
 	public HalfLink(Arc arc) {
-		this(arc, Collections.singleton(arc.getOutputDatumNames().isEmpty() ? new EmptyNode() :
-				new DiscreteNode(new HashSet<>(arc.getOutputDatumNames()))));
+		this(arc, Collections.singleton(arc.getOutputPointers().isEmpty() ? new EmptyNode() :
+				new DiscreteNode(new HashSet<>(arc.getOutputPointers()))));
 	}
 
 	/**
@@ -72,10 +72,10 @@ public final class HalfLink {
 		Map<String, Node> nodeOfDatum = new HashMap<>();
 		for (HalfLink halfLink : halfLinks) {
 			for (Node outputNode : halfLink.outputNodes) {
-				for (String datumName : outputNode.datumNames) {
-					Node rvalue = nodeOfDatum.put(datumName, outputNode);
+				for (String pointer : outputNode.pointers) {
+					Node rvalue = nodeOfDatum.put(pointer, outputNode);
 					if (rvalue != null) {
-						throw new IllegalArgumentException("Datum name " + datumName + " is already declared by " + rvalue);
+						throw new IllegalArgumentException("Pointer " + pointer + " is already declared by " + rvalue);
 					}
 				}
 			}
@@ -90,12 +90,12 @@ public final class HalfLink {
 
 			Set<Node> dependencies = new HashSet<>();
 			Set<String> danglingInputs = new HashSet<>();
-			for (String inputName : halfLink.arc.getInputDatumNames()) {
-				if (!nodeOfDatum.containsKey(inputName)) {
-					danglingInputs.add(inputName);
+			for (String inputPointers : halfLink.arc.getInputPointers()) {
+				if (!nodeOfDatum.containsKey(inputPointers)) {
+					danglingInputs.add(inputPointers);
 					continue;
 				}
-				dependencies.add(nodeOfDatum.get(inputName));
+				dependencies.add(nodeOfDatum.get(inputPointers));
 			}
 
 			if (!danglingInputs.isEmpty()) {

@@ -127,7 +127,7 @@ class OverseerTest {
 		System.out.println(visualizer.visualize(graph));
 		Overseer overseer = new Overseer(graph);
 
-		assertEquals(overseer.getStartingDatumNames(), Set.of("toSquare", "finalMultiplier", "finalExponent"));
+		assertEquals(overseer.getStartingPointers(), Set.of("toSquare", "finalMultiplier", "finalExponent"));
 
 		overseer.addStartingDatum("toSquare", 2.0);
 		overseer.addStartingDatum("finalMultiplier", 3.0);
@@ -175,7 +175,7 @@ class OverseerTest {
 			@Override
 			public void run() {
 				Queue<Double> queue = (Queue<Double>) getDatum("stream1");
-				Node stream1Node = getOverseer().getNodeOfDatum("stream1");
+				Node stream1Node = getOverseer().getNodeOfPointer("stream1");
 
 				double sum = 0;
 				synchronized (queue) {
@@ -506,7 +506,7 @@ class OverseerTest {
 
 	@Test
 	void animationTest() {
-		// make three arcs that output to one node each with different datum names
+		// make three arcs that output to one node each with different pointers
 		Arc arc1 = new AutoArc() {
 			@Override
 			public void run() {

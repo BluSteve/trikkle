@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * Marks a field in an arc as an input datum. These are filled by {@link Arc#getDatum(String)} before the arc's
  * {@link Arc#run()} method starts.
  * <p>
- * Dynamic datum names are supported by the {@link Arc#alias(String, String)} method. Input streams (see
+ * Dynamic pointers are supported by the {@link Arc#alias(String, String)} method. Input streams (see
  * {@link StreamNode}) are generally supported.
  *
  * @see Arc
@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Input {
 	/**
-	 * The name of the input datum. If empty, the name of the field will be used.
+	 * The pointer to the input datum. If empty, the name of the field will be used.
 	 *
-	 * @return the name of the input datum
+	 * @return the pointer to the input datum
 	 */
-	String name() default "";
+	String pointer() default "";
 }

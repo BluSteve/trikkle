@@ -27,7 +27,7 @@ public class MermaidGraphViz implements GraphViz {
 	}
 
 	private static String nodeToMermaid(Node node, String nodeId, NodeType nodeType) {
-		String nodeText = node.datumNames.isEmpty() ? "<br>" : String.join("<br>", node.datumNames);
+		String nodeText = node.pointers.isEmpty() ? "<br>" : String.join("<br>", node.pointers);
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(nodeId);

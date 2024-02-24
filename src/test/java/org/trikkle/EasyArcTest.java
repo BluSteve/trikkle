@@ -183,14 +183,14 @@ public class EasyArcTest {
 
 		Arc consumerArc = new Arc(false) {
 			double total = 0; // is this a pure function? it is if you reset()
-			@Input(name = "stream1")
+			@Input(pointer = "stream1")
 			Queue<Double> queue;
 			@Output
 			double result1;
 
 			@Override
 			public void run() {
-				Node stream1Node = getOverseer().getNodeOfDatum("stream1");
+				Node stream1Node = getOverseer().getNodeOfPointer("stream1");
 
 				double sum = 0;
 				synchronized (queue) {
@@ -240,7 +240,7 @@ public class EasyArcTest {
 		Arc arc = new AutoArc() {
 			@Input
 			double asdf1;
-			@Input(name = "asdf2")
+			@Input(pointer = "asdf2")
 			double smth;
 			@Output
 			double output;
@@ -273,9 +273,9 @@ public class EasyArcTest {
 	void testSameNameThrow() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			Arc arc = new AutoArc() {
-				@Input(name = "input1")
+				@Input(pointer = "input1")
 				double input1;
-				@Input(name = "input1")
+				@Input(pointer = "input1")
 				String input2;
 				@Output
 				int output;
@@ -289,7 +289,7 @@ public class EasyArcTest {
 	}
 
 	@Test
-	void setDatumNamesTest() {
+	void setPointersTest() {
 		Arc arc = new AutoArc() {
 			@Input
 			double input3;
@@ -301,10 +301,10 @@ public class EasyArcTest {
 				returnDatum("output", input1 + input2);
 			}
 		};
-		arc.setInputDatumNames("input1", "input2");
-		arc.setOutputDatumNames("output");
-		assertEquals(Set.of("input1", "input2"), arc.getInputDatumNames());
-		assertEquals(Set.of("output"), arc.getOutputDatumNames());
+		arc.setInputPointers("input1", "input2");
+		arc.setOutputPointers("output");
+		assertEquals(Set.of("input1", "input2"), arc.getInputPointers());
+		assertEquals(Set.of("output"), arc.getOutputPointers());
 
 		Link link = new Link(arc);
 		Graph graph = new Graph(link);

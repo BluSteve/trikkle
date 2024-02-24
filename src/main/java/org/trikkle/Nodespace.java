@@ -6,14 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.trikkle.EmptyNode.EMPTY_SET;
 
 /**
- * A nodespace is a namespace for nodes. All nodes with the same datum names in a nodespace are the same object.
+ * A nodespace is a namespace for nodes. All nodes with the same pointers in a nodespace are the same object.
  * Useful for when you want to access the same node from different parts of your code.
  * <p>
  * The default nodespace is {@code Nodespace.}{@link Nodespace#DEFAULT}.
  * <p>
- * Named nodespaces which prefixed all its datum names with a custom string was attempted and abandoned as the
+ * Named nodespaces which prefixed all its pointers with a custom string was attempted and abandoned as the
  * additional complexity was unjustified. The use case for it was intended to be when you want to combine two graphs
- * with overlapping datum names, but multiple nodespaces with separate graphs and overseers proved to be clearer. The
+ * with overlapping pointers, but multiple nodespaces with separate graphs and overseers proved to be clearer. The
  * constructor {@link Overseer#Overseer(Graph, Map)} and the method {@link Overseer#fillStartingDatums(Map)} may be
  * useful in joining two overseers.
  * <p>
@@ -27,49 +27,49 @@ public final class Nodespace {
 	public final Map<Set<String>, Node> nodeStore = new ConcurrentHashMap<>();
 
 	/**
-	 * Returns a {@link DiscreteNode} with the given datum names. If the node does not exist, it is created and added to
+	 * Returns a {@link DiscreteNode} with the given pointers. If the node does not exist, it is created and added to
 	 * the
 	 * {@link Nodespace#nodeStore}.
 	 *
-	 * @param datumNames the datum names
+	 * @param pointers the pointers
 	 * @see DiscreteNode#DiscreteNode(Set)
 	 */
-	public DiscreteNode discreteOf(Set<String> datumNames) {
-		if (nodeStore.containsKey(datumNames)) {
-			return (DiscreteNode) nodeStore.get(datumNames);
+	public DiscreteNode discreteOf(Set<String> pointers) {
+		if (nodeStore.containsKey(pointers)) {
+			return (DiscreteNode) nodeStore.get(pointers);
 		} else {
-			DiscreteNode node = new DiscreteNode(datumNames);
-			nodeStore.put(node.datumNames, node);
+			DiscreteNode node = new DiscreteNode(pointers);
+			nodeStore.put(node.pointers, node);
 			return node;
 		}
 	}
 
 	/**
-	 * Returns a {@link DiscreteNode} with the given datum names. If the node does not exist, it is created and added to
+	 * Returns a {@link DiscreteNode} with the given pointers. If the node does not exist, it is created and added to
 	 * the
 	 * {@link Nodespace#nodeStore}.
 	 *
-	 * @param datumNames the datum names
+	 * @param pointers the pointers
 	 * @see DiscreteNode#DiscreteNode(Set)
 	 */
-	public DiscreteNode discreteOf(String... datumNames) {
-		return discreteOf(new HashSet<>(Arrays.asList(datumNames)));
+	public DiscreteNode discreteOf(String... pointers) {
+		return discreteOf(new HashSet<>(Arrays.asList(pointers)));
 	}
 
 	/**
-	 * Returns a {@link StreamNode} with the given datum name. If the node does not exist, it is created and added to the
+	 * Returns a {@link StreamNode} with the given pointer. If the node does not exist, it is created and added to the
 	 * {@link Nodespace#nodeStore}.
 	 *
-	 * @param datumName the datum name
+	 * @param pointer the pointer
 	 * @see StreamNode#StreamNode(String)
 	 */
-	public StreamNode streamOf(String datumName) {
-		Set<String> singleton = Collections.singleton(datumName);
+	public StreamNode streamOf(String pointer) {
+		Set<String> singleton = Collections.singleton(pointer);
 		if (nodeStore.containsKey(singleton)) {
 			return (StreamNode) nodeStore.get(singleton);
 		} else {
-			StreamNode node = new StreamNode(datumName);
-			nodeStore.put(node.datumNames, node);
+			StreamNode node = new StreamNode(pointer);
+			nodeStore.put(node.pointers, node);
 			return node;
 		}
 	}
@@ -91,57 +91,57 @@ public final class Nodespace {
 	}
 
 	/**
-	 * Adds the given node to the {@link Nodespace#nodeStore} based on the node's datum names.
+	 * Adds the given node to the {@link Nodespace#nodeStore} based on the node's pointers.
 	 *
 	 * @param node the node
 	 */
 	public void add(Node node) {
-		nodeStore.put(node.datumNames, node);
+		nodeStore.put(node.pointers, node);
 	}
 
 	/**
-	 * Adds all the given nodes to the {@link Nodespace#nodeStore} based on the node's datum names.
+	 * Adds all the given nodes to the {@link Nodespace#nodeStore} based on the node's pointers.
 	 *
 	 * @param nodes the nodes
 	 */
 	public void addAll(Collection<Node> nodes) {
 		for (Node node : nodes) {
-			nodeStore.put(node.datumNames, node);
+			nodeStore.put(node.pointers, node);
 		}
 	}
 
 	/**
-	 * Removes the given node from the {@link Nodespace#nodeStore} based on the node's datum names. The node given and
+	 * Removes the given node from the {@link Nodespace#nodeStore} based on the node's pointers. The node given and
 	 * the node removed may not necessarily be the same object.
 	 *
 	 * @param node the node
 	 */
 	public void remove(Node node) {
-		nodeStore.remove(node.datumNames);
+		nodeStore.remove(node.pointers);
 	}
 
 	/**
-	 * Removes all the given nodes from the {@link Nodespace#nodeStore} based on the node's datum names. The node given
+	 * Removes all the given nodes from the {@link Nodespace#nodeStore} based on the node's pointers. The node given
 	 * and the node removed may not necessarily be the same object.
 	 *
 	 * @param nodes the nodes
 	 */
 	public void removeAll(Collection<Node> nodes) {
 		for (Node node : nodes) {
-			nodeStore.remove(node.datumNames);
+			nodeStore.remove(node.pointers);
 		}
 	}
 
 	/**
-	 * Returns all nodes with the given datum name.
+	 * Returns all nodes with the given pointer.
 	 *
-	 * @param datumName the datum name
-	 * @return all nodes with the given datum name
+	 * @param pointer the pointer
+	 * @return all nodes with the given pointer
 	 */
-	public List<Node> nodesWithDatum(String datumName) {
+	public List<Node> nodesWithDatum(String pointer) {
 		List<Node> nodes = new ArrayList<>();
 		for (Node node : nodeStore.values()) {
-			if (node.datumNames.contains(datumName)) {
+			if (node.pointers.contains(pointer)) {
 				nodes.add(node);
 			}
 		}
