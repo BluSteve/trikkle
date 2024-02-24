@@ -36,15 +36,15 @@ public final class HalfLink {
 	}
 
 	/**
-	 * Create a half link with the given arc. The output node is generated from {@link Arc#getOutputFields()}.
+	 * Create a half link with the given arc. The output node is generated from {@link Arc#getOutputDatumNames()}.
 	 *
 	 * @param arc the arc of the half link, should have annotations {@link Input} and {@link Output}
 	 * @see Link#Link(Arc)
-	 * @see Arc#getOutputFields()
+	 * @see Arc#getOutputDatumNames()
 	 */
 	public HalfLink(Arc arc) {
-		this(arc, Collections.singleton(arc.getOutputFields().keySet().isEmpty() ? new EmptyNode() :
-				new DiscreteNode(new HashSet<>(arc.getOutputFields().keySet()))));
+		this(arc, Collections.singleton(arc.getOutputDatumNames().isEmpty() ? new EmptyNode() :
+				new DiscreteNode(new HashSet<>(arc.getOutputDatumNames()))));
 	}
 
 	/**
@@ -90,7 +90,7 @@ public final class HalfLink {
 
 			Set<Node> dependencies = new HashSet<>();
 			Set<String> danglingInputs = new HashSet<>();
-			for (String inputName : halfLink.arc.getInputFields().keySet()) {
+			for (String inputName : halfLink.arc.getInputDatumNames()) {
 				if (!nodeOfDatum.containsKey(inputName)) {
 					danglingInputs.add(inputName);
 					continue;

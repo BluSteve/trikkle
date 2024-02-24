@@ -5,8 +5,7 @@ import org.trikkle.annotations.Output;
 import org.trikkle.structs.StrictHashMap;
 
 import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -17,9 +16,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 0.1.0
  */
 public abstract class Arc implements Primable {
-	private final Map<String, Field> inputFields, outputFields;
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
+	private Map<String, Field> inputFields, outputFields;
+	private Set<String> inputDatumNames, outputDatumNames;
 	private String name;
 	private ArcStatus status = ArcStatus.IDLE;
 
@@ -36,13 +36,13 @@ public abstract class Arc implements Primable {
 	public Arc(boolean safe) {
 		this.safe = safe;
 
-		Field[] fields = getClass().getDeclaredFields();
-		if (fields.length == 0) {
-			inputFields = null;
-			outputFields = null;
-		} else {
+		List<Field> fields = List.of(getClass().getDeclaredFields());
+		if (fields.stream().anyMatch(field ->
+				field.isAnnotationPresent(Input.class) || field.isAnnotationPresent(Output.class))) {
 			inputFields = new StrictHashMap<>();
 			outputFields = new StrictHashMap<>();
+			inputDatumNames = inputFields.keySet();
+			outputDatumNames = outputFields.keySet();
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(Input.class)) {
 					String name = field.getAnnotation(Input.class).name();
@@ -261,23 +261,69 @@ public abstract class Arc implements Primable {
 	}
 
 	/**
-	 * Gets the input fields of this arc as declared through {@link Input} and {@link Arc#alias(String, String)}. The
-	 * keys are the names of the fields and the values are the fields themselves.
+	 * Gets the input datum names of this arc as declared through {@link Input} and {@link Arc#alias(String, String)},
+	 * or manually set (overrides former). If the input datum names are not set, an empty set is returned.
 	 *
-	 * @return the input fields of this arc
+	 * @return the input datum names of this arc
 	 */
-	public Map<String, Field> getInputFields() {
-		return inputFields;
+	public Set<String> getInputDatumNames() {
+		if (inputDatumNames == null) {
+			return Set.of();
+		}
+		if (inputFields != null && inputDatumNames == inputFields.keySet()) {
+			return new HashSet<>(inputDatumNames);
+		}
+		return inputDatumNames;
 	}
 
 	/**
-	 * Gets the output fields of this arc as declared through {@link Output} and {@link Arc#alias(String, String)}. The
-	 * keys are the names of the fields and the values are the fields themselves.
+	 * Sets the input datum names of this arc. All annotations and aliases are overridden.
 	 *
-	 * @return the output fields of this arc
+	 * @param inputDatumNames the input datum names of this arc
 	 */
-	public Map<String, Field> getOutputFields() {
-		return outputFields;
+	public void setInputDatumNames(Set<String> inputDatumNames) {
+		this.inputDatumNames = inputDatumNames;
+		inputFields = null;
+	}
+
+	/**
+	 * @see #setInputDatumNames(Set)
+	 */
+	public void setInputDatumNames(String... inputDatumNames) {
+		setInputDatumNames(new HashSet<>(Arrays.asList(inputDatumNames)));
+	}
+
+	/**
+	 * Gets the output datum names of this arc as declared through {@link Output} and {@link Arc#alias(String, String)},
+	 * or manually set (overrides former). If the output datum names are not set, an empty set is returned.
+	 *
+	 * @return the output datum names of this arc
+	 */
+	public Set<String> getOutputDatumNames() {
+		if (outputDatumNames == null) {
+			return Set.of();
+		}
+		if (outputFields != null && outputDatumNames == outputFields.keySet()) {
+			return new HashSet<>(outputDatumNames);
+		}
+		return outputDatumNames;
+	}
+
+	/**
+	 * Sets the output datum names of this arc. All annotations and aliases are overridden.
+	 *
+	 * @param outputDatumNames the output datum names of this arc
+	 */
+	public void setOutputDatumNames(Set<String> outputDatumNames) {
+		this.outputDatumNames = outputDatumNames;
+		outputFields = null;
+	}
+
+	/**
+	 * @see #setOutputDatumNames(Set)
+	 */
+	public void setOutputDatumNames(String... outputDatumNames) {
+		setOutputDatumNames(new HashSet<>(Arrays.asList(outputDatumNames)));
 	}
 
 	/**

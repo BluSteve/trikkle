@@ -287,4 +287,32 @@ public class EasyArcTest {
 			};
 		});
 	}
+
+	@Test
+	void setDatumNamesTest() {
+		Arc arc = new AutoArc() {
+			@Input
+			double input3;
+
+			@Override
+			protected void run() {
+				double input1 = (double) getDatum("input1");
+				double input2 = (double) getDatum("input2");
+				returnDatum("output", input1 + input2);
+			}
+		};
+		arc.setInputDatumNames("input1", "input2");
+		arc.setOutputDatumNames("output");
+		assertEquals(Set.of("input1", "input2"), arc.getInputDatumNames());
+		assertEquals(Set.of("output"), arc.getOutputDatumNames());
+
+		Link link = new Link(arc);
+		Graph graph = new Graph(link);
+		Overseer overseer = new Overseer(graph);
+		overseer.addStartingDatum("input1", 2.5);
+		overseer.addStartingDatum("input2", 3.6);
+		overseer.start();
+
+		assertEquals(6.1, overseer.getResultCache().get("output"));
+	}
 }

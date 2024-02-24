@@ -52,7 +52,7 @@ public final class Link implements Congruent<Link> {
 
 	/**
 	 * Create a link with the given arc. The dependency and output node are generated from the arc via
-	 * {@link Arc#getInputFields()} and {@link Arc#getOutputFields()}. All input datums will be added to a single
+	 * {@link Arc#getInputDatumNames()} and {@link Arc#getOutputDatumNames()}. All input datums will be added to a single
 	 * dependency node, and all output datums will be added to a single output node. The nodes created will either be a
 	 * {@link DiscreteNode} or an {@link EmptyNode}, if there are no datums.
 	 * <p>
@@ -62,16 +62,16 @@ public final class Link implements Congruent<Link> {
 	 * @param arc the arc of the link, should have annotations {@link Input} and {@link Output}
 	 * @see Input
 	 * @see Output
-	 * @see Arc#getInputFields()
-	 * @see Arc#getOutputFields()
+	 * @see Arc#getInputDatumNames()
+	 * @see Arc#getOutputDatumNames()
 	 */
 	public Link(Arc arc) {
 		dependencies = new HashSet<>();
 		this.arc = arc;
 		outputNodes = new HashSet<>();
 
-		Set<String> inputNames = new HashSet<>(arc.getInputFields().keySet());
-		Set<String> outputNames = new HashSet<>(arc.getOutputFields().keySet());
+		Set<String> inputNames = arc.getInputDatumNames();
+		Set<String> outputNames = arc.getOutputDatumNames();
 
 		dependencies.add(inputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(inputNames));
 		outputNodes.add(outputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(outputNames));
