@@ -48,7 +48,7 @@ Ticktock: Proper name for one such "check". E.g., the overseer ticktocks when a 
 
 ## Getting Started
 
-Let us recreate the example shown in the animation above.
+Let's recreate the example shown in the animation above. Code can be found at [QuadraticExample.java](src/test/java/QuadraticExample.java).
 
 ```mermaid
 flowchart LR
