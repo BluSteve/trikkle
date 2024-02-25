@@ -268,6 +268,12 @@ public final class Graph implements Congruent<Graph> {
 		return hasCycle(dependenciesOfNode);
 	}
 
+	/**
+	 * Two graphs are congruent if they have congruent links.
+	 *
+	 * @param graph the graph to compare to
+	 * @return true if the graphs are congruent
+	 */
 	@Override
 	public boolean congruentTo(Graph graph) {
 		return Congruent.setsCongruent(links, graph.links);
@@ -286,6 +292,12 @@ public final class Graph implements Congruent<Graph> {
 		return Objects.hash(links);
 	}
 
+	/**
+	 * Visualize the graph using Mermaid without any done nodes.
+	 *
+	 * @return the Mermaid visualization
+	 * @see MermaidGraphViz#defaultVisualize(Graph...)
+	 */
 	@Override
 	public String toString() {
 		return MermaidGraphViz.defaultVisualize(this);

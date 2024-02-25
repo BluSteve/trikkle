@@ -23,7 +23,13 @@ import static org.trikkle.EmptyNode.EMPTY_SET;
  * @since 0.1.0
  */
 public final class Nodespace {
+	/**
+	 * The default global nodespace.
+	 */
 	public final static Nodespace DEFAULT = new Nodespace();
+	/**
+	 * The map of nodes for this nodespace.
+	 */
 	public final Map<Set<String>, Node> nodeStore = new ConcurrentHashMap<>();
 
 	/**
@@ -76,7 +82,7 @@ public final class Nodespace {
 
 	/**
 	 * Returns an {@link EmptyNode}. If the node does not exist, it is created and added to the
-	 * {@link Nodespace#nodeStore}.
+	 * {@link Nodespace#nodeStore}. Only one empty node can exist per nodespace.
 	 *
 	 * @see EmptyNode#EmptyNode()
 	 */

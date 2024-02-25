@@ -12,6 +12,12 @@ import java.util.*;
  * @since 0.1.0
  */
 public class LogUtils {
+	/**
+	 * Convert a link trace to a legible string.
+	 *
+	 * @param linkTrace the link trace
+	 * @return the string
+	 */
 	public static String linkTraceToString(Queue<Collection<Link>> linkTrace) {
 		StringBuilder sb = new StringBuilder();
 		int tick = 1;

@@ -14,14 +14,27 @@ public class MermaidGraphViz implements GraphViz {
 	private static final MermaidGraphViz mermaidGraphViz = new MermaidGraphViz();
 	public final String namespace;
 
+	/**
+	 * Creates a new MermaidGraphViz with no namespace.
+	 */
 	public MermaidGraphViz() {
 		namespace = "";
 	}
 
+	/**
+	 * Prefixes the graph's node and arc IDs with the given namespace.
+	 *
+	 * @param namespace the namespace to use
+	 */
 	public MermaidGraphViz(String namespace) {
 		this.namespace = namespace + "_";
 	}
 
+	/**
+	 * Convenience method for a default visualization with no namespace and done nodes.
+	 * @param graphs the graphs to visualize
+	 * @return the Mermaid visualization
+	 */
 	public static String defaultVisualize(Graph... graphs) {
 		return mermaidGraphViz.visualize(graphs);
 	}
@@ -92,7 +105,7 @@ public class MermaidGraphViz implements GraphViz {
 
 	/**
 	 * Visualize the given graphs using Mermaid. The done nodes (by object equivalence, not .equals()) will be colored
-	 * green.
+	 * green. If there is more than one graph, they will be visualized as Mermaid subgraphs.
 	 *
 	 * @param doneNodes which nodes are done
 	 * @param graphs    the graphs to visualize
@@ -170,7 +183,8 @@ public class MermaidGraphViz implements GraphViz {
 	}
 
 	/**
-	 * Visualize the given graphs using Mermaid without any done nodes.
+	 * Visualize the given graphs using Mermaid without any done nodes. If there is more than one graph, they will be
+	 * visualized as Mermaid subgraphs.
 	 *
 	 * @param graphs the graphs to visualize
 	 * @return the Mermaid visualization

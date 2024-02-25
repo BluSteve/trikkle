@@ -78,8 +78,8 @@ public final class Link implements Congruent<Link> {
 	}
 
 	/**
-	 * Check if the link is runnable. A link is runnable if all of its dependencies are usable and the arc is not yet
-	 * finished.
+	 * Check if the link is runnable. A link is runnable if it has no dependencies OR all of its dependencies are usable,
+	 * AND the arc is not yet finished.
 	 *
 	 * @return true if the link is runnable
 	 */
@@ -132,6 +132,12 @@ public final class Link implements Congruent<Link> {
 		this.outputNodes = outputNodes;
 	}
 
+	/**
+	 * Two links are congruent if they have congruent dependencies and output nodes.
+	 *
+	 * @param link the link to compare to
+	 * @return true if the links are congruent
+	 */
 	@Override
 	public boolean congruentTo(Link link) {
 		return Congruent.setsCongruent(dependencies, link.dependencies) &&

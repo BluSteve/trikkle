@@ -1,7 +1,10 @@
 import org.trikkle.*;
 import org.trikkle.viz.LogUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 // Imagine that arithmetic takes a lot of time.
 public class QuadraticExample {
@@ -89,10 +92,10 @@ public class QuadraticExample {
 		overseer.start();
 
 		System.out.println("Final tick: " + overseer.getTick());
+
 		System.out.println("\nLink trace:");
-		for (Collection<Link> linkCollection : overseer.getLinkTrace()) {
-			System.out.println(linkCollection);
-		}
+		System.out.print(LogUtils.linkTraceToString(overseer.getLinkTrace()));
+
 		System.out.println("\nFinal cache:");
 		for (Map.Entry<String, Object> stringObjectEntry : overseer.getCacheCopy().entrySet()) {
 			System.out.println(stringObjectEntry);
