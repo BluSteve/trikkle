@@ -356,10 +356,17 @@ Follow it up with [svgexport](https://github.com/piqnt/svgexport) to convert eve
 
 ## Feature Discussion
 
-Polling, or the constant checking of execution state to discover new operations to do, is minimized. Instead of polling
-on a time interval, Trikkle only searches for operations to run when new nodes have become usable. This leads to a
-deterministic number of times that the program has to loop through the list of possible operations. In other words,
-the _tick_ count is predictable.
+A "tick" passes every time the overseer checks for runnable links and runs them. The frequency and timing of going to
+the next tick, or "ticktocking" was a subject of much deliberation. The current implementation is to ticktock sparsely
+and economically, only when
+<ol>
+<li>the state of the <b>nodes</b> change (not the arcs) - aka <b>recursive ticktock</b></li>
+<li>no change was detected but the overseer has not finished - aka <b>iterative ticktock.</b></li>
+</ol>
+<p>
+This allows the overseer to tick only when needed and avoids the overhead of polling.
+All this leads to a deterministic number of times that the program has to loop through the list of possible operations.
+In other words, the tick count is predictable.
 
 ## FAQ
 

@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * to the next tick, or "ticktocking" was a subject of much deliberation. The current implementation is to ticktock
  * sparsely and economically, only when
  * <ol>
- * <li>the state of the <b>nodes</b> change (not the arcs)</li>
- * <li>no change was detected but the overseer has not finished.</li>
+ * <li>the state of the <b>nodes</b> change (not the arcs) - aka <b>recursive ticktock</b></li>
+ * <li>no change was detected but the overseer has not finished - aka <b>iterative ticktock.</b></li>
  * </ol>
  * <p>
  * This allows the overseer to tick only when needed and avoids the overhead of polling.
