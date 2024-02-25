@@ -15,20 +15,35 @@ import java.util.function.Function;
  * @since 0.1.0
  */
 public final class FunctionRacer {
+	/**
+	 * The functions this racer will race.
+	 */
 	public final Set<Function<Map<String, Object>, Map<String, Object>>> functions;
 	private final Notifier notifier = new Notifier();
 	private Map<String, Object> result = null;
 
+	/**
+	 * Creates a new function racer with the given functions.
+	 *
+	 * @param functions the given functions
+	 */
 	public FunctionRacer(Set<Function<Map<String, Object>, Map<String, Object>>> functions) {
 		this.functions = functions;
 	}
 
-	public Map<String, Object> apply(Map<String, Object> cache) {
+	/**
+	 * Applies the functions to the given input cache and returns the result of the first function that finishes. The
+	 * other functions are interrupted.
+	 *
+	 * @param inputCache the input cache
+	 * @return the output cache of the first function that finishes
+	 */
+	public Map<String, Object> apply(Map<String, Object> inputCache) {
 		List<RecursiveAction> tasks = new ArrayList<>();
 
 		for (Function<Map<String, Object>, Map<String, Object>> function : functions) {
 			// Wrapping in Thread is necessary for it to be interruptible
-			Thread thread = new Thread(() -> returnResult(function.apply(cache)));
+			Thread thread = new Thread(() -> returnResult(function.apply(inputCache)));
 			notifier.addListener(thread::interrupt);
 
 			RecursiveAction task = new RecursiveAction() {
@@ -60,21 +75,21 @@ public final class FunctionRacer {
 	}
 
 	private static class Notifier {
-		private final List<Runnable> listeners = new LinkedList<>();
-		private boolean called = false;
+		final List<Runnable> listeners = new LinkedList<>();
+		boolean called = false;
 
-		public void addListener(Runnable runnable) {
+		void addListener(Runnable runnable) {
 			listeners.add(runnable);
 		}
 
-		public void call() {
+		void call() {
 			called = true;
 			for (Runnable listener : listeners) {
 				listener.run();
 			}
 		}
 
-		public boolean wasCalled() {
+		boolean wasCalled() {
 			return called;
 		}
 	}

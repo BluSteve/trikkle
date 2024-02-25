@@ -1,4 +1,4 @@
-# Trikkle - Dataflow Programming for Java
+# 💧Trikkle - Dataflow Programming for Java
 
 `Author: Steve Cao`
 
@@ -10,13 +10,17 @@ have getting started create the demo
 
 ## Key Features
 
-- ✅ Implicit parallelism
-- ✅ Efficient polling - very low overhead
-- ✅ Implicit transitive dependencies
-- ✅ Multiple parameters per node
+- Algorithmic
+  - ✅ Implicit parallelism
+  - ✅ Full concurrency support
+  - ✅ Efficient polling - very low overhead
+- Structural
+  - ✅ Implicit transitive dependencies
+  - ✅ Multiple parameters per node
 - ✅ Visualizations through [Mermaid.js](https://github.com/mermaid-js/mermaid)
-- ✅ Unit tested
 - ✅ Java annotations support
+- ✅ Unit tested
+- ✅ Full JavaDoc
 
 ## Getting Started
 
@@ -32,9 +36,19 @@ have getting started create the demo
 
 ## Visualization Tools
 
-## Advanced Features
+### Mermaid
 
-### Stream Nodes
+### Logging
+
+## More Features
+
+### Nodespace
+
+### Other Types of Nodes
+
+#### Empty Node
+
+#### Stream Node
 
 ### Manual Arcs and Unsafe Arcs
 
@@ -42,4 +56,16 @@ mention reset()
 
 ### Follow-up Overseers
 
+### Annotations
+
+#### Auto-generated Links
+
+### Function Racer
+
 ### Mermaid "Animations"
+
+## FAQ
+
+### Why are no arcs executed in a tick occasionally?
+
+superset theory
