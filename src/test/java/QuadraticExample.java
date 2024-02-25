@@ -91,6 +91,7 @@ public class QuadraticExample {
 		System.out.println(overseer.getTick());
 		System.out.println(overseer.getLinkTrace());
 		System.out.println(overseer.getCacheCopy());
+
 		System.out.println(LogUtils.toMarkdown(LogUtils.animate(graph, overseer.getLinkTrace())));
 	}
 }

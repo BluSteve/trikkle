@@ -26,8 +26,8 @@ public class LogUtils {
 	}
 
 	/**
-	 * Animate a graph using a link trace with Mermaid. For each tick, the dependencies and output nodes of the links
-	 * that are going to be run will be colored.
+	 * Animate a graph using a link trace with Mermaid. The first visualization will have the starting nodes colored.
+	 * Then for each tick, the output nodes of the link that are going to be run will be colored.
 	 *
 	 * @param graph     the graph to animate
 	 * @param linkTrace the link trace to use
@@ -37,11 +37,11 @@ public class LogUtils {
 		List<String> animations = new ArrayList<>();
 		MermaidGraphViz mermaidGraphViz = new MermaidGraphViz();
 
-		Set<Node> done = new HashSet<>();
+		Set<Node> done = new HashSet<>(graph.startingNodes);
+		animations.add(mermaidGraphViz.visualize(done, graph));
 		for (Collection<Link> links : linkTrace) {
 			if (links.isEmpty()) continue;
 			for (Link link : links) {
-				done.addAll(link.getDependencies());
 				done.addAll(link.getOutputNodes());
 			}
 			animations.add(mermaidGraphViz.visualize(done, graph));
