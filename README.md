@@ -346,7 +346,13 @@ TODO
 
 ### Mermaid "Animations"
 
-TODO
+This is very hacky but looks pretty good.
+
+Use `LogUtils.toMarkdown(LogUtils.animate(graph, linkTrace))` and 
+[Animating Mermaid diagrams with terrible hacks](https://blog.lmorchard.com/2023/01/03/mermaid-animations/).
+
+Follow it up with [svgexport](https://github.com/piqnt/svgexport) to convert everything to png and
+[gifski](https://github.com/sindresorhus/Gifski) to finally turn it into a gif.
 
 ## Feature Discussion
 
