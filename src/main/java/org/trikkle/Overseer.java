@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A class that manages the execution of {@link Graph}s. It is responsible for running the graph and keeping track of
- * the cache which stores all data in key-value pairs.
+ * the cache which stores all data in key-value pairs. <b>An overseer ends when all of its ending nodes have progress
+ * 1.</b>
  * <p>
  * In Trikkle's architecture, a {@link Node} is only used to represent a dependency relationship. The actual
  * data associated with the node is stored in the overseer's cache. This is to allow for the same graph to be run
@@ -265,11 +266,6 @@ public final class Overseer {
 	private boolean hasEnded() {
 		for (Node endingNode : g.endingNodes) {
 			if (endingNode.getProgress() != 1) {
-				return false;
-			}
-		}
-		for (Arc arc : g.arcs) {
-			if (arc.getStatus() != ArcStatus.FINISHED) {
 				return false;
 			}
 		}

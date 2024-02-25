@@ -392,7 +392,7 @@ class OverseerTest {
 		discreteNode.setUsable();
 		overseer.start();
 
-		assertTrue(ab.get());
+		assertFalse(ab.get());
 		assertTrue(overseer.getResultCache().isEmpty());
 	}
 
@@ -420,6 +420,7 @@ class OverseerTest {
 			@Override
 			public void run() {
 				sleep(200);
+				getOutputNode().setUsable();
 			}
 		};
 		long1.setName("long1");
@@ -437,15 +438,16 @@ class OverseerTest {
 			@Override
 			public void run() {
 				sleep(100);
+				getOutputNode().setUsable();
 			}
 		};
 		med2.setName("med2");
 
 		Node medNode = Nodespace.DEFAULT.emptyOf();
 
-		Link link = new Link(Set.of(), long1, Set.of());
+		Link link = new Link(Set.of(), long1, new EmptyNode());
 		Link link2 = new Link(Set.of(), med1, medNode);
-		Link link3 = new Link(Set.of(medNode), med2, Set.of());
+		Link link3 = new Link(Set.of(medNode), med2, new EmptyNode());
 
 		Graph graph = new Graph(link, link2, link3);
 		Overseer overseer = new Overseer(graph);
