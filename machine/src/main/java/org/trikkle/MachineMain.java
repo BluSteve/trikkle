@@ -34,6 +34,7 @@ public class MachineMain {
 	public Map<Character, Method> handlers = new HashMap<>();
 	public ServerSocket serverSocket;
 	public Semaphore listening = new Semaphore(0);
+	public Socket managerSocket;
 
 	public MachineMain(String ownIp, int ownPort) {
 		this.ownIp = ownIp; // this is the ip of the machine to be used for communication with other machines
@@ -68,13 +69,6 @@ public class MachineMain {
 		machineMain.startListening();
 	}
 
-	public void broadcast(TlvMessage message) {
-		// todo maybe copy machines to avoid concurrent modification exception
-		for (MachineInfo machine : machines) {
-			machine.sendMessage(message);
-		}
-	}
-
 	public void register(String managerIp, int managerPort, String password) {
 		InitialData initialData = new InitialData();
 		initialData.password = password;
@@ -82,17 +76,16 @@ public class MachineMain {
 		initialData.ip = ownIp;
 		initialData.port = ownPort;
 
-		try (Socket socket = new Socket()) {
-			socket.connect(new InetSocketAddress(managerIp, managerPort));
-			char type = 'a';
-			byte[] data = Serializer.serialize(initialData);
-			TlvMessage message = new TlvMessage(type, data);
-			message.writeTo(socket.getOutputStream());
+		try {
+			managerSocket = new Socket();
+			managerSocket.connect(new InetSocketAddress(managerIp, managerPort));
+			TlvMessage message = new TlvMessage('a', Serializer.serialize(initialData));
+			message.writeTo(managerSocket.getOutputStream());
 
 			// add other machines to machines list
-			TlvMessage response = TlvMessage.readFrom(socket.getInputStream()).decrypted(decryptCipher);
-			MachineInfo[] machineArray = (MachineInfo[]) Serializer.deserialize(response.data);
-			for (MachineInfo machineInfo : machineArray) {
+			TlvMessage response = TlvMessage.readFrom(managerSocket.getInputStream()).decrypted(decryptCipher);
+			MachineInfo[] machineInfos = (MachineInfo[]) Serializer.deserialize(response.data);
+			for (MachineInfo machineInfo : machineInfos) {
 				if (machineInfo.publicKey.equals(keyPair.getPublic())) {
 					myself = machineInfo;
 				} else {
@@ -118,12 +111,12 @@ public class MachineMain {
 				switch (message.dataType) {
 					// sent by manager
 					case 'n': // new machine added
-						MachineInfo machine = (MachineInfo) Serializer.deserialize(message.data);
+						Machine machine = (Machine) Serializer.deserialize(message.data);
 						machines.add(machine);
 						System.out.println(ownPort + " updated machines = " + machines);
 						break;
 					case 'r': // machine removed
-						MachineInfo removedMachine = (MachineInfo) Serializer.deserialize(message.data);
+						Machine removedMachine = (Machine) Serializer.deserialize(message.data);
 						machines.remove(removedMachine);
 						System.out.println(ownPort + " updated machines = " + machines);
 						break;

@@ -2,7 +2,6 @@ package org.trikkle;
 
 import org.trikkle.cluster.ClusterManager;
 import org.trikkle.serial.JarInfo;
-import org.trikkle.serial.MachineInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,10 +23,10 @@ public class ClientMain {
 				System.out.println("sending jar");
 				JarInfo jarInfo = new JarInfo("org.trikkle.Handlers",
 						Files.readAllBytes(Paths.get("client/build/libs/client.jar")));
-				clusterManager.uploadJar(jarInfo);
+				clusterManager.broadcastJar(jarInfo);
 			} else if (line.equals("t")) {
 				System.out.println("sending test message");
-				for (MachineInfo machine : clusterManager.machines) {
+				for (Machine machine : clusterManager.machines) {
 					TlvMessage tlvMessage = new TlvMessage('t', "hello world".getBytes());
 					machine.sendMessage(tlvMessage);
 				}
