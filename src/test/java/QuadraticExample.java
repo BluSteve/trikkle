@@ -1,9 +1,7 @@
 import org.trikkle.*;
 import org.trikkle.viz.LogUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // Imagine that arithmetic takes a lot of time.
 public class QuadraticExample {
@@ -27,6 +25,7 @@ public class QuadraticExample {
 			@Override
 			protected void run() {
 				double a = (double) getDatum("a");
+
 				returnDatum("2a", 2 * a);
 			}
 		};
@@ -36,6 +35,7 @@ public class QuadraticExample {
 			@Override
 			protected void run() {
 				double b = (double) getDatum("b");
+
 				returnDatum("b^2", b * b);
 			}
 		};
@@ -88,9 +88,15 @@ public class QuadraticExample {
 		overseer.addStartingDatum("c", 6.0);
 		overseer.start();
 
-		System.out.println(overseer.getTick());
-		System.out.println(overseer.getLinkTrace());
-		System.out.println(overseer.getCacheCopy());
+		System.out.println("Final tick: " + overseer.getTick());
+		System.out.println("\nLink trace:");
+		for (Collection<Link> linkCollection : overseer.getLinkTrace()) {
+			System.out.println(linkCollection);
+		}
+		System.out.println("\nFinal cache:");
+		for (Map.Entry<String, Object> stringObjectEntry : overseer.getCacheCopy().entrySet()) {
+			System.out.println(stringObjectEntry);
+		}
 
 		System.out.println(LogUtils.toMarkdown(LogUtils.animate(graph, overseer.getLinkTrace())));
 	}
