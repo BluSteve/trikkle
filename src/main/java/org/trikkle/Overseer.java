@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A class that manages the execution of {@link Graph}s. It is responsible for running the graph and keeping track of
  * the cache which stores all data in key-value pairs. <b>An overseer ends when all of its ending nodes have progress
- * 1.</b>
+ * 1.</b> This may mean not all arcs are finished and not all nodes are at progress 1.
  * <p>
  * In Trikkle's architecture, a {@link Node} is only used to represent a dependency relationship. The actual
  * data associated with the node is stored in the overseer's cache. This is to allow for the same graph to be run
@@ -50,7 +50,7 @@ public final class Overseer {
 	private boolean started = false;
 
 	private boolean unsafeOnRecursive = false;
-	private boolean logging = true;
+	private boolean logging = false;
 	private Observer observer = null;
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
@@ -305,10 +305,20 @@ public final class Overseer {
 		return g.nodeOfDatum.get(datumName);
 	}
 
+	/**
+	 * Returns the current tick number. If logging is disabled, this will always return 0.
+	 *
+	 * @return the current tick number
+	 */
 	public int getTick() {
-		return tick.get();
+		return tick == null ? 0 : tick.get();
 	}
 
+	/**
+	 * Returns the link trace. If logging is disabled, this will always return null.
+	 *
+	 * @return the link trace
+	 */
 	public Queue<Collection<Link>> getLinkTrace() {
 		return linkTrace;
 	}
@@ -321,6 +331,11 @@ public final class Overseer {
 		return parallel;
 	}
 
+	/**
+	 * Default: {@code true}
+	 *
+	 * @param parallel whether to run runnable links in parallel
+	 */
 	public void setParallel(boolean parallel) {
 		this.parallel = parallel;
 	}
@@ -329,6 +344,12 @@ public final class Overseer {
 		return parallelThreshold;
 	}
 
+	/**
+	 * Default: {@code 2}
+	 *
+	 * @param parallelThreshold the minimum number of links that must be runnable for the overseer to run them in
+	 *                          parallel
+	 */
 	public void setParallelThreshold(int parallelThreshold) {
 		if (parallelThreshold < 2) {
 			throw new IllegalArgumentException("Parallel threshold must be at least 1!");
@@ -340,6 +361,13 @@ public final class Overseer {
 		return logging;
 	}
 
+	/**
+	 * Default: {@code false}
+	 *
+	 * @param logging whether to log the overseer's progress in ticks and link trace
+	 * @see #getTick()
+	 * @see #getLinkTrace()
+	 */
 	public void setLogging(boolean logging) {
 		this.logging = logging;
 	}

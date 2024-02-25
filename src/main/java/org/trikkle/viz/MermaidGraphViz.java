@@ -27,7 +27,7 @@ public class MermaidGraphViz implements GraphViz {
 	}
 
 	private static String nodeToMermaid(Node node, String nodeId, NodeType nodeType) {
-		String nodeText = node.datumNames.isEmpty() ? "<br>" : String.join("<br>", node.datumNames);
+		String nodeText = node.datumNames.isEmpty() ? "<br>" : "\"" + String.join("<br>", node.datumNames) + "\"";
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(nodeId);
@@ -62,8 +62,8 @@ public class MermaidGraphViz implements GraphViz {
 		return sb.toString();
 	}
 
-	private static String arcToMermaid(Arc arc, String arcId) {
-		return arcId + "{" + (arc.getName() == null ? arcId : arc.getName()) + "}";
+	private static String finalArcName(Arc arc, String arcId) {
+		return "\"" + (arc.getName() == null ? arcId : arc.getName()) + "\"";
 	}
 
 	private static String makeLink(Set<String> dependencyIds, String arcId, Set<String> outputNodeIds) {
@@ -151,10 +151,10 @@ public class MermaidGraphViz implements GraphViz {
 				Set<String> outputNodeIds = link.getOutputNodes().stream()
 						.map(nodeIdOfNode::get).collect(Collectors.toSet());
 				if (link.getDependencies().size() > 1 || link.getOutputNodes().size() > 1) {
-					lines.add(arcToMermaid(link.getArc(), arcId));
+					lines.add(arcId + "{" + finalArcName(link.getArc(), arcId) + "}");
 					linkLines.add(makeLink(dependencyIds, arcId, outputNodeIds));
 				} else {
-					String arcName = link.getArc().getName() == null ? arcId : link.getArc().getName();
+					String arcName = finalArcName(link.getArc(), arcId);
 					linkLines.add(makeLink(dependencyIds, arcName, outputNodeIds));
 				}
 			}

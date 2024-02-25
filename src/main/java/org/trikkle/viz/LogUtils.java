@@ -25,6 +25,14 @@ public class LogUtils {
 		return sb.toString();
 	}
 
+	/**
+	 * Animate a graph using a link trace with Mermaid. For each tick, the dependencies and output nodes of the links
+	 * that are going to be run will be colored.
+	 *
+	 * @param graph     the graph to animate
+	 * @param linkTrace the link trace to use
+	 * @return a list of strings, each string being a mermaid graph visualization
+	 */
 	public static List<String> animate(Graph graph, Queue<Collection<Link>> linkTrace) {
 		List<String> animations = new ArrayList<>();
 		MermaidGraphViz mermaidGraphViz = new MermaidGraphViz();
@@ -34,15 +42,20 @@ public class LogUtils {
 			if (links.isEmpty()) continue;
 			for (Link link : links) {
 				done.addAll(link.getDependencies());
+				done.addAll(link.getOutputNodes());
 			}
 			animations.add(mermaidGraphViz.visualize(done, graph));
 		}
 
-		animations.add(mermaidGraphViz.visualize(graph.nodes, graph));
-
 		return animations;
 	}
 
+	/**
+	 * Convert a list of Mermaid animations to a single markdown document.
+	 *
+	 * @param animations the list of animations
+	 * @return the markdown string
+	 */
 	public static String toMarkdown(List<String> animations) {
 		StringBuilder sb = new StringBuilder();
 		for (String animation : animations) {
