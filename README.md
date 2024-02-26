@@ -342,14 +342,19 @@ E.g., `overseer2.fillStartingDatums(overseer1.getResultCache())`
 
 A helper class [FunctionRacer](src/main/java/org/trikkle/FunctionRacer.java) is provided to help you race two functions
 and take the result of the first one that finishes, interrupting the rest. Useful if you have multiple ways to get to
-a result and you don't know ahead of time which would be faster.
+a result, and you don't know ahead of time which would be faster.
 
 ### Automatic Link Generation
+
+Another way to make links is to declare output datums and then have Trikkle deduce the nodes and links implicitly.
 
 Below is an example of various ways to declare input and output datums. You can use the `@Input` and `@Output`
 annotations, the `alias()` function or just manually setting datum names. The `toFullLinks` method will convert the
 half links into full links by using one another as context. So if one arc outputs `2a` as a datum and another
 arc needs `2a` then the nodes will be created automatically.
+
+Moreover, if no set of output nodes are passed into HalfLink's constructor, it will create a node containing all of its
+output datums by default. **An analogous feature exists in Link.**
 
 It's recommended that you visualize the graphs to verify their correctness after using half links.
 
@@ -407,9 +412,7 @@ Arc arc4 = new AutoArc("determinant") {
     returnDatum("-sqrt(b^2 - 4ac)", -Math.sqrt(bsq - fourAC));
   }
 };
-arc4.
-
-setOutputDatumNames("sqrt(b^2 - 4ac)","-sqrt(b^2 - 4ac)");
+arc4.setOutputDatumNames("sqrt(b^2 - 4ac)", "-sqrt(b^2 - 4ac)");
 
 Arc arc5 = new AutoArc("quadratic<br>formula") {
   @Override
@@ -423,47 +426,25 @@ Arc arc5 = new AutoArc("quadratic<br>formula") {
     returnDatum("smaller root", (-b + detsqrtneg) / twiceA);
   }
 };
-arc5.
-
-setInputDatumNames("b","2a","sqrt(b^2 - 4ac)","-sqrt(b^2 - 4ac)");
-arc5.
-
-setOutputDatumNames("larger root","smaller root");
+arc5.setInputDatumNames("b", "2a", "sqrt(b^2 - 4ac)", "-sqrt(b^2 - 4ac)");
+arc5.setOutputDatumNames("larger root", "smaller root");
 
 List<HalfLink> halfLinks = new ArrayList<>();
-halfLinks.
-
-add(new HalfLink(arc1));
-        halfLinks.
-
-add(new HalfLink(arc2));
-        halfLinks.
-
-add(new HalfLink(arc3));
-        halfLinks.
-
-add(new HalfLink(arc4));
-        halfLinks.
-
-add(new HalfLink(arc5, Set.of(
-        new DiscreteNode("larger root"),
-    new
-
-DiscreteNode("smaller root"))));
+halfLinks.add(new HalfLink(arc1));
+halfLinks.add(new HalfLink(arc2));
+halfLinks.add(new HalfLink(arc3));
+halfLinks.add(new HalfLink(arc4));
+halfLinks.add(new HalfLink(arc5, Set.of(
+    new DiscreteNode("larger root"),
+    new DiscreteNode("smaller root"))));
 
 List<Link> links = HalfLink.toFullLinks(halfLinks);
 
 Graph graph = new Graph(links);
-System.out.
+System.out.println(graph);
 
-println(graph);
-
-graph.
-
-optimizeDependencies();
-System.out.
-
-println(graph);
+graph.optimizeDependencies();
+System.out.println(graph);
 
 ```
 
