@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.trikkle"},{"l":"org.trikkle.annotations"},{"l":"org.trikkle.structs"},{"l":"org.trikkle.viz"}];updateSearchResults();
