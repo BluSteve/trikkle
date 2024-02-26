@@ -169,7 +169,8 @@ Note that in the last link, although `arc5` uses the datums `b` and `2a`, the li
 and `node2A` as dependencies, because the usability of `nodeDetsqrt` implies the usability of `nodeB` and `node2A`.
 This works because datums are just stored in a hash map and there are no access restrictions.
 
-The `graph.optimizeDependencies()` method exists to do this automatically.
+The `graph.optimizeDependencies()` method exists to do this automatically. See also
+[transitive reduction](https://en.wikipedia.org/wiki/Transitive_reduction).
 
 ### 4. Creating Graphs
 

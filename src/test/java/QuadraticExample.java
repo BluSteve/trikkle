@@ -13,11 +13,14 @@ import java.util.Set;
 // Imagine that arithmetic takes a lot of time.
 public class QuadraticExample {
 	public static void main(String[] args) {
-		annotation();
-//		verbose();
+		Graph annotationGraph = annotation();
+		Graph verboseGraph = verbose();
+		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
+		testGraph(annotationGraph);
+		testGraph(verboseGraph);
 	}
 
-	static void verbose() {
+	static Graph verbose() {
 		Node nodeA = new DiscreteNode("a");
 		Node nodeB = new DiscreteNode("b");
 		Node nodeC = new DiscreteNode("c");
@@ -93,10 +96,10 @@ public class QuadraticExample {
 		Graph graph = new Graph(links);
 		System.out.println(graph);
 
-		testGraph(graph);
+		return graph;
 	}
 
-	static void annotation() {
+	static Graph annotation() {
 		Arc arc1 = new AutoArc("x2") {
 			@Input
 			double a;
@@ -184,7 +187,7 @@ public class QuadraticExample {
 		graph.optimizeDependencies();
 		System.out.println(graph);
 
-		testGraph(graph);
+		return graph;
 	}
 
 	private static void testGraph(Graph graph) {
