@@ -19,6 +19,7 @@ public final class Graph implements Congruent<Graph> {
 	@SuppressWarnings("CanBeFinal")
 	public static boolean ALLOW_CYCLES = false;
 	public final Set<Link> links;
+	public final List<Link> linkList;
 	public final Set<Primable> primables;
 	public final Set<Arc> arcs;
 	public final Set<Node> nodes;
@@ -35,23 +36,23 @@ public final class Graph implements Congruent<Graph> {
 	public final Map<String, Node> nodeOfDatum = new HashMap<>();
 
 	/**
-	 * Create a graph with the given links. If the type of the given links is not a set, it will be converted into a
-	 * set, otherwise the set object will be used without copying.
+	 * Create a graph with the given links. Takes in an ordered list to allow fixed index of arcs and nodes.
 	 *
-	 * @param links the links of the graph
+	 * @param linkList the links of the graph
 	 */
-	public Graph(List<Link> links) {
-		if (links == null || links.isEmpty()) {
+	public Graph(List<Link> linkList) {
+		if (linkList == null || linkList.isEmpty()) {
 			throw new IllegalArgumentException("Graph must have at least one link!");
 		}
-		this.links = new HashSet<>(links);
+		this.linkList = linkList;
+		this.links = new HashSet<>(linkList);
 
 		arcs = arcIndex.keySet();
 		nodes = nodeIndex.keySet();
 
 		int nodeI = 0, arcI = 0;
 		Set<Node> dependencyNodes = new HashSet<>(); // all nodes that have been dependencies
-		for (Link link : links) {
+		for (Link link : linkList) {
 			if (arcMap.containsKey(link.getArc())) {
 				throw new IllegalArgumentException("The same arc cannot be used for two links!");
 			}
@@ -117,7 +118,7 @@ public final class Graph implements Congruent<Graph> {
 			}
 		}
 
-		if (hasCycle() && !ALLOW_CYCLES) {
+		if (!ALLOW_CYCLES && hasCycle()) {
 			throw new IllegalArgumentException("Graph has a cycle!");
 		}
 	}
@@ -178,9 +179,16 @@ public final class Graph implements Congruent<Graph> {
 		return concatGraphs(new HashSet<>(Arrays.asList(graphs)));
 	}
 
+	/**
+	 * Checks if a "graph" has a cycle. Takes in a map of node's dependencies because the graph may not have arcs
+	 * declared yet.
+	 *
+	 * @param dependenciesOfNode the immediate dependencies of each node
+	 * @return true if the graph has a cycle.
+	 */
 	public static boolean hasCycle(Map<Node, Set<Node>> dependenciesOfNode) {
 		Set<Node> nodes = dependenciesOfNode.keySet();
-		Set<Node> checked = new HashSet<>();
+		Set<Node> checked = new HashSet<>(); // memoization
 		for (Node node : nodes) {
 			Stack<Node> nodeStack = new Stack<>();
 			nodeStack.push(node);
@@ -203,27 +211,79 @@ public final class Graph implements Congruent<Graph> {
 		return false;
 	}
 
-	public Set<Node> findAllDependencies(Node node) {
-		if (!nodes.contains(node)) {
-			throw new IllegalArgumentException("Node must be in the graph!");
+	/**
+	 * Returns the map of *all* (not just immediate) dependencies of a node.
+	 *
+	 * @return the map of all dependencies of a node
+	 */
+	public static Map<Node, Set<Node>> getAllDependenciesOfNode(Map<Node, Set<Node>> dependenciesOfNode) {
+		Map<Node, Set<Node>> allDepsOfNode = new HashMap<>();
+		for (Node node : dependenciesOfNode.keySet()) {
+			Set<Node> dependencies = new HashSet<>();
+			Stack<Node> nodeStack = new Stack<>();
+			nodeStack.push(node);
+			while (!nodeStack.empty()) {
+				Node popped = nodeStack.pop();
+				if (dependencies.contains(popped)) continue; // popped node is a dependency through another path already
+
+				dependencies.add(popped);
+
+				if (allDepsOfNode.containsKey(popped)) { // popped node has been evaluated before. memoization
+					dependencies.addAll(allDepsOfNode.get(popped));
+					continue;
+				}
+
+				Set<Node> nodeDependencies = dependenciesOfNode.get(popped);
+				if (nodeDependencies != null) {
+					nodeStack.addAll(nodeDependencies);
+				}
+			}
+			dependencies.remove(node);
+			allDepsOfNode.put(node, dependencies);
 		}
 
-		Set<Node> dependencies = new HashSet<>();
-		Stack<Node> nodeStack = new Stack<>();
-		nodeStack.push(node);
-		while (!nodeStack.empty()) {
-			Node popped = nodeStack.pop();
-			if (dependencies.contains(popped)) continue;
-			dependencies.add(popped);
-			Set<Node> nodeDependencies = dependenciesOfNode.get(popped);
-			if (nodeDependencies != null) {
-				nodeStack.addAll(nodeDependencies);
-			}
-		}
-		dependencies.remove(node);
-		return dependencies;
+		return allDepsOfNode;
 	}
 
+	/**
+	 * Optimizes the graph by removing redundant transitive dependencies.
+	 */
+	public void optimizeDependencies() {
+		Map<Node, Set<Node>> allDepsOfNode = getAllDependenciesOfNode(dependenciesOfNode);
+		Map<Node, Set<Node>> optimized = new HashMap<>();
+
+		for (Map.Entry<Node, Set<Node>> entry : dependenciesOfNode.entrySet()) {
+			Set<Node> redundant = new HashSet<>();
+			for (Node a : entry.getValue()) {
+				for (Node b : entry.getValue()) {
+					Set<Node> nodes1 = allDepsOfNode.get(a);
+					if (nodes1 == null) {
+						continue;
+					}
+					if (nodes1.contains(b)) { // todo this is O(n^2)
+						redundant.add(b);
+					}
+				}
+			}
+
+			HashSet<Node> copy = new HashSet<>(entry.getValue());
+			copy.removeAll(redundant);
+			optimized.put(entry.getKey(), copy);
+		}
+
+		for (Link link : links) {
+			Node oneNode = link.getOutputNodes().iterator().next(); // all output nodes of a link have the same dependencies
+			link.setDependencies(optimized.get(oneNode));
+		}
+	}
+
+	/**
+	 * Finds the pruned graph for the given targetEndingNodes. The pruned graph is the minimal graph that can obtain the
+	 * targetEndingNodes.
+	 *
+	 * @param targetEndingNodes the ending nodes of the pruned graph
+	 * @return the pruned graph
+	 */
 	public Graph findPrunedGraphFor(Set<Node> targetEndingNodes) {
 		// Note: targetEndingNodes may not be in endingNodes. It's merely the targetEndingNodes of the PRUNED graph.
 		if (!nodes.containsAll(targetEndingNodes)) {
@@ -260,10 +320,16 @@ public final class Graph implements Congruent<Graph> {
 		return new Graph(finalLinks);
 	}
 
+	/**
+	 * @see #findPrunedGraphFor(Set)
+	 */
 	public Graph findPrunedGraphFor(Node... targetEndingNodes) {
 		return findPrunedGraphFor(new HashSet<>(Arrays.asList(targetEndingNodes)));
 	}
 
+	/**
+	 * @return true if the graph has a cycle
+	 */
 	public boolean hasCycle() {
 		return hasCycle(dependenciesOfNode);
 	}

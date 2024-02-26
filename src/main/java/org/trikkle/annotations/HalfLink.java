@@ -31,10 +31,6 @@ public final class HalfLink {
 		this.outputNodes = outputNodes;
 	}
 
-	public HalfLink(Arc arc, Node outputNode) {
-		this(arc, Collections.singleton(outputNode));
-	}
-
 	/**
 	 * Create a half link with the given arc. The output node is generated from {@link Arc#getOutputDatumNames()}.
 	 *
@@ -69,6 +65,7 @@ public final class HalfLink {
 	 * @see DiscreteNode
 	 */
 	public static List<Link> toFullLinks(List<HalfLink> halfLinks) {
+		// associates output datums with their nodes
 		Map<String, Node> nodeOfDatum = new HashMap<>();
 		for (HalfLink halfLink : halfLinks) {
 			for (Node outputNode : halfLink.outputNodes) {
@@ -81,9 +78,11 @@ public final class HalfLink {
 			}
 		}
 
+		Nodespace ns = new Nodespace();
+
 		List<Link> fullLinks = new ArrayList<>(halfLinks.size());
 		for (HalfLink halfLink : halfLinks) {
-			if (halfLink.dependencies != null) {
+			if (halfLink.dependencies != null) { // manually declared dependencies
 				fullLinks.add(new Link(halfLink.dependencies, halfLink.arc, halfLink.outputNodes));
 				continue;
 			}
@@ -99,7 +98,7 @@ public final class HalfLink {
 			}
 
 			if (!danglingInputs.isEmpty()) {
-				Node startingNode = new DiscreteNode(danglingInputs); // combines all danglingInputs into one starting node
+				Node startingNode = ns.discreteOf(danglingInputs); // combines all danglingInputs into one starting node
 				dependencies.add(startingNode);
 			}
 

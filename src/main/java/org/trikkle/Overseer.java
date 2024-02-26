@@ -54,6 +54,7 @@ public final class Overseer {
 	private Observer observer = null;
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
+	private Map<String, Object> resultCache;
 
 	/**
 	 * Constructs an overseer with the given graph. The initial cache is empty. All {@link Primable}s will be locked and
@@ -203,9 +204,7 @@ public final class Overseer {
 	}
 
 	/**
-	 * Returns the names of datums that are required to start the graph, belonging to the starting nodes.
-	 *
-	 * @return the names of datums that are required to start the graph
+	 * @return the names of datums that are required to start the graph, belonging to the starting nodes
 	 */
 	public Set<String> getStartingDatumNames() {
 		Set<String> startingDatumNames = new HashSet<>();
@@ -216,10 +215,7 @@ public final class Overseer {
 	}
 
 	/**
-	 * Returns the names of datums that are required to start the graph, belonging to the starting nodes, but which have
-	 * not been filled.
-	 *
-	 * @return the names of datums that are required to start the graph but have not been filled
+	 * @return the names of datums that are required to start the graph but which have not been filled
 	 */
 	public Set<String> getUnfilledStartingDatumNames() {
 		Set<String> startingDatumNames = new HashSet<>();
@@ -282,8 +278,15 @@ public final class Overseer {
 		return cache;
 	}
 
+	/**
+	 * The result cache contains only the datums of ending nodes.
+	 *
+	 * @return the result cache
+	 */
 	public Map<String, Object> getResultCache() {
-		Map<String, Object> resultCache = new HashMap<>();
+		if (resultCache != null) return resultCache;
+
+		resultCache = new HashMap<>();
 		for (Node endingNode : g.endingNodes) {
 			for (String datumName : endingNode.datumNames) {
 				Object datum = cache.get(datumName);
@@ -293,14 +296,29 @@ public final class Overseer {
 		return resultCache;
 	}
 
+	/**
+	 * @return a copy of the full cache
+	 */
 	public Map<String, Object> getCacheCopy() {
 		return new HashMap<>(cache);
 	}
 
+	/**
+	 * Returns the datum with the given name from the cache. If the datum is not in the cache, this will return null.
+	 *
+	 * @param datumName the name of the datum
+	 * @return the datum with the given name
+	 */
 	public Object getDatum(String datumName) {
 		return cache.get(datumName);
 	}
 
+	/**
+	 * Returns the node that contains the given datum. If the datum is not in the graph, this will return null.
+	 *
+	 * @param datumName the name of the datum
+	 * @return the node that contains the given datum
+	 */
 	public Node getNodeOfDatum(String datumName) {
 		return g.nodeOfDatum.get(datumName);
 	}
@@ -323,6 +341,9 @@ public final class Overseer {
 		return linkTrace;
 	}
 
+	/**
+	 * @return the graph that this overseer is running
+	 */
 	public Graph getGraph() {
 		return g;
 	}
@@ -392,11 +413,6 @@ public final class Overseer {
 		this.unsafeOnRecursive = unsafeOnRecursive;
 	}
 
-	/**
-	 * Returns the observer for this overseer.
-	 *
-	 * @return the observer for this overseer
-	 */
 	public Observer getObserver() {
 		return observer;
 	}

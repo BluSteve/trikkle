@@ -45,6 +45,8 @@ Overseer: Executes a graph. Handles datum storage.
 
 Tick: The number of times the overseer "checks" for runnable links.
 Ticktock: Proper name for one such "check". E.g., the overseer ticktocks when a new node is usable.
+
+Half link: A link without dependencies declared. Used for link autogeneration.
 ```
 
 ## Getting Started
@@ -101,6 +103,7 @@ Arc arc1 = new AutoArc("x2") {
     returnDatum("2a", 2 * a);
   }
 };
+
 Arc arc2 = new AutoArc("square") {
   @Override
   protected void run() {
@@ -109,6 +112,7 @@ Arc arc2 = new AutoArc("square") {
     returnDatum("b^2", b * b);
   }
 };
+
 Arc arc3 = new AutoArc("make 4ac") {
   @Override
   protected void run() {
@@ -118,6 +122,7 @@ Arc arc3 = new AutoArc("make 4ac") {
     returnDatum("4ac", 2 * twiceA * c);
   }
 };
+
 Arc arc4 = new AutoArc("determinant") {
   @Override
   protected void run() {
@@ -128,6 +133,7 @@ Arc arc4 = new AutoArc("determinant") {
     returnDatum("-sqrt(b^2 - 4ac)", -Math.sqrt(bsq - fourAC));
   }
 };
+
 Arc arc5 = new AutoArc("quadratic<br>formula") {
   @Override
   protected void run() {
@@ -158,6 +164,8 @@ links.add(new Link(Set.of(nodeDetsqrt), arc5, Set.of(nodePosSoln, nodeNegSoln)))
 Note that in the last link, although `arc5` uses the datums `b` and `2a`, the link does not need to include `nodeB`
 and `node2A` as dependencies, because the usability of `nodeDetsqrt` implies the usability of `nodeB` and `node2A`.
 This works because datums are just stored in a hash map and there are no access restrictions.
+
+The `graph.optimizeDependencies()` method exists to do this automatically.
 
 ### 4. Creating Graphs
 
@@ -336,13 +344,178 @@ A helper class [FunctionRacer](src/main/java/org/trikkle/FunctionRacer.java) is 
 and take the result of the first one that finishes, interrupting the rest. Useful if you have multiple ways to get to
 a result and you don't know ahead of time which would be faster.
 
-### Annotations
+### Automatic Link Generation
 
-TODO
+Below is an example of various ways to declare input and output datums. You can use the `@Input` and `@Output`
+annotations, the `alias()` function or just manually setting datum names. The `toFullLinks` method will convert the
+half links into full links by using one another as context. So if one arc outputs `2a` as a datum and another
+arc needs `2a` then the nodes will be created automatically.
 
-#### Auto-generated Links
+It's recommended that you visualize the graphs to verify their correctness after using half links.
 
-TODO
+```java
+Arc arc1 = new AutoArc("x2") {
+  @Input
+  double a;
+  @Output(name = "2a")
+  double twiceA;
+
+  @Override
+  protected void run() {
+    twiceA = 2 * a;
+  }
+};
+
+Arc arc2 = new AutoArc("square") {
+  @Input
+  double b;
+  @Output(name = "b^2")
+  double bsq;
+
+  @Override
+  protected void run() {
+    bsq = b * b;
+  }
+};
+
+Arc arc3 = new AutoArc("make 4ac") {
+  @Input(name = "2a")
+  double twiceA;
+  @Input
+  double c;
+  @Output(name = "4ac")
+  double fourAC;
+
+  @Override
+  protected void run() {
+    fourAC = 2 * twiceA * c;
+  }
+};
+
+Arc arc4 = new AutoArc("determinant") {
+  @Input
+  double bsq, fourAC;
+
+  {
+    alias("bsq", "b^2");
+    alias("fourAC", "4ac");
+  }
+
+  @Override
+  protected void run() {
+    returnDatum("sqrt(b^2 - 4ac)", Math.sqrt(bsq - fourAC));
+    returnDatum("-sqrt(b^2 - 4ac)", -Math.sqrt(bsq - fourAC));
+  }
+};
+arc4.
+
+setOutputDatumNames("sqrt(b^2 - 4ac)","-sqrt(b^2 - 4ac)");
+
+Arc arc5 = new AutoArc("quadratic<br>formula") {
+  @Override
+  protected void run() {
+    double b = (double) getDatum("b");
+    double twiceA = (double) getDatum("2a");
+    double detsqrtpos = (double) getDatum("sqrt(b^2 - 4ac)");
+    double detsqrtneg = (double) getDatum("-sqrt(b^2 - 4ac)");
+
+    returnDatum("larger root", (-b + detsqrtpos) / twiceA);
+    returnDatum("smaller root", (-b + detsqrtneg) / twiceA);
+  }
+};
+arc5.
+
+setInputDatumNames("b","2a","sqrt(b^2 - 4ac)","-sqrt(b^2 - 4ac)");
+arc5.
+
+setOutputDatumNames("larger root","smaller root");
+
+List<HalfLink> halfLinks = new ArrayList<>();
+halfLinks.
+
+add(new HalfLink(arc1));
+        halfLinks.
+
+add(new HalfLink(arc2));
+        halfLinks.
+
+add(new HalfLink(arc3));
+        halfLinks.
+
+add(new HalfLink(arc4));
+        halfLinks.
+
+add(new HalfLink(arc5, Set.of(
+        new DiscreteNode("larger root"),
+    new
+
+DiscreteNode("smaller root"))));
+
+List<Link> links = HalfLink.toFullLinks(halfLinks);
+
+Graph graph = new Graph(links);
+System.out.
+
+println(graph);
+
+graph.
+
+optimizeDependencies();
+System.out.
+
+println(graph);
+
+```
+
+#### Output:
+
+##### Before optimization:
+
+```mermaid
+flowchart LR
+  classDef hidden display: none;
+  node1["smaller root"]
+  node2["b"]
+  node3(("4ac"))
+  node4["larger root"]
+  node5(("sqrt(b^2 - 4ac)<br>-sqrt(b^2 - 4ac)"))
+  node6["c"]
+  node7["a"]
+  node8(("2a"))
+  node9(("b^2"))
+  arc1{"determinant"}
+  arc2{"quadratic<br>formula"}
+  arc3{"make 4ac"}
+  node3 & node9 --- arc1 --> node5
+  node5 & node2 & node8 --- arc2 --> node4 & node1
+  node8 & node6 --- arc3 --> node3
+  node2 -- " square " --> node9
+  node7 -- " x2 " --> node8
+```
+
+##### After optimization:
+
+```mermaid
+flowchart LR
+  classDef hidden display: none;
+  node1["smaller root"]
+  node2["b"]
+  node3(("4ac"))
+  node4["larger root"]
+  node5(("sqrt(b^2 - 4ac)<br>-sqrt(b^2 - 4ac)"))
+  node6["c"]
+  node7["a"]
+  node8(("2a"))
+  node9(("b^2"))
+  arc1{"determinant"}
+  arc2{"quadratic<br>formula"}
+  arc3{"make 4ac"}
+  node3 & node9 --- arc1 --> node5
+  node5 --- arc2 --> node4 & node1
+  node8 & node6 --- arc3 --> node3
+  node2 -- " square " --> node9
+  node7 -- " x2 " --> node8
+```
 
 ### Mermaid "Animations"
 
