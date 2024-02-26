@@ -1,4 +1,5 @@
 # 💧Trikkle - Dataflow Programming for Java
+[![Build Status](https://github.com/blusteve/trikkle/actions/workflows/gradle.yml/badge.svg)](https://github.com/blusteve/trikkle/actions/workflows/gradle.yml/)
 [![Javadoc](https://img.shields.io/badge/JavaDoc-Online-green)](https://blusteve.github.io/trikkle/javadoc/)
 
 `Author: Steve Cao`
