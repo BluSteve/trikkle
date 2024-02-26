@@ -459,6 +459,7 @@ class OverseerTest {
 		assertTrue(end - start < 300);
 
 		Overseer overseer2 = new Overseer(graph);
+		overseer2.setLogging(true);
 		overseer2.resetGraph();
 		overseer2.setParallel(false);
 		long start2 = System.currentTimeMillis();
@@ -502,6 +503,7 @@ class OverseerTest {
 			startingNode.setUsable();
 		}
 		overseer.setParallel(false);
+		overseer.setLogging(true);
 		overseer.start();
 		assertEquals(1, overseer.getTick());
 	}
@@ -543,6 +545,7 @@ class OverseerTest {
 		Graph graph = new Graph(link1, link2, link3);
 		Overseer overseer = new Overseer(graph);
 		initNode.setUsable();
+		overseer.setLogging(true);
 		overseer.start();
 
 		System.out.println(toMarkdown(animate(graph, overseer.getLinkTrace())));
