@@ -358,6 +358,8 @@ output datums by default. **An analogous feature exists in Link.**
 
 It's recommended that you visualize the graphs to verify their correctness after using half links.
 
+Code can be found at [QuadraticExample](src/test/java/QuadraticExample.java).
+
 ```java
 Arc arc1 = new AutoArc("x2") {
   @Input
