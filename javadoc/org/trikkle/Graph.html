@@ -179,8 +179,12 @@ implements <a href="Congruent.html" title="interface in org.trikkle">Congruent</
 <div class="col-last even-row-color">
 <div class="block">Create a graph with the given links.</div>
 </div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.trikkle.Link...)" class="member-name-link">Graph</a><wbr>(<a href="Link.html" title="class in org.trikkle">Link</a>...&nbsp;links)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.trikkle.Graph)" class="member-name-link">Graph</a><wbr>(<a href="Graph.html" title="class in org.trikkle">Graph</a>&nbsp;graph)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Copy constructor that calls <a href="Link.html#%3Cinit%3E(org.trikkle.Link)"><code>Link(Link)</code></a> on each link in the graph.</div>
+</div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.trikkle.Link...)" class="member-name-link">Graph</a><wbr>(<a href="Link.html" title="class in org.trikkle">Link</a>...&nbsp;links)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -391,6 +395,18 @@ implements <a href="Congruent.html" title="interface in org.trikkle">Congruent</
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Graph</span><wbr><span class="parameters">(<a href="Link.html" title="class in org.trikkle">Link</a>...&nbsp;links)</span></div>
 </section>
 </li>
+<li>
+<section class="detail" id="&lt;init&gt;(org.trikkle.Graph)">
+<h3>Graph</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Graph</span><wbr><span class="parameters">(<a href="Graph.html" title="class in org.trikkle">Graph</a>&nbsp;graph)</span></div>
+<div class="block">Copy constructor that calls <a href="Link.html#%3Cinit%3E(org.trikkle.Link)"><code>Link(Link)</code></a> on each link in the graph. This is a deep copy. The nodes and
+ arcs are the original objects.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>graph</code> - the graph to copy</dd>
+</dl>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -463,7 +479,7 @@ implements <a href="Congruent.html" title="interface in org.trikkle">Congruent</
 <section class="detail" id="optimizeDependencies()">
 <h3>optimizeDependencies</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">optimizeDependencies</span>()</div>
-<div class="block">Optimizes the graph by removing redundant transitive dependencies.</div>
+<div class="block">Optimizes the graph by removing redundant transitive dependencies. <b>Changes links in place.</b></div>
 </section>
 </li>
 <li>
