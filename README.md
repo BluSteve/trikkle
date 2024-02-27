@@ -448,10 +448,12 @@ halfLinks.add(new HalfLink(arc5, Set.of(
 List<Link> links = HalfLink.toFullLinks(halfLinks);
 
 Graph graph = new Graph(links);
-System.out.println(graph);
 
-graph.optimizeDependencies();
+Graph optimizedGraph = new Graph(graph); // copies all links; needed as next line changes links in place
+optimizedGraph.optimizeDependencies();
+
 System.out.println(graph);
+System.out.println(optimizedGraph);
 
 ```
 

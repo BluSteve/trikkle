@@ -78,6 +78,15 @@ public final class Link implements Congruent<Link> {
 	}
 
 	/**
+	 * Copy constructor. The dependencies, arc, and output nodes are copied from the link.
+	 *
+	 * @param link the link to copy
+	 */
+	public Link(Link link) {
+		this(link.dependencies, link.arc, link.outputNodes);
+	}
+
+	/**
 	 * Check if the link is runnable. A link is runnable if it has no dependencies OR all of its dependencies are usable,
 	 * AND the arc is not yet finished.
 	 *

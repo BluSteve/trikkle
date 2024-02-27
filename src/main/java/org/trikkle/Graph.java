@@ -75,7 +75,7 @@ public final class Graph implements Congruent<Graph> {
 			for (Node outputNode : link.getOutputNodes()) {
 				outputNodeMap.putOne(outputNode, link);
 				for (Node dependency : link.getDependencies()) {
-					dependenciesOfNode.putOne(outputNode, dependency);
+					dependenciesOfNode.putOne(outputNode, dependency); // works for multiple links to the same output node
 				}
 			}
 
@@ -125,6 +125,16 @@ public final class Graph implements Congruent<Graph> {
 
 	public Graph(Link... links) {
 		this(Arrays.asList(links));
+	}
+
+	/**
+	 * Copy constructor that calls {@link Link#Link(Link)} on each link in the graph. This is a deep copy. The nodes and
+	 * arcs are the original objects.
+	 *
+	 * @param graph the graph to copy
+	 */
+	public Graph(Graph graph) {
+		this(graph.linkList.stream().map(Link::new).toList());
 	}
 
 	/**
@@ -246,7 +256,7 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	/**
-	 * Optimizes the graph by removing redundant transitive dependencies.
+	 * Optimizes the graph by removing redundant transitive dependencies. <b>Changes links in place.</b>
 	 */
 	public void optimizeDependencies() {
 		Map<Node, Set<Node>> allDepsOfNode = getAllDependenciesOfNode(dependenciesOfNode);
@@ -256,11 +266,11 @@ public final class Graph implements Congruent<Graph> {
 			Set<Node> redundant = new HashSet<>();
 			for (Node a : entry.getValue()) {
 				for (Node b : entry.getValue()) {
-					Set<Node> nodes1 = allDepsOfNode.get(a);
-					if (nodes1 == null) {
+					Set<Node> allDepsOfA = allDepsOfNode.get(a);
+					if (allDepsOfA == null) {
 						continue;
 					}
-					if (nodes1.contains(b)) { // todo this is O(n^2)
+					if (allDepsOfA.contains(b)) { // todo this is O(n^2)
 						redundant.add(b);
 					}
 				}

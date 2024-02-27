@@ -275,4 +275,46 @@ class GraphTest {
 		});
 		assertTrue(e1.getMessage().contains("targetNodes must be a subset of the graph's nodes!"));
 	}
+
+	@Test
+	void optimizeTest() {
+		// make a linear graph of 4 nodes
+		Node nodeA = new DiscreteNode("A");
+		Node nodeB = new DiscreteNode("B");
+		Node nodeC = new DiscreteNode("C");
+		Node nodeD = new DiscreteNode("D");
+		Arc arc1 = new AutoArc("arc1") {
+			@Override
+			public void run() {
+
+			}
+		};
+		Arc arc2 = new AutoArc("arc2") {
+			@Override
+			public void run() {
+
+			}
+		};
+		Arc arc3 = new AutoArc("arc3") {
+			@Override
+			public void run() {
+
+			}
+		};
+		Arc arc4 = new AutoArc("arc4") {
+			@Override
+			public void run() {
+
+			}
+		};
+		Link link1 = new Link(Set.of(nodeA), arc1, nodeB);
+		Link link2 = new Link(Set.of(nodeB), arc2, nodeC);
+		Link link3 = new Link(Set.of(nodeB, nodeC), arc3, nodeD);
+//		Link link4 = new Link(Set.of(nodeB), arc4, nodeD);
+// todo multiple links to same output node doesn't work as expected
+
+		Graph graph = new Graph(link1, link2, link3);
+		graph.optimizeDependencies();
+		System.out.println(graph);
+	}
 }

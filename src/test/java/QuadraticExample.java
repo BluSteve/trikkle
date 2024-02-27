@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.trikkle.*;
 import org.trikkle.annotations.HalfLink;
 import org.trikkle.annotations.Input;
@@ -11,15 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 // Imagine that arithmetic takes a lot of time.
-public class QuadraticExample {
-	public static void main(String[] args) {
-		Graph annotationGraph = annotation();
-		Graph verboseGraph = verbose();
-		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
-		testGraph(annotationGraph);
-		testGraph(verboseGraph);
-	}
-
+class QuadraticExample {
 	static Graph verbose() {
 		Node nodeA = new DiscreteNode("a");
 		Node nodeB = new DiscreteNode("b");
@@ -182,12 +175,14 @@ public class QuadraticExample {
 		List<Link> links = HalfLink.toFullLinks(halfLinks);
 
 		Graph graph = new Graph(links);
-		System.out.println(graph);
 
-		graph.optimizeDependencies();
-		System.out.println(graph);
+		Graph optimizedGraph = new Graph(graph);
+		optimizedGraph.optimizeDependencies();
 
-		return graph;
+		System.out.println(graph);
+		System.out.println(optimizedGraph);
+
+		return optimizedGraph;
 	}
 
 	private static void testGraph(Graph graph) {
@@ -212,5 +207,14 @@ public class QuadraticExample {
 		Assertions.assertEquals(-3.0, overseer.getResultCache().get("smaller root"));
 
 		System.out.println(LogUtils.toMarkdown(LogUtils.animate(graph, overseer.getLinkTrace())));
+	}
+
+	@Test
+	void test() {
+		Graph annotationGraph = annotation();
+		Graph verboseGraph = verbose();
+		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
+		testGraph(annotationGraph);
+		testGraph(verboseGraph);
 	}
 }
