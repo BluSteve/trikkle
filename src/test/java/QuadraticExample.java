@@ -13,6 +13,14 @@ import java.util.Set;
 
 // Imagine that arithmetic takes a lot of time.
 class QuadraticExample {
+	public static void main(String[] args) {
+		Graph g = verbose();
+		testGraph(g);
+		Graph g2 = GraphSerializer.deserialize(GraphSerializer.serialize(g));
+		testGraph(g2);
+		System.out.println(g2);
+	}
+
 	static Graph verbose() {
 		Node nodeA = new DiscreteNode("a");
 		Node nodeB = new DiscreteNode("b");
