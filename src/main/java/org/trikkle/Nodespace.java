@@ -153,4 +153,27 @@ public final class Nodespace {
 		}
 		return nodes;
 	}
+
+	/**
+	 * Returns the node with the given datum name. If there are multiple nodes with the same datum name, an exception is
+	 * thrown. If there are no nodes with the given datum name, null is returned.
+	 * @param datumName the datum name
+	 * @return the node with the given datum name
+	 */
+	public Node nodeWithDatum(String datumName) {
+		List<Node> nodes = new ArrayList<>();
+		for (Node node : nodeStore.values()) {
+			if (node.datumNames.contains(datumName)) {
+				nodes.add(node);
+			}
+		}
+
+		if (nodes.isEmpty()) {
+			return null;
+		} else if (nodes.size() == 1) {
+			return nodes.getFirst();
+		} else {
+			throw new RuntimeException("Multiple nodes with the same datum name");
+		}
+	}
 }
