@@ -74,6 +74,9 @@ public final class Graph implements Congruent<Graph> {
 			arcMap.put(link.getArc(), link);
 			for (Node outputNode : link.getOutputNodes()) {
 				outputNodeMap.putOne(outputNode, link);
+				if (!dependenciesOfNode.containsKey(outputNode)) { // in case the output node has no dependencies
+					dependenciesOfNode.put(outputNode, new HashSet<>());
+				}
 				for (Node dependency : link.getDependencies()) {
 					dependenciesOfNode.putOne(outputNode, dependency); // works for multiple links to the same output node
 				}
@@ -256,9 +259,12 @@ public final class Graph implements Congruent<Graph> {
 	}
 
 	/**
-	 * Optimizes the graph by removing redundant transitive dependencies. <b>Changes links in place.</b>
+	 * Optimizes the graph by removing redundant transitive dependencies. <b>Changes links in place.</b>\
+	 *
+	 * @return true if the graph was changed
 	 */
-	public void optimizeDependencies() {
+	public boolean optimizeDependencies() {
+		boolean changed = false;
 		Map<Node, Set<Node>> allDepsOfNode = getAllDependenciesOfNode(dependenciesOfNode);
 		Map<Node, Set<Node>> optimized = new HashMap<>();
 
@@ -272,6 +278,7 @@ public final class Graph implements Congruent<Graph> {
 					}
 					if (allDepsOfA.contains(b)) { // todo this is O(n^2)
 						redundant.add(b);
+						changed = true;
 					}
 				}
 			}
@@ -285,6 +292,8 @@ public final class Graph implements Congruent<Graph> {
 			Node oneNode = link.getOutputNodes().iterator().next(); // all output nodes of a link have the same dependencies
 			link.setDependencies(optimized.get(oneNode));
 		}
+
+		return changed;
 	}
 
 	/**
