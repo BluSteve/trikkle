@@ -192,19 +192,24 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns all nodes with the given datum name.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remove(org.trikkle.Node)" class="member-name-link">remove</a><wbr>(<a href="Node.html" title="class in org.trikkle">Node</a>&nbsp;node)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="Node.html" title="class in org.trikkle">Node</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#nodeWithDatum(java.lang.String)" class="member-name-link">nodeWithDatum</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;datumName)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Removes the given node from the <a href="#nodeStore"><code>nodeStore</code></a> based on the node's datum names.</div>
+<div class="block">Returns the node with the given datum name.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAll(java.util.Collection)" class="member-name-link">removeAll</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="Node.html" title="class in org.trikkle">Node</a>&gt;&nbsp;nodes)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#remove(org.trikkle.Node)" class="member-name-link">remove</a><wbr>(<a href="Node.html" title="class in org.trikkle">Node</a>&nbsp;node)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Removes the given node from the <a href="#nodeStore"><code>nodeStore</code></a> based on the node's datum names.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeAll(java.util.Collection)" class="member-name-link">removeAll</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;<a href="Node.html" title="class in org.trikkle">Node</a>&gt;&nbsp;nodes)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Removes all the given nodes from the <a href="#nodeStore"><code>nodeStore</code></a> based on the node's datum names.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="StreamNode.html" title="class in org.trikkle">StreamNode</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#streamOf(java.lang.String)" class="member-name-link">streamOf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;datumName)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="StreamNode.html" title="class in org.trikkle">StreamNode</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#streamOf(java.lang.String)" class="member-name-link">streamOf</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;datumName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns a <a href="StreamNode.html" title="class in org.trikkle"><code>StreamNode</code></a> with the given datum name.</div>
 </div>
 </div>
@@ -388,6 +393,20 @@ loadScripts(document, 'script');</script>
 <dd><code>datumName</code> - the datum name</dd>
 <dt>Returns:</dt>
 <dd>all nodes with the given datum name</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="nodeWithDatum(java.lang.String)">
+<h3>nodeWithDatum</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="Node.html" title="class in org.trikkle">Node</a></span>&nbsp;<span class="element-name">nodeWithDatum</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;datumName)</span></div>
+<div class="block">Returns the node with the given datum name. If there are multiple nodes with the same datum name, an exception is
+ thrown. If there are no nodes with the given datum name, null is returned.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>datumName</code> - the datum name</dd>
+<dt>Returns:</dt>
+<dd>the node with the given datum name</dd>
 </dl>
 </section>
 </li>
