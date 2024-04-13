@@ -307,7 +307,7 @@ public final class Graph implements Congruent<Graph> {
 		 for each dependency find link which creates it
 		*/
 
-		List<Link> finalLinks = new ArrayList<>();
+		Set<Link> finalLinks = new HashSet<>();
 
 		Stack<Node> nodeStack = new Stack<>();
 		for (Node targetEndingNode : targetEndingNodes) {
@@ -327,7 +327,7 @@ public final class Graph implements Congruent<Graph> {
 			}
 		}
 
-		return new Graph(finalLinks);
+		return new Graph(new ArrayList<>(finalLinks));
 	}
 
 	/**
