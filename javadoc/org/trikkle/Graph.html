@@ -246,7 +246,7 @@ implements <a href="Congruent.html" title="interface in org.trikkle">Congruent</
 <div class="block">Merges the graphs into one optimized graph, using the <code>endingNodes</code> as the ending nodes of the merged
  graph.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#optimizeDependencies()" class="member-name-link">optimizeDependencies</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Optimizes the graph by removing redundant transitive dependencies.</div>
@@ -478,8 +478,12 @@ implements <a href="Congruent.html" title="interface in org.trikkle">Congruent</
 <li>
 <section class="detail" id="optimizeDependencies()">
 <h3>optimizeDependencies</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">optimizeDependencies</span>()</div>
-<div class="block">Optimizes the graph by removing redundant transitive dependencies. <b>Changes links in place.</b></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">optimizeDependencies</span>()</div>
+<div class="block">Optimizes the graph by removing redundant transitive dependencies. <b>Changes links in place.</b>\</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if the graph was changed</dd>
+</dl>
 </section>
 </li>
 <li>
