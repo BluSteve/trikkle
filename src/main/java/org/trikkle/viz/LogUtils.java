@@ -22,7 +22,7 @@ public class LogUtils {
 		StringBuilder sb = new StringBuilder();
 		int tick = 1;
 		for (Collection<Link> links : linkTrace) {
-			sb.append("Tick ").append(tick++).append(":\n");
+			sb.append("Tick ").append(tick++).append(" (").append(links.size()).append("):\n");
 			for (Link link : links) {
 				sb.append(link).append("\n");
 			}
