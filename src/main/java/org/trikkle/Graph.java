@@ -38,12 +38,9 @@ public final class Graph implements Congruent<Graph> {
 	/**
 	 * Create a graph with the given links. Takes in an ordered list to allow fixed index of arcs and nodes.
 	 *
-	 * @param linkList the links of the graph
+	 * @param linkList the links of the graph (may be empty)
 	 */
 	public Graph(List<Link> linkList) {
-		if (linkList == null || linkList.isEmpty()) {
-			throw new IllegalArgumentException("Graph must have at least one link!");
-		}
 		this.linkList = linkList;
 		this.links = new HashSet<>(linkList);
 
