@@ -265,15 +265,20 @@ class GraphTest {
 
 	@Test
 	void prunedGraphs() {
-		Exception e = assertThrows(IllegalArgumentException.class, () -> {
-			graph1.findPrunedGraphFor(Set.of(paramNode));
-		});
-		assertTrue(e.getMessage().contains("Graph must have at least one link!"));
-
 		Exception e1 = assertThrows(IllegalArgumentException.class, () -> {
 			graph1.findPrunedGraphFor(Set.of(paramNode, matrixNode));
 		});
 		assertTrue(e1.getMessage().contains("targetNodes must be a subset of the graph's nodes!"));
+	}
+
+	@Test
+	void emptyGraph() {
+		Graph graph = new Graph();
+		assertEquals(0, graph.nodes.size());
+		assertEquals(0, graph.links.size());
+		assertEquals(0, graph.primables.size());
+		assertEquals(0, graph.endingNodes.size());
+		assertEquals(0, graph.startingNodes.size());
 	}
 
 	@Test
