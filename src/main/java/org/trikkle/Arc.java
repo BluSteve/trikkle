@@ -114,6 +114,21 @@ public abstract class Arc implements Primable {
 	}
 
 	/**
+	 * Gets the datum with the given name from the overseer's cache. If the datum is not in the cache, the default value
+	 * is returned.
+	 *
+	 * @param datumName the name of the datum
+	 * @return the datum with the given name, or the default value if the datum is not in the cache
+	 */
+	protected <T> T getDatum(String datumName, T defaultValue) {
+		if (!overseer.getCache().containsKey(datumName)) {
+			return defaultValue;
+		}
+		//noinspection unchecked
+		return (T) overseer.getCache().get(datumName);
+	}
+
+	/**
 	 * Returns the datum with the given name to the overseer's cache by calling {@link Node#addDatum(String, Object)}.
 	 * The datum can be null.
 	 *
