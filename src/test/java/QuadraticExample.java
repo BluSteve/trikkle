@@ -32,7 +32,7 @@ class QuadraticExample {
 		Arc arc1 = new AutoArc("x2") {
 			@Override
 			protected void run() {
-				double a = (double) getDatum("a");
+				double a = getDatum("a");
 
 				returnDatum("2a", 2 * a);
 			}
@@ -42,7 +42,7 @@ class QuadraticExample {
 		Arc arc2 = new AutoArc("square") {
 			@Override
 			protected void run() {
-				double b = (double) getDatum("b");
+				double b = getDatum("b");
 
 				returnDatum("b^2", b * b);
 			}
@@ -52,8 +52,8 @@ class QuadraticExample {
 		Arc arc3 = new AutoArc("make 4ac") {
 			@Override
 			protected void run() {
-				double twiceA = (double) getDatum("2a");
-				double c = (double) getDatum("c");
+				double twiceA = getDatum("2a");
+				double c = getDatum("c");
 
 				returnDatum("4ac", 2 * twiceA * c);
 			}
@@ -63,8 +63,8 @@ class QuadraticExample {
 		Arc arc4 = new AutoArc("determinant") {
 			@Override
 			protected void run() {
-				double bsq = (double) getDatum("b^2");
-				double fourAC = (double) getDatum("4ac");
+				double bsq = getDatum("b^2");
+				double fourAC = getDatum("4ac");
 
 				returnDatum("sqrt(b^2 - 4ac)", Math.sqrt(bsq - fourAC));
 				returnDatum("-sqrt(b^2 - 4ac)", -Math.sqrt(bsq - fourAC));
@@ -75,10 +75,10 @@ class QuadraticExample {
 		Arc arc5 = new AutoArc("quadratic<br>formula") {
 			@Override
 			protected void run() {
-				double b = (double) getDatum("b");
-				double twiceA = (double) getDatum("2a");
-				double detsqrtpos = (double) getDatum("sqrt(b^2 - 4ac)");
-				double detsqrtneg = (double) getDatum("-sqrt(b^2 - 4ac)");
+				double b = getDatum("b");
+				double twiceA = getDatum("2a");
+				double detsqrtpos = getDatum("sqrt(b^2 - 4ac)");
+				double detsqrtneg = getDatum("-sqrt(b^2 - 4ac)");
 
 				returnDatum("larger root", (-b + detsqrtpos) / twiceA);
 				returnDatum("smaller root", (-b + detsqrtneg) / twiceA);
@@ -151,10 +151,10 @@ class QuadraticExample {
 		Arc arc5 = new AutoArc("quadratic<br>formula") {
 			@Override
 			protected void run() {
-				double b = (double) getDatum("b");
-				double twiceA = (double) getDatum("2a");
-				double detsqrtpos = (double) getDatum("sqrt(b^2 - 4ac)");
-				double detsqrtneg = (double) getDatum("-sqrt(b^2 - 4ac)");
+				double b = getDatum("b");
+				double twiceA = getDatum("2a");
+				double detsqrtpos = getDatum("sqrt(b^2 - 4ac)");
+				double detsqrtneg = getDatum("-sqrt(b^2 - 4ac)");
 
 				returnDatum("larger root", (-b + detsqrtpos) / twiceA);
 				returnDatum("smaller root", (-b + detsqrtneg) / twiceA);

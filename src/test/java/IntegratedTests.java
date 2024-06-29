@@ -75,7 +75,7 @@ public class IntegratedTests {
 		Arc coffeeArc = new Arc(false) {
 			@Override
 			public void run() {
-				Queue<Double> volume = (Queue<Double>) getDatum("brewer");
+				Queue<Double> volume = getDatum("brewer");
 				List<Double> volumes = Arrays.asList(volume.toArray(new Double[0])); // thread-safe snapshot
 				double sum = volumes.stream().mapToDouble(Double::doubleValue).sum();
 				if (sum >= 500) {
@@ -93,8 +93,8 @@ public class IntegratedTests {
 		Arc serveBothArc = new AutoArc() {
 			@Override
 			public void run() {
-				Omelette omelette = (Omelette) getDatum("omelette");
-				Coffee coffee = (Coffee) getDatum("coffee");
+				Omelette omelette = getDatum("omelette");
+				Coffee coffee = getDatum("coffee");
 				returnDatum("customerVeryHappy", serveOmeletteAndCoffee(omelette, coffee));
 			}
 		};
