@@ -338,7 +338,7 @@ class GraphTest {
 // todo multiple links to same output node doesn't work as expected
 
 		Graph graph = new Graph(link1, link2, link3);
-		graph.optimizeDependencies();
+		System.out.println("graph.optimizeDependencies() = " + graph.optimizeDependencies());
 		System.out.println(graph);
 	}
 }

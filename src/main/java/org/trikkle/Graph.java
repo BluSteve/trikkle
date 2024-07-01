@@ -258,12 +258,12 @@ public final class Graph implements Congruent<Graph> {
 	/**
 	 * Optimizes the graph by removing redundant transitive dependencies. <b>Changes links in place.</b>\
 	 *
-	 * @return true if the graph was changed
+	 * @return a map of nodes to their redundant dependencies
 	 */
-	public boolean optimizeDependencies() {
-		boolean changed = false;
+	public Map<Node, Set<Node>> optimizeDependencies() {
 		Map<Node, Set<Node>> allDepsOfNode = getAllDependenciesOfNode(dependenciesOfNode);
 		Map<Node, Set<Node>> optimized = new HashMap<>();
+		MultiMap<Node, Node> redundanciesOfNode = new MultiHashMap<>();
 
 		for (Map.Entry<Node, Set<Node>> entry : dependenciesOfNode.entrySet()) {
 			Set<Node> redundant = new HashSet<>();
@@ -275,7 +275,7 @@ public final class Graph implements Congruent<Graph> {
 					}
 					if (allDepsOfA.contains(b)) { // todo this is O(n^2)
 						redundant.add(b);
-						changed = true;
+						redundanciesOfNode.putOne(entry.getKey(), b);
 					}
 				}
 			}
@@ -290,7 +290,7 @@ public final class Graph implements Congruent<Graph> {
 			link.setDependencies(optimized.get(oneNode));
 		}
 
-		return changed;
+		return redundanciesOfNode;
 	}
 
 	/**
