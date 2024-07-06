@@ -274,7 +274,10 @@ public final class Overseer {
 		}
 	}
 
-	Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
+	/**
+	 * @return the full cache
+	 */
+	public Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
 		return cache;
 	}
 
