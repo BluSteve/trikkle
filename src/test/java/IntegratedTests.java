@@ -120,6 +120,8 @@ public class IntegratedTests {
 		overseer.addStartingDatum("chivesCount", 2);
 		overseer.addStartingDatum("eggsCount", 3);
 		overseer.start();
+		System.out.println(overseer.getGraph().links);
+		System.out.println(overseer.getBurstTimes(TimeUnit.NANOSECONDS));
 		assertTrue((boolean) overseer.getResultCache().get("customerHappy"));
 		assertTrue((boolean) overseer.getResultCache().get("customerVeryHappy"));
 		System.out.println(overseer.getTick());

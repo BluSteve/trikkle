@@ -18,11 +18,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Arc implements Primable {
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
+	long startTime = -1, endTime = -1;
 	private Map<String, Field> inputFields, outputFields;
 	private Set<String> inputDatumNames, outputDatumNames;
 	private String name;
 	private ArcStatus status = ArcStatus.IDLE;
-
 	private Overseer overseer;
 	private Link link;
 
@@ -249,7 +249,13 @@ public abstract class Arc implements Primable {
 			throw new IllegalArgumentException(
 					"Safe arc " + this + " cannot be set to " + status + " from " + this.status + "!");
 		}
+
 		this.status = status;
+		if (this.status == ArcStatus.IN_PROGRESS && startTime == -1) {
+			startTime = System.nanoTime();
+		} else if (this.status == ArcStatus.FINISHED) {
+			endTime = System.nanoTime();
+		}
 	}
 
 	public String getName() {

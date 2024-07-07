@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -44,10 +45,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class Overseer {
 	final Graph g;
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
-	private final Collection<Link> links = new ConcurrentLinkedQueue<>();
+	private final Collection<Link> linkQueue = new ConcurrentLinkedQueue<>();
 	private AtomicInteger tick;
 	private Queue<Collection<Link>> linkTrace;
 	private boolean started = false;
+	private long startTime = -1;
 
 	private boolean unsafeOnRecursive = false;
 	private boolean logging = false;
@@ -78,7 +80,7 @@ public final class Overseer {
 		if (initialCache != null) {
 			this.cache.putAll(initialCache); // doesn't check that the initialCache has datums that are actually in the graph
 		}
-		links.addAll(g.links);
+		linkQueue.addAll(g.links);
 
 		// undoes previous overseer's changes
 		// Prime nodes and arcs with this overseer
@@ -131,6 +133,7 @@ public final class Overseer {
 		}
 
 		started = true;
+		startTime = System.nanoTime();
 		if (logging) {
 			tick = new AtomicInteger(0);
 			linkTrace = new ConcurrentLinkedQueue<>();
@@ -145,8 +148,8 @@ public final class Overseer {
 		if (!started) return; // for adding datums manually
 		if (hasEnded()) return;
 
-		Collection<Link> linksNow = new ArrayList<>(links.size());
-		for (Iterator<Link> iterator = links.iterator(); iterator.hasNext(); ) {
+		Collection<Link> linksNow = new ArrayList<>(linkQueue.size());
+		for (Iterator<Link> iterator = linkQueue.iterator(); iterator.hasNext(); ) {
 			Link link = iterator.next();
 			if (link.getArc().getStatus() == ArcStatus.FINISHED) { // lazily remove finished links
 				iterator.remove();
@@ -342,6 +345,32 @@ public final class Overseer {
 	 */
 	public Queue<Collection<Link>> getLinkTrace() {
 		return linkTrace;
+	}
+
+	/**
+	 * Returns the time taken to run each link in nanoseconds. If the link has not finished running, the burst time
+	 * will be -1.
+	 *
+	 * @param timeUnit the time unit to return the burst times in.
+	 * @return the time taken to run each link in nanoseconds
+	 * @throws NullPointerException if the time unit is null
+	 */
+	public Map<Link, Long> getBurstTimes(TimeUnit timeUnit) {
+		if (timeUnit == null) {
+			throw new NullPointerException("Time unit cannot be null!");
+		}
+
+		Map<Link, Long> burstTimes = new HashMap<>();
+		for (Link link : g.links) {
+			long startTime = link.getArc().startTime;
+			long endTime = link.getArc().endTime;
+			if (startTime == -1 || endTime == -1) {
+				burstTimes.put(link, -1L);
+			} else {
+				burstTimes.put(link, timeUnit.convert(endTime - startTime, TimeUnit.NANOSECONDS));
+			}
+		}
+		return burstTimes;
 	}
 
 	/**
