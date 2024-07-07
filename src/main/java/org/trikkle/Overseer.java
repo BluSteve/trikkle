@@ -158,10 +158,10 @@ public final class Overseer {
 		}
 
 		Collection<Link> linksNow = new ArrayList<>(linkQueue.size());
-		Collection<Link> linksToRemove = new ArrayList<>();
-		for (Link link : linkQueue) {
+		for (Iterator<Link> iterator = linkQueue.iterator(); iterator.hasNext(); ) {
+			Link link = iterator.next();
 			if (link.getArc().getStatus() == ArcStatus.FINISHED) { // lazily remove finished links
-				linksToRemove.add(link);
+				iterator.remove();
 				continue;
 			}
 			if (link.runnable()) {
@@ -177,8 +177,6 @@ public final class Overseer {
 				}
 			}
 		}
-
-		linkQueue.removeAll(linksToRemove);
 
 		if (logging) {
 			int t = tick.incrementAndGet();
