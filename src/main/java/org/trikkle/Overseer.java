@@ -49,7 +49,6 @@ public final class Overseer {
 	private AtomicInteger tick;
 	private Queue<Collection<Link>> linkTrace;
 	private boolean started = false;
-	private long startTime = -1;
 
 	private boolean unsafeOnRecursive = false;
 	private boolean logging = false;
@@ -133,7 +132,6 @@ public final class Overseer {
 		}
 
 		started = true;
-		startTime = System.nanoTime();
 		if (logging) {
 			tick = new AtomicInteger(0);
 			linkTrace = new ConcurrentLinkedQueue<>();
@@ -145,14 +143,25 @@ public final class Overseer {
 	}
 
 	private void ticktock(Node caller) {
-		if (!started) return; // for adding datums manually
+		if (!started) return; // to prevent adding datums manually from triggering a ticktock
 		if (hasEnded()) return;
+
+		// all outputs nodes having progress 1 is equivalent to the arc being done.
+		if (caller != null && caller.getProgress() == 1) {
+			for (Link link : g.outputNodeMap.get(caller)) {
+				// maybe another one of its output nodes got to it first
+				if (link.getArc().getStatus() == ArcStatus.FINISHED) continue;
+				if (link.getArc().getOutputNodesRemaining() == 0) {
+					link.getArc().setStatus(ArcStatus.FINISHED);
+				}
+			}
+		}
 
 		Collection<Link> linksNow = new ArrayList<>(linkQueue.size());
 		for (Iterator<Link> iterator = linkQueue.iterator(); iterator.hasNext(); ) {
 			Link link = iterator.next();
 			if (link.getArc().getStatus() == ArcStatus.FINISHED) { // lazily remove finished links
-				iterator.remove();
+				iterator.remove(); // todo this remove is slow
 				continue;
 			}
 			if (link.runnable()) {
@@ -161,7 +170,8 @@ public final class Overseer {
 					continue;
 				}
 				synchronized (arc) { // prevents one arc from being added to two separate linksNow
-					if (arc.getStatus() == ArcStatus.IDLE) {
+					if (arc.getStatus() == ArcStatus.IDLE) { // todo i think a autoarc can still get to this point multiple times
+						// todo as it is set to finished after the ticktock triggered by its output nodes
 						arc.setStatus(ArcStatus.STAND_BY);
 						linksNow.add(link);
 					}
@@ -174,7 +184,7 @@ public final class Overseer {
 			linkTrace.add(linksNow);
 			if (observer != null) observer.accept(caller, t, linksNow);
 		} else {
-			if (observer != null) observer.accept(caller, 0, null);
+			if (observer != null) observer.accept(caller, 0, linksNow);
 		}
 
 		if (linksNow.isEmpty()) return;
@@ -362,8 +372,8 @@ public final class Overseer {
 
 		Map<Link, Long> burstTimes = new HashMap<>();
 		for (Link link : g.links) {
-			long startTime = link.getArc().startTime;
-			long endTime = link.getArc().endTime;
+			long startTime = link.getArc().getStartTime();
+			long endTime = link.getArc().getEndTime();
 			if (startTime == -1 || endTime == -1) {
 				burstTimes.put(link, -1L);
 			} else {

@@ -22,10 +22,11 @@ public abstract class Arc implements Primable {
 	private Set<String> inputDatumNames, outputDatumNames;
 	private String name;
 
-	long startTime = -1, endTime = -1;
+	private long startTime = -1, endTime = -1;
 	private ArcStatus status = ArcStatus.IDLE;
 	private Overseer overseer;
 	private Link link;
+	private Set<Node> outputNodesRemaining; // could be stale
 
 	/**
 	 * A safe arc is one that cannot be set to a status that is less than its current status. This means it can only be
@@ -139,7 +140,7 @@ public abstract class Arc implements Primable {
 	 * @throws NullPointerException     if the datum name is not associated with any node
 	 * @throws IllegalArgumentException if the node with this datum is not an output of this arc
 	 */
-	protected void returnDatum(String datumName, Object datum) {
+	protected final void returnDatum(String datumName, Object datum) {
 		Node node = overseer.getNodeOfDatum(datumName);
 		if (node == null) {
 			throw new NullPointerException("No output node is associated with datum " + datumName + "!");
@@ -259,6 +260,11 @@ public abstract class Arc implements Primable {
 		}
 	}
 
+	int getOutputNodesRemaining() { // this can determine if there are no more undone output nodes in O(n) time
+		outputNodesRemaining.removeIf((node) -> node.getProgress() == 1);
+		return outputNodesRemaining.size();
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -290,6 +296,7 @@ public abstract class Arc implements Primable {
 	public void primeWith(Overseer overseer) { // aka initialize
 		this.overseer = overseer;
 		link = overseer.g.arcMap.get(this);
+		outputNodesRemaining = new HashSet<>(link.getOutputNodes());
 	}
 
 	/**
@@ -358,6 +365,14 @@ public abstract class Arc implements Primable {
 		setOutputDatumNames(new HashSet<>(Arrays.asList(outputDatumNames)));
 	}
 
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public long getEndTime() {
+		return endTime;
+	}
+
 	/**
 	 * Gets the link this arc is a part of. Only available after the arc is primed.
 	 *
@@ -409,6 +424,7 @@ public abstract class Arc implements Primable {
 		link = null;
 		startTime = -1;
 		endTime = -1;
+		outputNodesRemaining = null;
 	}
 
 	@Override
