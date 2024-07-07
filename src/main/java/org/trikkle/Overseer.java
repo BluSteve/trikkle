@@ -158,10 +158,10 @@ public final class Overseer {
 		}
 
 		Collection<Link> linksNow = new ArrayList<>(linkQueue.size());
-		for (Iterator<Link> iterator = linkQueue.iterator(); iterator.hasNext(); ) {
-			Link link = iterator.next();
+		Collection<Link> linksToRemove = new ArrayList<>();
+		for (Link link : linkQueue) {
 			if (link.getArc().getStatus() == ArcStatus.FINISHED) { // lazily remove finished links
-				iterator.remove(); // todo this remove is slow
+				linksToRemove.add(link);
 				continue;
 			}
 			if (link.runnable()) {
@@ -170,14 +170,15 @@ public final class Overseer {
 					continue;
 				}
 				synchronized (arc) { // prevents one arc from being added to two separate linksNow
-					if (arc.getStatus() == ArcStatus.IDLE) { // todo i think a autoarc can still get to this point multiple times
-						// todo as it is set to finished after the ticktock triggered by its output nodes
+					if (arc.getStatus() == ArcStatus.IDLE) {
 						arc.setStatus(ArcStatus.STAND_BY);
 						linksNow.add(link);
 					}
 				}
 			}
 		}
+
+		linkQueue.removeAll(linksToRemove);
 
 		if (logging) {
 			int t = tick.incrementAndGet();
