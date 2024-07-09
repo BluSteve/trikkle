@@ -260,7 +260,7 @@ public abstract class Arc implements Primable {
 		}
 	}
 
-	int getOutputNodesRemaining() { // this can determine if there are no more undone output nodes in O(n) time
+	synchronized int getOutputNodesRemaining() { // this can determine if there are no more undone output nodes in O(n) time
 		outputNodesRemaining.removeIf((node) -> node.getProgress() == 1);
 		return outputNodesRemaining.size();
 	}
