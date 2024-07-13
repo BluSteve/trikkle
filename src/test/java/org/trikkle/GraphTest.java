@@ -23,7 +23,6 @@ class GraphTest {
 	static Graph graph2 = new Graph(link2, link3);
 	static Link link4 = new Link(Set.of(paramNode), arcs.get(3), dipoleNode);
 
-
 	@Test
 	void getDatumDefault() {
 		Arc arc = new AutoArc() {
@@ -50,7 +49,8 @@ class GraphTest {
 					new Link(Set.of(magicNode), arcs.get(0), hfNode)
 			));
 		});
-		assertTrue(exception.getMessage().contains("The same arc cannot be used for two links!"));
+		System.out.println("exception.getMessage() = " + exception.getMessage());
+		assertTrue(exception.getMessage().contains("The same arc cannot be used for two links"));
 	}
 
 	@Test
@@ -340,5 +340,31 @@ class GraphTest {
 		Graph graph = new Graph(link1, link2, link3);
 		System.out.println("graph.optimizeDependencies() = " + graph.optimizeDependencies());
 		System.out.println(graph);
+	}
+
+	@Test
+	void twoSameLinksTest() {
+		// make a graph with two links that have the same input and output nodes
+		Node nodeA = new DiscreteNode("A");
+		Node nodeB = new DiscreteNode("B");
+		Arc arc1 = new AutoArc("arc1") {
+			@Override
+			public void run() {
+
+			}
+		};
+		Arc arc2 = new AutoArc("arc2") {
+			@Override
+			public void run() {
+
+			}
+		};
+		Link link1 = new Link(Set.of(nodeA), arc1, nodeB);
+		Link link2 = new Link(Set.of(nodeA), arc2, nodeB);
+		List<Link[]> duplicates = new Graph(link1, link2).findDuplicateLinks();
+		assertEquals(1, duplicates.size());
+		for (Link[] duplicate : duplicates) {
+			System.out.println("duplicate = " + duplicate[0] + " " + duplicate[1]);
+		}
 	}
 }

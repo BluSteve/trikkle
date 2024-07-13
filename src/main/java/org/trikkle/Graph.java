@@ -51,7 +51,8 @@ public final class Graph implements Congruent<Graph> {
 		Set<Node> dependencyNodes = new HashSet<>(); // all nodes that have been dependencies
 		for (Link link : linkList) {
 			if (arcMap.containsKey(link.getArc())) {
-				throw new IllegalArgumentException("The same arc cannot be used for two links!");
+				throw new IllegalArgumentException(
+						"The same arc cannot be used for two links: " + link + " and " + arcMap.get(link.getArc()));
 			}
 
 			// indexing data structures. the order of traversal is constant
@@ -348,6 +349,28 @@ public final class Graph implements Congruent<Graph> {
 	 */
 	public boolean hasCycle() {
 		return hasCycle(dependenciesOfNode);
+	}
+
+	/**
+	 * Find all the links that have the same (i.e., not just congruent) dependencies and output nodes.
+	 *
+	 * @return a list of pairs of duplicate links
+	 */
+	public List<Link[]> findDuplicateLinks() {
+		List<Link[]> duplicates = new ArrayList<>();
+		// todo this is O(n^2)
+		for (int i = 0; i < linkList.size(); i++) {
+			Link link1 = linkList.get(i);
+			for (int j = i + 1; j < linkList.size(); j++) {
+				Link link2 = linkList.get(j);
+				if (Objects.equals(link1.getDependencies(), link2.getDependencies())
+						&& Objects.equals(link1.getOutputNodes(), link2.getOutputNodes())) {
+					duplicates.add(new Link[]{link1, link2});
+				}
+			}
+		}
+
+		return duplicates;
 	}
 
 	/**
