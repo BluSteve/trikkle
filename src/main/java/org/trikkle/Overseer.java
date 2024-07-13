@@ -1,6 +1,7 @@
 package org.trikkle;
 
 import org.trikkle.structs.StrictConcurrentHashMap;
+import org.trikkle.structs.StrictHashMap;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -287,6 +288,9 @@ public final class Overseer {
 	}
 
 	/**
+	 * Returns the full cache which is a {@link StrictHashMap}. Trying to get a datum that is not in the cache will
+	 * throw an exception.
+	 *
 	 * @return the full cache
 	 */
 	public Map<String, Object> getCache() { // just give the full cache in case arc needs to iterate through it.
@@ -294,7 +298,8 @@ public final class Overseer {
 	}
 
 	/**
-	 * The result cache contains only the datums of ending nodes.
+	 * The result cache contains only the datums of ending nodes. Trying to get a datum that is not in the cache will
+	 * return null.
 	 *
 	 * @return the result cache
 	 */
@@ -312,6 +317,8 @@ public final class Overseer {
 	}
 
 	/**
+	 * Returns the full cache as a copy. Trying to get a datum that is not in the cache will return null.
+	 *
 	 * @return a copy of the full cache
 	 */
 	public Map<String, Object> getCacheCopy() {
