@@ -4,6 +4,10 @@ import org.trikkle.annotations.Input;
 import org.trikkle.annotations.Output;
 import org.trikkle.structs.StrictHashMap;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -260,7 +264,8 @@ public abstract class Arc implements Primable {
 		}
 	}
 
-	synchronized int getOutputNodesRemaining() { // this can determine if there are no more undone output nodes in O(n) time
+	synchronized int getOutputNodesRemaining() { // this can determine if there are no more undone output nodes in O(n)
+		// time
 		outputNodesRemaining.removeIf((node) -> node.getProgress() == 1);
 		return outputNodesRemaining.size();
 	}
@@ -365,6 +370,20 @@ public abstract class Arc implements Primable {
 		setOutputDatumNames(new HashSet<>(Arrays.asList(outputDatumNames)));
 	}
 
+	public List<String> getInputDatumNames2() {
+		List<String> res = new ArrayList<>();
+		for (Field field : this.getClass().getFields()) {
+			if (field.getType().equals(String.class) && !field.isAnnotationPresent(Ignore.class)) {
+				try {
+					res.add((String) field.get(this));
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		return res;
+	}
+
 	public long getStartTime() {
 		return startTime;
 	}
@@ -439,5 +458,10 @@ public abstract class Arc implements Primable {
 		} else {
 			return name;
 		}
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.FIELD)
+	public @interface Ignore {
 	}
 }
