@@ -4,10 +4,6 @@ import org.trikkle.annotations.Input;
 import org.trikkle.annotations.Output;
 import org.trikkle.structs.StrictHashMap;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -372,8 +368,9 @@ public abstract class Arc implements Primable {
 
 	public List<String> getInputDatumNames2() {
 		List<String> res = new ArrayList<>();
-		for (Field field : this.getClass().getFields()) {
-			if (field.getType().equals(String.class) && !field.isAnnotationPresent(Ignore.class)) {
+		for (Field field : this.getClass().getDeclaredFields()) {
+			System.out.println(field.getName() + " " + field.getModifiers());
+			if (field.getName().endsWith("$name")) {
 				try {
 					res.add((String) field.get(this));
 				} catch (IllegalAccessException e) {
@@ -458,10 +455,5 @@ public abstract class Arc implements Primable {
 		} else {
 			return name;
 		}
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target(ElementType.FIELD)
-	public @interface Ignore {
 	}
 }
