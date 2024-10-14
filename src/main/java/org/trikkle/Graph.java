@@ -156,7 +156,7 @@ public final class Graph implements Congruent<Graph> {
 			for (Node outputNode : halfLink.getOutputNodes()) {
 				for (String datumName : outputNode.datumNames) {
 					Node rvalue = nodeOfDatum.put(datumName, outputNode);
-					if (rvalue != null) {
+					if (rvalue != null && rvalue != outputNode) {
 						throw new IllegalArgumentException("Datum name " + datumName + " is already declared by " + rvalue);
 					}
 				}

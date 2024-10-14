@@ -156,7 +156,6 @@ public final class Overseer {
 				}
 			}
 		}
-		System.out.println();
 	}
 
 	private void ticktock(Node caller) {

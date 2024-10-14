@@ -91,6 +91,8 @@ class QuadraticExample {
 
 	static Graph simple() {
 		List<Link> links = new ArrayList<>();
+		Nodespace ns = new Nodespace();
+		Node nodeA =ns.discreteOf("a");
 
 		String a$in, b$in, c$in, a2$in, bsq$in, fourac$in, detsqrtpos$in, detsqrtneg$in;
 		String a2$out, bsq$out, fourac$out, detsqrtpos$out, detsqrtneg$out, pos$out, neg$out;
@@ -108,10 +110,11 @@ class QuadraticExample {
 
 		Arc arc1 = new AutoArc("x2") {
 			String[] s = {a$in, a2$out};
-			double a, a2;
+			double a2;
 
 			@Override
 			protected void run() {
+				double a = getDatum(a$in);
 				a2 = 2 * a;
 			}
 		};
@@ -163,7 +166,7 @@ class QuadraticExample {
 		};
 		links.add(new Link(null, arc5, Set.of(new DiscreteNode(pos$out), new DiscreteNode(neg$out))));
 
-		Graph.preprocess(links, new Nodespace());
+		Graph.preprocess(links, ns);
 
 		Graph graph = new Graph(links);
 		System.out.println(graph);
