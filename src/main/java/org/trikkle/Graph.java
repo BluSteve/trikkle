@@ -56,7 +56,7 @@ public final class Graph implements Congruent<Graph> {
 			}
 
 			// indexing data structures. the order of traversal is constant
-			for (Node dependency : link.getDependencies()) {
+			for (Node dependency : link.getInputNodes()) {
 				if (!nodeIndex.containsKey(dependency)) {
 					nodeIndex.put(dependency, nodeI++);
 				}
@@ -75,12 +75,12 @@ public final class Graph implements Congruent<Graph> {
 				if (!dependenciesOfNode.containsKey(outputNode)) { // in case the output node has no dependencies
 					dependenciesOfNode.put(outputNode, new HashSet<>());
 				}
-				for (Node dependency : link.getDependencies()) {
+				for (Node dependency : link.getInputNodes()) {
 					dependenciesOfNode.putOne(outputNode, dependency); // works for multiple links to the same output node
 				}
 			}
 
-			dependencyNodes.addAll(link.getDependencies());
+			dependencyNodes.addAll(link.getInputNodes());
 		}
 		primables = new HashSet<>(nodes);
 		primables.addAll(arcs);
@@ -288,7 +288,7 @@ public final class Graph implements Congruent<Graph> {
 
 		for (Link link : links) {
 			Node oneNode = link.getOutputNodes().iterator().next(); // all output nodes of a link have the same dependencies
-			link.setDependencies(optimized.get(oneNode));
+			link.setInputNodes(optimized.get(oneNode));
 		}
 
 		return redundanciesOfNode;
@@ -327,7 +327,7 @@ public final class Graph implements Congruent<Graph> {
 			if (generatingLinks != null) {
 				finalLinks.addAll(generatingLinks);
 				for (Link generatingLink : generatingLinks) {
-					for (Node dependency : generatingLink.getDependencies()) {
+					for (Node dependency : generatingLink.getInputNodes()) {
 						nodeStack.push(dependency);
 					}
 				}
@@ -363,7 +363,7 @@ public final class Graph implements Congruent<Graph> {
 			Link link1 = linkList.get(i);
 			for (int j = i + 1; j < linkList.size(); j++) {
 				Link link2 = linkList.get(j);
-				if (Objects.equals(link1.getDependencies(), link2.getDependencies())
+				if (Objects.equals(link1.getInputNodes(), link2.getInputNodes())
 						&& Objects.equals(link1.getOutputNodes(), link2.getOutputNodes())) {
 					duplicates.add(new Link[]{link1, link2});
 				}

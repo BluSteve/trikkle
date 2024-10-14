@@ -84,7 +84,7 @@ public class GraphGenerator {
 
 		// add unused nodes to the dependencies of a random link in links
 		for (Node node : unusedNodes) {
-			links.get(random.nextInt(numArcs)).getDependencies().add(node);
+			links.get(random.nextInt(numArcs)).getInputNodes().add(node);
 		}
 
 		return new Graph(links);

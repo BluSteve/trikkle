@@ -159,11 +159,11 @@ public class MermaidGraphViz implements GraphViz {
 				k++;
 				String arcId = prefix + "arc" + k;
 
-				Set<String> dependencyIds = link.getDependencies().stream()
+				Set<String> dependencyIds = link.getInputNodes().stream()
 						.map(nodeIdOfNode::get).collect(Collectors.toSet());
 				Set<String> outputNodeIds = link.getOutputNodes().stream()
 						.map(nodeIdOfNode::get).collect(Collectors.toSet());
-				if (link.getDependencies().size() > 1 || link.getOutputNodes().size() > 1) {
+				if (link.getInputNodes().size() > 1 || link.getOutputNodes().size() > 1) {
 					lines.add(arcId + "{" + finalArcName(link.getArc(), arcId) + "}");
 					linkLines.add(makeLink(dependencyIds, arcId, outputNodeIds));
 				} else {

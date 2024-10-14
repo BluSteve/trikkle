@@ -14,56 +14,56 @@ import java.util.Set;
  * @since 0.1.0
  */
 public final class Link implements Congruent<Link> {
-	private Set<Node> dependencies, outputNodes;
+	private Set<Node> inputNodes, outputNodes;
 	private Arc arc;
 
 	/**
-	 * Create a link with the given dependencies, arc, and output nodes.
+	 * Create a link with the given input nodes, arc, and output nodes.
 	 *
-	 * @param dependencies the dependency nodes of the link
+	 * @param inputNodes the dependency nodes of the link
 	 * @param arc          the arc of the link
 	 * @param outputNodes  the output nodes of the link
-	 * @throws NullPointerException     if dependencies, arc, or outputNodes is null
+	 * @throws NullPointerException     if input nodes, arc, or outputNodes is null
 	 * @throws IllegalArgumentException if a StreamNode is the input of an AutoArc
 	 */
-	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
+	public Link(Set<Node> inputNodes, Arc arc, Set<Node> outputNodes) {
 		if (arc == null) throw new NullPointerException("Arc cannot be null!");
 
-		if (dependencies != null) {
-			boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
+		if (inputNodes != null) {
+			boolean hasStreamNode = inputNodes.stream().anyMatch(node -> node instanceof StreamNode);
 			boolean autoArc = arc instanceof AutoArc;
 			if (hasStreamNode && autoArc) {
 				throw new IllegalArgumentException("StreamNode cannot be the input of an AutoArc. Use Arc instead.");
 			}
 		}
 
-		this.dependencies = dependencies;
+		this.inputNodes = inputNodes;
 		this.arc = arc;
 		this.outputNodes = outputNodes;
 	}
 
-	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
-		this(dependencies, arc, Collections.singleton(outputNode));
+	public Link(Set<Node> inputNodes, Arc arc, Node outputNode) {
+		this(inputNodes, arc, Collections.singleton(outputNode));
 	}
 
 	/**
-	 * Copy constructor. The dependencies, arc, and output nodes are copied from the link.
+	 * Copy constructor. The input nodes, arc, and output nodes are copied from the link.
 	 *
 	 * @param link the link to copy
 	 */
 	public Link(Link link) {
-		this(link.dependencies, link.arc, link.outputNodes);
+		this(link.inputNodes, link.arc, link.outputNodes);
 	}
 
 	/**
-	 * Check if the link is runnable. A link is runnable if it has no dependencies OR all of its dependencies are usable,
+	 * Check if the link is runnable. A link is runnable if it has no input nodes OR all of its input nodes are usable,
 	 * AND the arc is not yet finished.
 	 *
 	 * @return true if the link is runnable
 	 */
 	public boolean runnable() {
 		if (arc.getStatus() == ArcStatus.FINISHED) return false;
-		for (Node dependency : dependencies) {
+		for (Node dependency : inputNodes) {
 			if (!dependency.isUsable()) {
 				return false;
 			}
@@ -71,13 +71,12 @@ public final class Link implements Congruent<Link> {
 		return true;
 	}
 
-	public Set<Node> getDependencies() {
-		return dependencies;
+	public Set<Node> getInputNodes() {
+		return inputNodes;
 	}
 
-	public void setDependencies(Set<Node> dependencies) {
-		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
-		this.dependencies = dependencies;
+	public void setInputNodes(Set<Node> inputNodes) {
+		this.inputNodes = inputNodes;
 	}
 
 	public Arc getArc() {
@@ -85,7 +84,6 @@ public final class Link implements Congruent<Link> {
 	}
 
 	public void setArc(Arc arc) {
-		if (arc == null) throw new NullPointerException("Arc cannot be null!");
 		this.arc = arc;
 	}
 
@@ -111,19 +109,19 @@ public final class Link implements Congruent<Link> {
 	}
 
 	/**
-	 * Two links are congruent if they have congruent dependencies and output nodes.
+	 * Two links are congruent if they have congruent input nodes and output nodes.
 	 *
 	 * @param link the link to compare to
 	 * @return true if the links are congruent
 	 */
 	@Override
 	public boolean congruentTo(Link link) {
-		return Congruent.setsCongruent(dependencies, link.dependencies) &&
+		return Congruent.setsCongruent(inputNodes, link.inputNodes) &&
 				Congruent.setsCongruent(outputNodes, link.outputNodes);
 	}
 
 	/**
-	 * Two links are equal if they have the same dependencies, arc, and output nodes.
+	 * Two links are equal if they have the same input nodes, arc, and output nodes.
 	 *
 	 * @param o the object to compare to
 	 * @return true if the links are equal
@@ -133,17 +131,17 @@ public final class Link implements Congruent<Link> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Link link = (Link) o;
-		return Objects.equals(dependencies, link.dependencies) && Objects.equals(arc, link.arc) &&
+		return Objects.equals(inputNodes, link.inputNodes) && Objects.equals(arc, link.arc) &&
 				Objects.equals(outputNodes, link.outputNodes);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(dependencies, arc, outputNodes);
+		return Objects.hash(inputNodes, arc, outputNodes);
 	}
 
 	@Override
 	public String toString() {
-		return dependencies + " -> " + arc + " -> " + outputNodes;
+		return inputNodes + " -> " + arc + " -> " + outputNodes;
 	}
 }

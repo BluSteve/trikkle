@@ -230,12 +230,12 @@ public abstract class Arc implements Primable {
 	}
 
 	/**
-	 * Gets the dependencies of this arc. Same as {@link Link#getDependencies()}. Only available after the arc is primed.
+	 * Gets the input nodes of this arc. Same as {@link Link#getInputNodes()}. Only available after the arc is primed.
 	 *
-	 * @return the dependencies of this arc
+	 * @return the input nodes of this arc
 	 */
-	protected Set<Node> getDependencies() {
-		return link.getDependencies();
+	protected Set<Node> getInputNodes() {
+		return link.getInputNodes();
 	}
 
 	/**
