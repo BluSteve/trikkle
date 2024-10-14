@@ -41,6 +41,10 @@ public final class Link implements Congruent<Link> {
 		this.outputNodes = outputNodes;
 	}
 
+	public Link(Arc arc) {
+		this(null, arc, null);
+	}
+
 	/**
 	 * Copy constructor. The input nodes, arc, and output nodes are copied from the link.
 	 *

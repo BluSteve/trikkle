@@ -89,6 +89,88 @@ class QuadraticExample {
 		return graph;
 	}
 
+	static Graph simple() {
+		List<Link> links = new ArrayList<>();
+
+		String a$in, b$in, c$in, a2$in, bsq$in, fourac$in, detsqrtpos$in, detsqrtneg$in;
+		String a2$out, bsq$out, fourac$out, detsqrtpos$out, detsqrtneg$out, pos$out, neg$out;
+
+		a$in = "a";
+		b$in = "b";
+		c$in = "c";
+		a2$in = a2$out = "2a";
+		bsq$in = bsq$out = "b^2";
+		fourac$in = fourac$out = "4ac";
+		detsqrtpos$in = detsqrtpos$out = "sqrt(b^2 - 4ac)";
+		detsqrtneg$in = detsqrtneg$out = "-sqrt(b^2 - 4ac)";
+		pos$out = "larger root";
+		neg$out = "smaller root";
+
+		Arc arc1 = new AutoArc("x2") {
+			String[] s = {a$in, a2$out};
+			double a, a2;
+
+			@Override
+			protected void run() {
+				a2 = 2 * a;
+			}
+		};
+		links.add(new Link(arc1));
+
+		Arc arc2 = new AutoArc("square") {
+			String[] s = {b$in, bsq$out};
+			double b, bsq;
+
+			@Override
+			protected void run() {
+				bsq = b * b;
+			}
+		};
+		links.add(new Link(arc2));
+
+		Arc arc3 = new AutoArc("make 4ac") {
+			String[] s = {a2$in, c$in, fourac$out};
+			double a2, c, fourac;
+
+			@Override
+			protected void run() {
+				fourac = 2 * a2 * c;
+			}
+		};
+		links.add(new Link(arc3));
+
+		Arc arc4 = new AutoArc("determinant") {
+			String[] s = {bsq$in, fourac$in, detsqrtpos$out, detsqrtneg$out};
+			double bsq, fourac, detsqrtpos, detsqrtneg;
+
+			@Override
+			protected void run() {
+				detsqrtpos = Math.sqrt(bsq - fourac);
+				detsqrtneg = -Math.sqrt(bsq - fourac);
+			}
+		};
+		links.add(new Link(arc4));
+
+		Arc arc5 = new AutoArc("quadratic<br>formula") {
+			String[] s = {b$in, a2$in, detsqrtpos$in, detsqrtneg$in, pos$out, neg$out};
+			double b, a2, detsqrtpos, detsqrtneg, pos, neg;
+
+			@Override
+			protected void run() {
+				pos = (-b + detsqrtpos) / a2;
+				neg = (-b + detsqrtneg) / a2;
+			}
+		};
+		links.add(new Link(null, arc5, Set.of(new DiscreteNode(pos$out), new DiscreteNode(neg$out))));
+
+		Graph.preprocess(links, new Nodespace());
+
+		Graph graph = new Graph(links);
+		graph.optimizeDependencies();
+		System.out.println(graph);
+		return graph;
+	}
+
 	private static void testGraph(Graph graph) {
 		Overseer overseer = new Overseer(graph);
 		overseer.setLogging(true);
@@ -115,7 +197,10 @@ class QuadraticExample {
 
 	@Test
 	void test() {
+		Graph annotationGraph = simple();
 		Graph verboseGraph = verbose();
+		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
+		testGraph(annotationGraph);
 		testGraph(verboseGraph);
 	}
 }

@@ -118,12 +118,15 @@ public abstract class Arc implements Primable {
 		for (Field field : this.getClass().getDeclaredFields()) {
 			if (field.getName().endsWith("$in")) {
 				try {
+					field.setAccessible(true);
 					String datumName = (String) field.get(this);
 					String var$in = field.getName();
 					String[] split = var$in.split("\\$"); // an implicit final variable is in the format val$a$in
 					String var = split[split.length - 2];
 					try {
-						this.getClass().getDeclaredField(var).set(this, getDatum(datumName));
+						Field declaredField = this.getClass().getDeclaredField(var);
+						declaredField.setAccessible(true);
+						declaredField.set(this, getDatum(datumName));
 					} catch (NoSuchFieldException ignored) {
 						System.out.println(ignored);
 					}
@@ -138,12 +141,15 @@ public abstract class Arc implements Primable {
 		for (Field field : this.getClass().getDeclaredFields()) {
 			if (field.getName().endsWith("$out")) {
 				try {
+					field.setAccessible(true);
 					String datumName = (String) field.get(this);
 					String var$out = field.getName();
 					String[] split = var$out.split("\\$");
 					String var = split[split.length - 2];
 					try {
-						returnDatum(datumName, this.getClass().getDeclaredField(var).get(this));
+						Field declaredField = this.getClass().getDeclaredField(var);
+						declaredField.setAccessible(true);
+						returnDatum(datumName, declaredField.get(this));
 					} catch (NoSuchFieldException ignored) {
 					}
 				} catch (IllegalAccessException e) {
@@ -235,6 +241,7 @@ public abstract class Arc implements Primable {
 		for (Field field : this.getClass().getDeclaredFields()) {
 			if (field.getName().endsWith("$in")) {
 				try {
+					field.setAccessible(true);
 					inputDatumNames.add((String) field.get(this));
 				} catch (IllegalAccessException e) {
 					throw new RuntimeException(e);
@@ -250,6 +257,7 @@ public abstract class Arc implements Primable {
 		for (Field field : this.getClass().getDeclaredFields()) {
 			if (field.getName().endsWith("$out")) {
 				try {
+					field.setAccessible(true);
 					outputDatumNames.add((String) field.get(this));
 				} catch (IllegalAccessException e) {
 					throw new RuntimeException(e);
