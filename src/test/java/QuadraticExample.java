@@ -1,9 +1,6 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.trikkle.*;
-import org.trikkle.annotations.HalfLink;
-import org.trikkle.annotations.Input;
-import org.trikkle.annotations.Output;
 import org.trikkle.viz.LogUtils;
 
 import java.util.ArrayList;
@@ -92,99 +89,6 @@ class QuadraticExample {
 		return graph;
 	}
 
-	static Graph annotation() {
-		Arc arc1 = new AutoArc("x2") {
-			@Input
-			double a;
-			@Output(name = "2a")
-			double twiceA;
-
-			@Override
-			protected void run() {
-				twiceA = 2 * a;
-			}
-		};
-
-		Arc arc2 = new AutoArc("square") {
-			@Input
-			double b;
-			@Output(name = "b^2")
-			double bsq;
-
-			@Override
-			protected void run() {
-				bsq = b * b;
-			}
-		};
-
-		Arc arc3 = new AutoArc("make 4ac") {
-			@Input(name = "2a")
-			double twiceA;
-			@Input
-			double c;
-			@Output(name = "4ac")
-			double fourAC;
-
-			@Override
-			protected void run() {
-				fourAC = 2 * twiceA * c;
-			}
-		};
-
-		Arc arc4 = new AutoArc("determinant") {
-			@Input
-			double bsq, fourAC;
-
-			{
-				alias("bsq", "b^2");
-				alias("fourAC", "4ac");
-			}
-
-			@Override
-			protected void run() {
-				returnDatum("sqrt(b^2 - 4ac)", Math.sqrt(bsq - fourAC));
-				returnDatum("-sqrt(b^2 - 4ac)", -Math.sqrt(bsq - fourAC));
-			}
-		};
-		arc4.setOutputDatumNames("sqrt(b^2 - 4ac)", "-sqrt(b^2 - 4ac)");
-
-		Arc arc5 = new AutoArc("quadratic<br>formula") {
-			@Override
-			protected void run() {
-				double b = getDatum("b");
-				double twiceA = getDatum("2a");
-				double detsqrtpos = getDatum("sqrt(b^2 - 4ac)");
-				double detsqrtneg = getDatum("-sqrt(b^2 - 4ac)");
-
-				returnDatum("larger root", (-b + detsqrtpos) / twiceA);
-				returnDatum("smaller root", (-b + detsqrtneg) / twiceA);
-			}
-		};
-		arc5.setInputDatumNames("b", "2a", "sqrt(b^2 - 4ac)", "-sqrt(b^2 - 4ac)");
-		arc5.setOutputDatumNames("larger root", "smaller root");
-
-		List<HalfLink> halfLinks = new ArrayList<>();
-		halfLinks.add(new HalfLink(arc1));
-		halfLinks.add(new HalfLink(arc2));
-		halfLinks.add(new HalfLink(arc3));
-		halfLinks.add(new HalfLink(arc4));
-		halfLinks.add(new HalfLink(arc5, Set.of(
-				new DiscreteNode("larger root"),
-				new DiscreteNode("smaller root"))));
-
-		List<Link> links = HalfLink.toFullLinks(halfLinks);
-
-		Graph graph = new Graph(links);
-
-		Graph optimizedGraph = new Graph(graph);
-		optimizedGraph.optimizeDependencies();
-
-		System.out.println(graph);
-		System.out.println(optimizedGraph);
-
-		return optimizedGraph;
-	}
-
 	private static void testGraph(Graph graph) {
 		Overseer overseer = new Overseer(graph);
 		overseer.setLogging(true);
@@ -211,10 +115,7 @@ class QuadraticExample {
 
 	@Test
 	void test() {
-		Graph annotationGraph = annotation();
 		Graph verboseGraph = verbose();
-		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
-		testGraph(annotationGraph);
 		testGraph(verboseGraph);
 	}
 }

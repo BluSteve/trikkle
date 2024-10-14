@@ -24,24 +24,6 @@ class GraphTest {
 	static Link link4 = new Link(Set.of(paramNode), arcs.get(3), dipoleNode);
 
 	@Test
-	void getDatumDefault() {
-		Arc arc = new AutoArc() {
-			@Override
-			public void run() {
-				double d = getDatum("d", 3.0);
-				assertEquals(3.0, d);
-				getOutputNode().setUsable();
-			}
-		};
-
-		Link link = new Link(arc);
-		Graph graph = new Graph(link);
-		Overseer overseer = new Overseer(graph);
-		link.getDependencies().iterator().next().setProgress(1);
-		overseer.start();
-	}
-
-	@Test
 	void twoLinksSameArc() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(List.of(

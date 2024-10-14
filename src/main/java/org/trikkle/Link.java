@@ -1,10 +1,6 @@
 package org.trikkle;
 
-import org.trikkle.annotations.Input;
-import org.trikkle.annotations.Output;
-
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -48,33 +44,6 @@ public final class Link implements Congruent<Link> {
 
 	public Link(Set<Node> dependencies, Arc arc, Node outputNode) {
 		this(dependencies, arc, Collections.singleton(outputNode));
-	}
-
-	/**
-	 * Create a link with the given arc. The dependency and output node are generated from the arc via
-	 * {@link Arc#getInputDatumNames()} and {@link Arc#getOutputDatumNames()}. All input datums will be added to a single
-	 * dependency node, and all output datums will be added to a single output node. The nodes created will either be a
-	 * {@link DiscreteNode} or an {@link EmptyNode}, if there are no datums.
-	 * <p>
-	 * This constructor is ideal for graphs without partial dependencies- that is, an arc that only uses a subset of the
-	 * datums of its dependency.
-	 *
-	 * @param arc the arc of the link
-	 * @see Input
-	 * @see Output
-	 * @see Arc#getInputDatumNames()
-	 * @see Arc#getOutputDatumNames()
-	 */
-	public Link(Arc arc) {
-		dependencies = new HashSet<>();
-		this.arc = arc;
-		outputNodes = new HashSet<>();
-
-		Set<String> inputNames = arc.getInputDatumNames();
-		Set<String> outputNames = arc.getOutputDatumNames();
-
-		dependencies.add(inputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(inputNames));
-		outputNodes.add(outputNames.isEmpty() ? new EmptyNode() : new DiscreteNode(outputNames));
 	}
 
 	/**
