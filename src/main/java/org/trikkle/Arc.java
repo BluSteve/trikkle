@@ -120,10 +120,12 @@ public abstract class Arc implements Primable {
 				try {
 					String datumName = (String) field.get(this);
 					String var$in = field.getName();
-					String var = var$in.substring(0, var$in.length() - 3);
+					String[] split = var$in.split("\\$"); // an implicit final variable is in the format val$a$in
+					String var = split[split.length - 2];
 					try {
-						this.getClass().getField(var).set(this, getDatum(datumName));
+						this.getClass().getDeclaredField(var).set(this, getDatum(datumName));
 					} catch (NoSuchFieldException ignored) {
+						System.out.println(ignored);
 					}
 				} catch (IllegalAccessException e) {
 					throw new RuntimeException(e);
@@ -138,9 +140,10 @@ public abstract class Arc implements Primable {
 				try {
 					String datumName = (String) field.get(this);
 					String var$out = field.getName();
-					String var = var$out.substring(0, var$out.length() - 4);
+					String[] split = var$out.split("\\$");
+					String var = split[split.length - 2];
 					try {
-						returnDatum(datumName, this.getClass().getField(var).get(this));
+						returnDatum(datumName, this.getClass().getDeclaredField(var).get(this));
 					} catch (NoSuchFieldException ignored) {
 					}
 				} catch (IllegalAccessException e) {

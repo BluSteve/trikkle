@@ -34,7 +34,7 @@ class QuadraticExample {
 				returnDatum("2a", 2 * a);
 			}
 		};
-		links.add(new Link(Set.of(nodeA), arc1, node2A));
+		links.add(new Link(Set.of(nodeA), arc1, Set.of(node2A)));
 
 		Arc arc2 = new AutoArc("square") {
 			@Override
@@ -44,7 +44,7 @@ class QuadraticExample {
 				returnDatum("b^2", b * b);
 			}
 		};
-		links.add(new Link(Set.of(nodeB), arc2, nodeBsq));
+		links.add(new Link(Set.of(nodeB), arc2, Set.of(nodeBsq)));
 
 		Arc arc3 = new AutoArc("make 4ac") {
 			@Override
@@ -55,7 +55,7 @@ class QuadraticExample {
 				returnDatum("4ac", 2 * twiceA * c);
 			}
 		};
-		links.add(new Link(Set.of(node2A, nodeC), arc3, node4AC));
+		links.add(new Link(Set.of(node2A, nodeC), arc3, Set.of(node4AC)));
 
 		Arc arc4 = new AutoArc("determinant") {
 			@Override
@@ -67,7 +67,7 @@ class QuadraticExample {
 				returnDatum("-sqrt(b^2 - 4ac)", -Math.sqrt(bsq - fourAC));
 			}
 		};
-		links.add(new Link(Set.of(nodeBsq, node4AC), arc4, nodeDetsqrt));
+		links.add(new Link(Set.of(nodeBsq, node4AC), arc4, Set.of(nodeDetsqrt)));
 
 		Arc arc5 = new AutoArc("quadratic<br>formula") {
 			@Override

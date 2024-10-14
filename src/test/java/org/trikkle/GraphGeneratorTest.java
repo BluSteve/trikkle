@@ -31,8 +31,8 @@ class GraphGeneratorTest {
 		arc2.setName("2");
 
 		Graph manualGraph = new Graph(List.of(
-				new Link(Set.of(node2, node3), arc1, node1),
-				new Link(Set.of(node2), arc2, node3)
+				new Link(Set.of(node2, node3), arc1, Set.of(node1)),
+				new Link(Set.of(node2), arc2, Set.of(node3))
 		));
 
 		assertTrue(graph.congruentTo(manualGraph));

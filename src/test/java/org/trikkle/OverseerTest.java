@@ -33,7 +33,7 @@ class OverseerTest {
 			public void run() {
 			}
 		};
-		Link link = new Link(Set.of(node), arc, new EmptyNode());
+		Link link = new Link(Set.of(node), arc, Set.of(new EmptyNode()));
 		Graph graph = new Graph(link);
 		Overseer overseer = new Overseer(graph);
 		node.addDatum("toSquare", 2.0);
@@ -65,7 +65,7 @@ class OverseerTest {
 			}
 		};
 		Node outputNode = ns.discreteOf("squared");
-		Link link = new Link(Set.of(inputNode), arc, outputNode);
+		Link link = new Link(Set.of(inputNode), arc, Set.of(outputNode));
 
 		Graph graph = new Graph(link);
 		System.out.println(new MermaidGraphViz().visualize(graph));
@@ -93,7 +93,7 @@ class OverseerTest {
 		};
 		arc.setName("squarer");
 		Node node2 = new DiscreteNode("squared");
-		Link link = new Link(Set.of(inputNode), arc, node2);
+		Link link = new Link(Set.of(inputNode), arc, Set.of(node2));
 
 		Arc arc2 = new AutoArc() {
 			@Override
@@ -107,7 +107,7 @@ class OverseerTest {
 		};
 		arc2.setName("process 1");
 		Node node3 = new DiscreteNode("result1");
-		Link link2 = new Link(Set.of(inputNode, node2), arc2, node3);
+		Link link2 = new Link(Set.of(inputNode, node2), arc2, Set.of(node3));
 
 		Arc arc3 = new AutoArc() {
 			@Override
@@ -120,7 +120,7 @@ class OverseerTest {
 		};
 		arc3.setName("aggregator");
 		Node node4 = new DiscreteNode("result2");
-		Link link3 = new Link(Set.of(node3, inputNode2), arc3, node4);
+		Link link3 = new Link(Set.of(node3, inputNode2), arc3, Set.of(node4));
 
 		Graph graph = new Graph(link, link2, link3);
 		GraphViz visualizer = new MermaidGraphViz();
@@ -167,7 +167,7 @@ class OverseerTest {
 			}
 		};
 		Node streamNode = Nodespace.DEFAULT.streamOf("stream1");
-		Link link = new Link(Set.of(), inputArc, streamNode);
+		Link link = new Link(Set.of(), inputArc, Set.of(streamNode));
 
 		Arc consumerArc = new Arc(false) {
 			double total = 0; // is this a pure function? it is if you reset()
@@ -208,7 +208,7 @@ class OverseerTest {
 			}
 		};
 		Node outputNode = new DiscreteNode("result1");
-		Link link2 = new Link(Set.of(streamNode), consumerArc, outputNode);
+		Link link2 = new Link(Set.of(streamNode), consumerArc, Set.of(outputNode));
 
 		Graph graph = new Graph(link, link2);
 		Overseer overseer = new Overseer(graph);
@@ -244,8 +244,8 @@ class OverseerTest {
 				}
 			}
 		};
-		Link link = new Link(Set.of(), inputArc, streamNode);
-		Link link2 = new Link(Set.of(), inputArc2, streamNode);
+		Link link = new Link(Set.of(), inputArc, Set.of(streamNode));
+		Link link2 = new Link(Set.of(), inputArc2, Set.of(streamNode));
 		Graph graph = new Graph(link, link2);
 		System.out.println(graph);
 
@@ -272,7 +272,7 @@ class OverseerTest {
 					}
 				}
 			};
-			Link link = new Link(Set.of(), inputArc, streamNode);
+			Link link = new Link(Set.of(), inputArc, Set.of(streamNode));
 			links.add(link);
 		}
 		Graph graph = new Graph(links);
@@ -307,7 +307,7 @@ class OverseerTest {
 				getOutputNode().setProgress(1);
 			}
 		};
-		Link link = new Link(dependencies, inputArc, Nodespace.DEFAULT.emptyOf());
+		Link link = new Link(dependencies, inputArc, Set.of(Nodespace.DEFAULT.emptyOf()));
 
 		Graph graph = new Graph(link);
 		System.out.println(graph);
@@ -334,8 +334,8 @@ class OverseerTest {
 				returnDatum("res2", 2.0);
 			}
 		};
-		Link link = new Link(Set.of(), inputArc, discreteNode);
-		Link link2 = new Link(Set.of(), inputArc2, discreteNode);
+		Link link = new Link(Set.of(), inputArc, Set.of(discreteNode));
+		Link link2 = new Link(Set.of(), inputArc2, Set.of(discreteNode));
 		Graph graph = new Graph(link, link2);
 		System.out.println(graph);
 
@@ -445,9 +445,9 @@ class OverseerTest {
 
 		Node medNode = Nodespace.DEFAULT.emptyOf();
 
-		Link link = new Link(Set.of(), long1, new EmptyNode());
-		Link link2 = new Link(Set.of(), med1, medNode);
-		Link link3 = new Link(Set.of(medNode), med2, new EmptyNode());
+		Link link = new Link(Set.of(), long1, Set.of(new EmptyNode()));
+		Link link2 = new Link(Set.of(), med1, Set.of(medNode));
+		Link link3 = new Link(Set.of(medNode), med2, Set.of(new EmptyNode()));
 
 		Graph graph = new Graph(link, link2, link3);
 		Overseer overseer = new Overseer(graph);
@@ -496,7 +496,7 @@ class OverseerTest {
 					getOutputNode().setUsable();
 				}
 			};
-			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, new Nodespace().emptyOf()));
+			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, Set.of(new Nodespace().emptyOf())));
 		}
 		Overseer overseer = new Overseer(new Graph(manyLinks));
 		for (Node startingNode : overseer.getGraph().startingNodes) {
@@ -537,9 +537,9 @@ class OverseerTest {
 		Node initNode = Nodespace.DEFAULT.emptyOf();
 
 		// make three links
-		Link link1 = new Link(Set.of(initNode), arc1, node1);
-		Link link2 = new Link(Set.of(node1), arc2, node2);
-		Link link3 = new Link(Set.of(node2), arc3, node3);
+		Link link1 = new Link(Set.of(initNode), arc1, Set.of(node1));
+		Link link2 = new Link(Set.of(node1), arc2, Set.of(node2));
+		Link link3 = new Link(Set.of(node2), arc3, Set.of(node3));
 
 		// make a graph with the three links
 		Graph graph = new Graph(link1, link2, link3);
@@ -570,8 +570,8 @@ class OverseerTest {
 		Node node1 = new EmptyNode();
 		Node node2 = new EmptyNode();
 		Node node3 = new EmptyNode();
-		Link link1 = new Link(Set.of(node1), arc1, node2);
-		Link link2 = new Link(Set.of(node2), arc2, node3);
+		Link link1 = new Link(Set.of(node1), arc1, Set.of(node2));
+		Link link2 = new Link(Set.of(node2), arc2, Set.of(node3));
 		Graph graph = new Graph(link1, link2);
 		Overseer overseer = new Overseer(graph);
 		node1.setUsable();

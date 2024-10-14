@@ -1,6 +1,5 @@
 package org.trikkle;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,10 +39,6 @@ public final class Link implements Congruent<Link> {
 		this.inputNodes = inputNodes;
 		this.arc = arc;
 		this.outputNodes = outputNodes;
-	}
-
-	public Link(Set<Node> inputNodes, Arc arc, Node outputNode) {
-		this(inputNodes, arc, Collections.singleton(outputNode));
 	}
 
 	/**

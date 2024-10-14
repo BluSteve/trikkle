@@ -16,19 +16,19 @@ class GraphTest {
 	static Node matrixNode = new DiscreteNode("matrix");
 	static Node dipoleNode = new DiscreteNode("dipole");
 	static List<Arc> arcs = GraphGenerator.generateArcs(4);
-	static Link link1 = new Link(Set.of(magicNode, paramNode), arcs.get(0), hfNode);
+	static Link link1 = new Link(Set.of(magicNode, paramNode), arcs.get(0), Set.of(hfNode));
 	static Graph graph1 = new Graph(link1);
-	static Link link2 = new Link(Set.of(matrixNode), arcs.get(1), hfNode);
-	static Link link3 = new Link(Set.of(matrixNode), arcs.get(2), dipoleNode);
+	static Link link2 = new Link(Set.of(matrixNode), arcs.get(1), Set.of(hfNode));
+	static Link link3 = new Link(Set.of(matrixNode), arcs.get(2), Set.of(dipoleNode));
 	static Graph graph2 = new Graph(link2, link3);
-	static Link link4 = new Link(Set.of(paramNode), arcs.get(3), dipoleNode);
+	static Link link4 = new Link(Set.of(paramNode), arcs.get(3), Set.of(dipoleNode));
 
 	@Test
 	void twoLinksSameArc() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(List.of(
-					new Link(Set.of(paramNode), arcs.get(0), magicNode),
-					new Link(Set.of(magicNode), arcs.get(0), hfNode)
+					new Link(Set.of(paramNode), arcs.get(0), Set.of(magicNode)),
+					new Link(Set.of(magicNode), arcs.get(0), Set.of(hfNode))
 			));
 		});
 		System.out.println("exception.getMessage() = " + exception.getMessage());
@@ -39,9 +39,9 @@ class GraphTest {
 	void hasCycle() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(List.of(
-					new Link(Set.of(paramNode), arcs.get(0), magicNode),
-					new Link(Set.of(magicNode), arcs.get(1), hfNode),
-					new Link(Set.of(hfNode), arcs.get(2), paramNode)
+					new Link(Set.of(paramNode), arcs.get(0), Set.of(magicNode)),
+					new Link(Set.of(magicNode), arcs.get(1), Set.of(hfNode)),
+					new Link(Set.of(hfNode), arcs.get(2), Set.of(paramNode))
 			));
 		});
 		assertTrue(exception.getMessage().contains("Graph has a cycle!"));
@@ -81,13 +81,13 @@ class GraphTest {
 		arc3.setName("arc3");
 
 		// make a link connecting nodeB to nodeF with arc1
-		Link link1 = new Link(Set.of(nodeB), arc1, nodeF);
+		Link link1 = new Link(Set.of(nodeB), arc1, Set.of(nodeF));
 
 		// make a link connecting node A and B to node C with arc2
-		Link link2 = new Link(Set.of(nodeA, nodeB), arc2, nodeC);
+		Link link2 = new Link(Set.of(nodeA, nodeB), arc2, Set.of(nodeC));
 
 		// make a link connecting node C and E to node D with arc3
-		Link link3 = new Link(Set.of(nodeC, nodeE), arc3, nodeD);
+		Link link3 = new Link(Set.of(nodeC, nodeE), arc3, Set.of(nodeD));
 
 		// make a graph with links 1 and 2
 		Graph graph1 = new Graph(link1, link2);
@@ -110,20 +110,20 @@ class GraphTest {
 			}
 		};
 		arc5.setName("arc5");
-		Link link4 = new Link(Set.of(nodeD), arc4, nodeG);
+		Link link4 = new Link(Set.of(nodeD), arc4, Set.of(nodeG));
 		Node nodeI = new DiscreteNode("I");
-		Link link5 = new Link(Set.of(nodeI), arc5, nodeH);
+		Link link5 = new Link(Set.of(nodeI), arc5, Set.of(nodeH));
 
 		Graph graph4 = new Graph(link4, link5);
 
 		Graph graph3 = Graph.concatGraphs(graph1, graph2, graph4);
 
 		Graph manualGraph = new Graph(List.of(
-				new Link(Set.of(nodeB), arc1, nodeF),
-				new Link(Set.of(nodeA, nodeB), arc2, nodeC),
-				new Link(Set.of(nodeC, nodeE), arc3, nodeD),
-				new Link(Set.of(nodeD), arc4, nodeG),
-				new Link(Set.of(nodeI), arc5, nodeH)
+				new Link(Set.of(nodeB), arc1, Set.of(nodeF)),
+				new Link(Set.of(nodeA, nodeB), arc2, Set.of(nodeC)),
+				new Link(Set.of(nodeC, nodeE), arc3, Set.of(nodeD)),
+				new Link(Set.of(nodeD), arc4, Set.of(nodeG)),
+				new Link(Set.of(nodeI), arc5, Set.of(nodeH))
 		));
 
 		// visualize graph3 and manualgraph
@@ -137,8 +137,8 @@ class GraphTest {
 	@Test
 	void congruentTo() {
 		Graph graph = new Graph(List.of(
-				new Link(Set.of(matrixNode), arcs.get(2), hfNode),
-				new Link(Set.of(matrixNode), arcs.get(3), dipoleNode)
+				new Link(Set.of(matrixNode), arcs.get(2), Set.of(hfNode)),
+				new Link(Set.of(matrixNode), arcs.get(3), Set.of(dipoleNode))
 		));
 		Graph graph3 = new Graph(link4);
 		assertFalse(graph3.congruentTo(graph1));
@@ -179,7 +179,7 @@ class GraphTest {
 	void mergeGraphs5() {
 		Node ieNode = new DiscreteNode("ie");
 		Arc arc = GraphGenerator.generateArcs(1).get(0);
-		Link link = new Link(Set.of(dipoleNode), arc, ieNode);
+		Link link = new Link(Set.of(dipoleNode), arc, Set.of(ieNode));
 		Graph e1 = new Graph(link2, link3, link);
 		Graph mergedGraph = Graph.mergeGraphs(List.of(graph1, e1), Set.of(hfNode, ieNode));
 		assertEquals(mergedGraph, new Graph(link1, link3, link));
@@ -209,8 +209,8 @@ class GraphTest {
 			}
 		};
 		arc2.setName("arc2");
-		Link link1 = new Link(Set.of(nodeA), arc1, nodeC1);
-		Link link2 = new Link(Set.of(nodeC2), arc2, nodeD);
+		Link link1 = new Link(Set.of(nodeA), arc1, Set.of(nodeC1));
+		Link link2 = new Link(Set.of(nodeC2), arc2, Set.of(nodeD));
 
 		// generate a graph with links 1 and 2
 		Graph graph = new Graph(link1, link2);
@@ -227,7 +227,7 @@ class GraphTest {
 			}
 		};
 		arc1a.setName("arc1a");
-		Link link1A = new Link(Set.of(nodeA), arc1a, nodeC1);
+		Link link1A = new Link(Set.of(nodeA), arc1a, Set.of(nodeC1));
 		Graph graph1a = new Graph(link1A, link2);
 
 		assertFalse(graph.equals(graph1a));
@@ -241,8 +241,8 @@ class GraphTest {
 		// add two different nodes but with the same datum name into a graph. should throw an error
 		Exception exception = assertThrows(IllegalArgumentException.class, () -> {
 			new Graph(List.of(
-					new Link(Set.of(paramNode), arcs.get(0), magicNode),
-					new Link(Set.of(paramNode2), arcs.get(1), matrixNode)
+					new Link(Set.of(paramNode), arcs.get(0), Set.of(magicNode)),
+					new Link(Set.of(paramNode2), arcs.get(1), Set.of(matrixNode))
 			));
 		});
 
@@ -313,9 +313,9 @@ class GraphTest {
 
 			}
 		};
-		Link link1 = new Link(Set.of(nodeA), arc1, nodeB);
-		Link link2 = new Link(Set.of(nodeB), arc2, nodeC);
-		Link link3 = new Link(Set.of(nodeB, nodeC), arc3, nodeD);
+		Link link1 = new Link(Set.of(nodeA), arc1, Set.of(nodeB));
+		Link link2 = new Link(Set.of(nodeB), arc2, Set.of(nodeC));
+		Link link3 = new Link(Set.of(nodeB, nodeC), arc3, Set.of(nodeD));
 //		Link link4 = new Link(Set.of(nodeB), arc4, nodeD);
 // todo multiple links to same output node doesn't work as expected
 
@@ -341,8 +341,8 @@ class GraphTest {
 
 			}
 		};
-		Link link1 = new Link(Set.of(nodeA), arc1, nodeB);
-		Link link2 = new Link(Set.of(nodeA), arc2, nodeB);
+		Link link1 = new Link(Set.of(nodeA), arc1, Set.of(nodeB));
+		Link link2 = new Link(Set.of(nodeA), arc2, Set.of(nodeB));
 		List<Link[]> duplicates = new Graph(link1, link2).findDuplicateLinks();
 		assertEquals(1, duplicates.size());
 		for (Link[] duplicate : duplicates) {

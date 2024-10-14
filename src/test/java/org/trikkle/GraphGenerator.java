@@ -74,7 +74,7 @@ public class GraphGenerator {
 				return getGraph(nodes, arcs, new Random(random.nextLong()));
 			}
 
-			links.add(new Link(dependencies, arcs.get(i), outputNode));
+			links.add(new Link(dependencies, arcs.get(i), Set.of(outputNode)));
 			dependenciesOfNode.put(outputNode, dependencies);
 
 			unusedNodes.remove(outputNode);

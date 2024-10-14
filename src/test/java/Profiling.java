@@ -16,7 +16,7 @@ public class Profiling {
 					getOutputNode().setUsable();
 				}
 			};
-			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, new Nodespace().emptyOf()));
+			manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, Set.of(new Nodespace().emptyOf())));
 		}
 		Overseer overseer = new Overseer(new Graph(manyLinks));
 		for (Node startingNode : overseer.getGraph().startingNodes) {

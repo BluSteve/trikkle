@@ -45,7 +45,7 @@ public class Benchmarks {
 						getOutputNode().setProgress(1);
 					}
 				};
-				manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, new Nodespace().emptyOf()));
+				manyLinks.add(new Link(Set.of(new Nodespace().emptyOf()), arc, Set.of(new Nodespace().emptyOf())));
 			}
 			overseer = new Overseer(new Graph(manyLinks));
 			for (Node startingNode : overseer.getGraph().startingNodes) {
