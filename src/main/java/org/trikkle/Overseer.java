@@ -74,10 +74,12 @@ public final class Overseer {
 		linkQueue.addAll(g.links);
 
 		for (Link link : g.links) {
-			for (String datumName : link.getArc().getInputDatumNames()) {
-				for (Node outputNode : link.getOutputNodes()) {
-					// only input datums and not ending datums are keys in this map
-					depNodesOfDatum.putOne(datumName, outputNode);
+			for (Node inputNode : link.getInputNodes()) {
+				for (String datumName : inputNode.datumNames) {
+					for (Node outputNode : link.getOutputNodes()) {
+						// only input datums and not ending datums are keys in this map
+						depNodesOfDatum.putOne(datumName, outputNode);
+					}
 				}
 			}
 		}
@@ -149,10 +151,12 @@ public final class Overseer {
 		Set<Link> links = g.outputNodeMap.get(node);
 		if (links == null) return;
 		for (Link link : links) {
-			for (String datumName : link.getArc().getInputDatumNames()) {
-				depNodesOfDatum.get(datumName).remove(node);
-				if (depNodesOfDatum.get(datumName).isEmpty()) {
-					cache.remove(datumName); // garbage collect intermediate values
+			for (Node inputNode : link.getInputNodes()) {
+				for (String datumName : inputNode.datumNames) {
+					depNodesOfDatum.get(datumName).remove(node);
+					if (depNodesOfDatum.get(datumName).isEmpty()) {
+						cache.remove(datumName); // garbage collect intermediate values
+					}
 				}
 			}
 		}

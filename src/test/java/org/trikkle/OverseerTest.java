@@ -134,6 +134,7 @@ class OverseerTest {
 		assertEquals(3, overseer.depNodesOfDatum.get("2a").size());
 		overseer.start();
 		assertEquals(0, overseer.depNodesOfDatum.get("2a").size());
+		assertEquals(2, overseer.getCache().size());
 
 		overseer = new Overseer(graph);
 		overseer.resetGraph();
@@ -144,6 +145,7 @@ class OverseerTest {
 		assertEquals(3, overseer.depNodesOfDatum.get("2a").size());
 		overseer.start();
 		assertEquals(3, overseer.depNodesOfDatum.get("2a").size());
+		assertEquals(10, overseer.getCache().size());
 	}
 
 	@Test

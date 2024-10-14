@@ -128,7 +128,6 @@ public abstract class Arc implements Primable {
 						declaredField.setAccessible(true);
 						declaredField.set(this, getDatum(datumName));
 					} catch (NoSuchFieldException ignored) {
-						System.out.println(ignored);
 					}
 				} catch (IllegalAccessException e) {
 					throw new RuntimeException(e);

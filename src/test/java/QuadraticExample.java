@@ -175,6 +175,7 @@ class QuadraticExample {
 
 	private static void testGraph(Graph graph) {
 		Overseer overseer = new Overseer(graph);
+		overseer.setGarbageCollect(false);
 		overseer.setLogging(true);
 		overseer.addStartingDatum("a", 1.0);
 		overseer.addStartingDatum("b", 5.0);
@@ -187,7 +188,7 @@ class QuadraticExample {
 		System.out.print(LogUtils.linkTraceToString(overseer.getLinkTrace()));
 
 		System.out.println("\nFinal cache:");
-		for (Map.Entry<String, Object> stringObjectEntry : overseer.getCacheCopy().entrySet()) {
+		for (Map.Entry<String, Object> stringObjectEntry : overseer.getCache().entrySet()) {
 			System.out.println(stringObjectEntry);
 		}
 
