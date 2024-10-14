@@ -1,7 +1,10 @@
 package org.trikkle;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -12,8 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class Arc implements Primable {
 	private final ReentrantLock lock = new ReentrantLock();
 	private final boolean safe;
-	private Map<String, Field> inputFields, outputFields;
-	private Set<String> inputDatumNames, outputDatumNames;
 	private String name;
 
 	private long startTime = -1, endTime = -1;
@@ -56,9 +57,7 @@ public abstract class Arc implements Primable {
 	protected abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {
-		if (inputFields != null) autoFill();
 		run();
-		if (outputFields != null) autoReturn();
 	}
 
 	/**
@@ -111,35 +110,6 @@ public abstract class Arc implements Primable {
 		} else {
 			throw new IllegalArgumentException(
 					"Arc " + this + " cannot return datum " + datumName + " because it is not an output of this arc!");
-		}
-	}
-
-	private void autoFill() {
-		for (Map.Entry<String, Field> inputEntry : inputFields.entrySet()) {
-			String datumName = inputEntry.getKey();
-			Field field = inputEntry.getValue();
-			Object datum = getDatum(datumName);
-			field.setAccessible(true);
-			try {
-				field.set(this, datum);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	private void autoReturn() {
-		for (Map.Entry<String, Field> outputEntry : outputFields.entrySet()) {
-			String datumName = outputEntry.getKey();
-			Field field = outputEntry.getValue();
-			Object datum;
-			field.setAccessible(true);
-			try {
-				datum = field.get(this);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-			returnDatum(datumName, datum);
 		}
 	}
 
