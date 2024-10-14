@@ -56,7 +56,9 @@ public abstract class Arc implements Primable {
 	protected abstract void run(); // lambda won't work because it won't allow for multiple parameter inputs
 
 	void runWrapper() {
+		autoFill();
 		run();
+		autoReturn();
 	}
 
 	/**
@@ -109,6 +111,42 @@ public abstract class Arc implements Primable {
 		} else {
 			throw new IllegalArgumentException(
 					"Arc " + this + " cannot return datum " + datumName + " because it is not an output of this arc!");
+		}
+	}
+
+	private void autoFill() {
+		for (Field field : this.getClass().getDeclaredFields()) {
+			if (field.getName().endsWith("$in")) {
+				try {
+					String datumName = (String) field.get(this);
+					String var$in = field.getName();
+					String var = var$in.substring(0, var$in.length() - 3);
+					try {
+						this.getClass().getField(var).set(this, getDatum(datumName));
+					} catch (NoSuchFieldException ignored) {
+					}
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+	}
+
+	private void autoReturn() {
+		for (Field field : this.getClass().getDeclaredFields()) {
+			if (field.getName().endsWith("$out")) {
+				try {
+					String datumName = (String) field.get(this);
+					String var$out = field.getName();
+					String var = var$out.substring(0, var$out.length() - 4);
+					try {
+						returnDatum(datumName, this.getClass().getField(var).get(this));
+					} catch (NoSuchFieldException ignored) {
+					}
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 	}
 
