@@ -42,6 +42,16 @@ public final class Graph implements Congruent<Graph> {
 	 */
 	public Graph(List<Link> linkList) {
 		this.linkList = linkList;
+
+		for (Link link: linkList) {
+			if (link.getInputNodes() == null) {
+				throw new IllegalArgumentException("Link " + link + " has null input nodes!");
+			}
+			if (link.getOutputNodes() == null) {
+				throw new IllegalArgumentException("Link " + link + " has null output nodes!");
+			}
+		}
+
 		this.links = new HashSet<>(linkList);
 
 		arcs = arcIndex.keySet();
@@ -121,6 +131,57 @@ public final class Graph implements Congruent<Graph> {
 
 		if (!ALLOW_CYCLES && hasCycle()) {
 			throw new IllegalArgumentException("Graph has a cycle!");
+		}
+	}
+
+	public static void preprocess(List<Link> halfLinks, Nodespace ns) {
+		/*
+		1. Create output node from datum names if output node does not exist.
+		2. Create nodeOfDatum map
+		3. For each link, if input nodes is null, then associate them with output nodes
+		4. Populate dangling inputss
+		 */
+
+		// create output nodes if they don't exist
+		for (Link halfLink: halfLinks) {
+			if (halfLink.getOutputNodes() == null) {
+				Node outputNode = new DiscreteNode(halfLink.getArc().getOutputDatumNames());
+				halfLink.setOutputNodes(Collections.singleton(outputNode));
+			}
+		}
+
+		// associates output datums with their nodes
+		Map<String, Node> nodeOfDatum = new HashMap<>();
+		for (Link halfLink : halfLinks) {
+			for (Node outputNode : halfLink.getOutputNodes()) {
+				for (String datumName : outputNode.datumNames) {
+					Node rvalue = nodeOfDatum.put(datumName, outputNode);
+					if (rvalue != null) {
+						throw new IllegalArgumentException("Datum name " + datumName + " is already declared by " + rvalue);
+					}
+				}
+			}
+		}
+
+		for (Link halfLink : halfLinks) {
+			if (halfLink.getInputNodes() == null) {
+				Set<Node> inputNodes = new HashSet<>();
+				Set<String> danglingInputs = new HashSet<>();
+				for (String inputName : halfLink.getArc().getInputDatumNames()) {
+					if (!nodeOfDatum.containsKey(inputName)) {
+						danglingInputs.add(inputName);
+					} else {
+						inputNodes.add(nodeOfDatum.get(inputName));
+					}
+				}
+
+				if (!danglingInputs.isEmpty()) {
+					Node startingNode = ns.discreteOf(danglingInputs); // combines all danglingInputs into one starting node
+					inputNodes.add(startingNode);
+				}
+
+				halfLink.setInputNodes(inputNodes);
+			}
 		}
 	}
 

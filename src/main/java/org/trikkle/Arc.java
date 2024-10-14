@@ -16,7 +16,7 @@ public abstract class Arc implements Primable {
 	private String name;
 
 	private long startTime = -1, endTime = -1;
-	private final Set<String> inputDatumNames, outputDatumNames;
+	private Set<String> inputDatumNames, outputDatumNames;
 	private ArcStatus status = ArcStatus.IDLE;
 	private Overseer overseer;
 	private Link link;
@@ -31,23 +31,6 @@ public abstract class Arc implements Primable {
 	 */
 	public Arc(boolean safe) {
 		this.safe = safe;
-
-		inputDatumNames = new HashSet<>();
-		outputDatumNames = new HashSet<>();
-		for (Field field : this.getClass().getDeclaredFields()) {
-			boolean in = field.getName().endsWith("$in");
-			boolean out = field.getName().endsWith("$out");
-
-			if (in || out) {
-				try {
-					String s = (String) field.get(this);
-					if (in) inputDatumNames.add(s);
-					if (out) outputDatumNames.add(s);
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
 	}
 
 	/**
@@ -205,10 +188,33 @@ public abstract class Arc implements Primable {
 	}
 
 	public Set<String> getInputDatumNames() { // returns object itself, not a copy
+		if (inputDatumNames != null) return inputDatumNames;
+		inputDatumNames = new HashSet<>();
+		// this cannot be in the constructor because local fields are initialized after parent constructor
+		for (Field field : this.getClass().getDeclaredFields()) {
+			if (field.getName().endsWith("$in")) {
+				try {
+					inputDatumNames.add((String) field.get(this));
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 		return inputDatumNames;
 	}
 
 	public Set<String> getOutputDatumNames() {
+		if (outputDatumNames != null) return outputDatumNames;
+		outputDatumNames = new HashSet<>();
+		for (Field field : this.getClass().getDeclaredFields()) {
+			if (field.getName().endsWith("$out")) {
+				try {
+					outputDatumNames.add((String) field.get(this));
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 		return outputDatumNames;
 	}
 
