@@ -166,7 +166,6 @@ class QuadraticExample {
 		Graph.preprocess(links, new Nodespace());
 
 		Graph graph = new Graph(links);
-		graph.optimizeDependencies();
 		System.out.println(graph);
 		return graph;
 	}
@@ -199,8 +198,9 @@ class QuadraticExample {
 	void test() {
 		Graph annotationGraph = simple();
 		Graph verboseGraph = verbose();
-		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
 		testGraph(annotationGraph);
 		testGraph(verboseGraph);
+		annotationGraph.optimizeDependencies();
+		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
 	}
 }

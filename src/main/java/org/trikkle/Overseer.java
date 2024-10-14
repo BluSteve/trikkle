@@ -1,5 +1,7 @@
 package org.trikkle;
 
+import org.trikkle.structs.MultiHashMap;
+import org.trikkle.structs.MultiMap;
 import org.trikkle.structs.StrictConcurrentHashMap;
 import org.trikkle.structs.StrictHashMap;
 
@@ -45,42 +47,40 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class Overseer {
 	final Graph g;
+	// number of dependent nodes undone for each datum. Using Map<String,Integer> wouldn't work because of double
+	// counting of nodes if more than one link points to them.
+	final MultiMap<String, Node> depNodesOfDatum = new MultiHashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Collection<Link> linkQueue = new ConcurrentLinkedQueue<>();
 	private AtomicInteger tick;
 	private Queue<Collection<Link>> linkTrace;
 	private boolean started = false;
-
 	private boolean unsafeOnRecursive = false;
 	private boolean logging = false;
 	private Observer observer = null;
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
+	private boolean garbageCollect = true;
 	private Map<String, Object> resultCache;
 
 	/**
-	 * Constructs an overseer with the given graph. The initial cache is empty. All {@link Primable}s will be locked and
-	 * primed with this overseer.
+	 * Constructs an overseer with the given graph. All {@link Primable}s will be locked and primed
+	 * with this overseer.
 	 *
 	 * @param graph the graph to be executed
 	 */
 	public Overseer(Graph graph) {
-		this(graph, null);
-	}
-
-	/**
-	 * Constructs an overseer with the given graph and initial cache. All {@link Primable}s will be locked and primed
-	 * with this overseer.
-	 *
-	 * @param graph        the graph to be executed
-	 * @param initialCache the initial cache, possibly from another overseer
-	 */
-	public Overseer(Graph graph, Map<String, Object> initialCache) {
 		this.g = graph;
-		if (initialCache != null) {
-			this.cache.putAll(initialCache); // doesn't check that the initialCache has datums that are actually in the graph
-		}
 		linkQueue.addAll(g.links);
+
+		for (Link link : g.links) {
+			for (String datumName : link.getArc().getInputDatumNames()) {
+				for (Node outputNode : link.getOutputNodes()) {
+					// only input datums and not ending datums are keys in this map
+					depNodesOfDatum.putOne(datumName, outputNode);
+				}
+			}
+		}
 
 		// undoes previous overseer's changes
 		// Prime nodes and arcs with this overseer
@@ -141,6 +141,22 @@ public final class Overseer {
 			ticktock(null);
 		}
 		onEnd();
+	}
+
+	void markDone(Node node) {
+		if (!garbageCollect) return;
+
+		Set<Link> links = g.outputNodeMap.get(node);
+		if (links == null) return;
+		for (Link link : links) {
+			for (String datumName : link.getArc().getInputDatumNames()) {
+				depNodesOfDatum.get(datumName).remove(node);
+				if (depNodesOfDatum.get(datumName).isEmpty()) {
+					cache.remove(datumName); // garbage collect intermediate values
+				}
+			}
+		}
+		System.out.println();
 	}
 
 	private void ticktock(Node caller) {
@@ -478,6 +494,19 @@ public final class Overseer {
 	 */
 	public void setObserver(Observer observer) {
 		this.observer = observer;
+	}
+
+	public boolean isGarbageCollect() {
+		return garbageCollect;
+	}
+
+	/**
+	 * Default: {@code true}
+	 *
+	 * @param garbageCollect whether to garbage collect intermediate values
+	 */
+	public void setGarbageCollect(boolean garbageCollect) {
+		this.garbageCollect = garbageCollect;
 	}
 
 	/**
