@@ -145,7 +145,7 @@ public final class Graph implements Congruent<Graph> {
 		// create output nodes if they don't exist
 		for (Link halfLink: halfLinks) {
 			if (halfLink.getOutputNodes() == null) {
-				Node outputNode = new DiscreteNode(halfLink.getArc().getOutputDatumNames());
+				Node outputNode = ns.discreteOf(halfLink.getArc().getOutputDatumNames());
 				halfLink.setOutputNodes(Collections.singleton(outputNode));
 			}
 		}
