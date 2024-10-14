@@ -1,9 +1,7 @@
 package org.trikkle;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,6 +16,7 @@ public abstract class Arc implements Primable {
 	private String name;
 
 	private long startTime = -1, endTime = -1;
+	private final Set<String> inputDatumNames, outputDatumNames;
 	private ArcStatus status = ArcStatus.IDLE;
 	private Overseer overseer;
 	private Link link;
@@ -32,6 +31,23 @@ public abstract class Arc implements Primable {
 	 */
 	public Arc(boolean safe) {
 		this.safe = safe;
+
+		inputDatumNames = new HashSet<>();
+		outputDatumNames = new HashSet<>();
+		for (Field field : this.getClass().getDeclaredFields()) {
+			boolean in = field.getName().endsWith("$in");
+			boolean out = field.getName().endsWith("$out");
+
+			if (in || out) {
+				try {
+					String s = (String) field.get(this);
+					if (in) inputDatumNames.add(s);
+					if (out) outputDatumNames.add(s);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 	}
 
 	/**
@@ -188,19 +204,12 @@ public abstract class Arc implements Primable {
 		outputNodesRemaining = new HashSet<>(link.getOutputNodes());
 	}
 
-	public List<String> getInputDatumNames2() {
-		List<String> res = new ArrayList<>();
-		for (Field field : this.getClass().getDeclaredFields()) {
-			System.out.println(field.getName() + " " + field.getModifiers());
-			if (field.getName().endsWith("$name")) {
-				try {
-					res.add((String) field.get(this));
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-		return res;
+	public Set<String> getInputDatumNames() { // returns object itself, not a copy
+		return inputDatumNames;
+	}
+
+	public Set<String> getOutputDatumNames() {
+		return outputDatumNames;
 	}
 
 	public long getStartTime() {
