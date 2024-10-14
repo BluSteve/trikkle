@@ -27,14 +27,14 @@ public final class Link implements Congruent<Link> {
 	 * @throws IllegalArgumentException if a StreamNode is the input of an AutoArc
 	 */
 	public Link(Set<Node> dependencies, Arc arc, Set<Node> outputNodes) {
-		if (dependencies == null) throw new NullPointerException("Dependencies cannot be null!");
 		if (arc == null) throw new NullPointerException("Arc cannot be null!");
-		if (outputNodes == null) throw new NullPointerException("outputNodes cannot be null!");
 
-		boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
-		boolean autoArc = arc instanceof AutoArc;
-		if (hasStreamNode && autoArc) {
-			throw new IllegalArgumentException("StreamNode cannot be the input of an AutoArc. Use Arc instead.");
+		if (dependencies != null) {
+			boolean hasStreamNode = dependencies.stream().anyMatch(node -> node instanceof StreamNode);
+			boolean autoArc = arc instanceof AutoArc;
+			if (hasStreamNode && autoArc) {
+				throw new IllegalArgumentException("StreamNode cannot be the input of an AutoArc. Use Arc instead.");
+			}
 		}
 
 		this.dependencies = dependencies;
