@@ -135,8 +135,8 @@ public final class Overseer {
 		}
 
 		started = true;
+		tick = new AtomicInteger(0);
 		if (logging) {
-			tick = new AtomicInteger(0);
 			linkTrace = new ConcurrentLinkedQueue<>();
 		}
 		while (!hasEnded()) {
@@ -198,8 +198,8 @@ public final class Overseer {
 			}
 		}
 
+		int t = tick.incrementAndGet();
 		if (logging) {
-			int t = tick.incrementAndGet();
 			linkTrace.add(linksNow);
 			if (observer != null) observer.accept(caller, t, linksNow);
 		} else {
@@ -365,12 +365,12 @@ public final class Overseer {
 	}
 
 	/**
-	 * Returns the current tick number. If logging is disabled, this will always return 0.
+	 * Returns the current tick number.
 	 *
 	 * @return the current tick number
 	 */
 	public int getTick() {
-		return tick == null ? 0 : tick.get();
+		return tick.get();
 	}
 
 	/**
