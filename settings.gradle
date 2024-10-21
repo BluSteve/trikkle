@@ -1,2 +1,4 @@
 rootProject.name = 'trikkle'
+include 'src:annotations'
+findProject(':src:annotations')?.name = 'annotations'
 
