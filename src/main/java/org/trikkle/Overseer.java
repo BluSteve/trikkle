@@ -201,12 +201,8 @@ public final class Overseer {
 		}
 
 		int t = tick.incrementAndGet();
-		if (logging) {
-			linkTrace.add(linksNow);
-			if (observer != null) observer.accept(caller, t, linksNow);
-		} else {
-			if (observer != null) observer.accept(caller, 0, linksNow);
-		}
+		if (logging) linkTrace.add(linksNow);
+		if (observer != null) observer.accept(caller, t, linksNow);
 
 		if (linksNow.isEmpty()) return;
 		if (!parallel || linksNow.size() < parallelThreshold) {
