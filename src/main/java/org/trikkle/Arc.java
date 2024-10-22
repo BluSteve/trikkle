@@ -16,7 +16,7 @@ public abstract class Arc implements Primable {
 	private String name;
 
 	private long startTime = -1, endTime = -1;
-	private Set<String> inputDatumNames, outputDatumNames;
+	private Set<String> inputDatumNames, outputDatumNames; // may be incomplete!
 	private ArcStatus status = ArcStatus.IDLE;
 	private Overseer overseer;
 	private Link link;
@@ -69,6 +69,17 @@ public abstract class Arc implements Primable {
 	 * @throws NullPointerException if there is no datum with the given name in the cache
 	 */
 	protected <T> T getDatum(String datumName) {
+		boolean in = false;
+		for (Node n : link.getInputNodes()) {
+			if (n.datumNames.contains(datumName)) {
+				in = true;
+				break;
+			}
+		}
+		if (!in && overseer.getCache().containsKey(datumName)) {
+			System.err.println("Warning: datum " + datumName + " is not an input of link " + link.getOutputNodes() + "!");
+		}
+
 		if (!overseer.getCache().containsKey(datumName)) {
 			throw new NullPointerException("No datum with name " + datumName + " is in the cache!");
 		}
@@ -84,6 +95,17 @@ public abstract class Arc implements Primable {
 	 * @return the datum with the given name, or the default value if the datum is not in the cache
 	 */
 	protected <T> T getDatum(String datumName, T defaultValue) {
+		boolean in = false;
+		for (Node n : link.getInputNodes()) {
+			if (n.datumNames.contains(datumName)) {
+				in = true;
+				break;
+			}
+		}
+		if (!in && overseer.getCache().containsKey(datumName)) {
+			System.err.println("Warning: datum " + datumName + " is not an input of link " + link.getOutputNodes() + "!");
+		}
+
 		if (!overseer.getCache().containsKey(datumName)) {
 			return defaultValue;
 		}
@@ -193,6 +215,7 @@ public abstract class Arc implements Primable {
 		}
 	}
 
+	// todo this method looks sus for the race condition!
 	synchronized int getOutputNodesRemaining() { // this can determine if there are no more undone output nodes in O(n)
 		// time
 		outputNodesRemaining.removeIf((node) -> node.getProgress() == 1);
