@@ -7,6 +7,7 @@ import java.util.Random;
 public class JavassistTest {
 	static Random r = new Random(1);
 	static String randomString = Long.toHexString(r.nextLong()); // effectively final variables are abstract fsr
+	static String a$in = "a" + randomString;
 
 	public static void main(String[] args) {
 		String b$in = "b" + randomString;
@@ -14,7 +15,6 @@ public class JavassistTest {
 
 		String output$out = "a+b";
 		Arc arc = new AutoArc() {
-			String a$in = "a" + randomString;
 			String[] placeholder = {a$in, b$in, output$out};
 			double a, b, output;
 

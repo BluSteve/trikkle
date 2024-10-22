@@ -1,15 +1,10 @@
 package org.trikkle;
 
-import org.trikkle.structs.MultiHashMap;
-import org.trikkle.structs.MultiMap;
 import org.trikkle.structs.StrictConcurrentHashMap;
 import org.trikkle.structs.StrictHashMap;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -49,7 +44,7 @@ public final class Overseer {
 	final Graph g;
 	// number of dependent nodes undone for each datum. Using Map<String,Integer> wouldn't work because of double
 	// counting of nodes if more than one link points to them.
-	final MultiMap<String, Node> depNodesOfDatum = new MultiHashMap<>();
+	final Map<String, Set<Node>> depNodesOfDatum = new HashMap<>();
 	private final Map<String, Object> cache = new StrictConcurrentHashMap<>();
 	private final Collection<Link> linkQueue = new ConcurrentLinkedQueue<>();
 	private AtomicInteger tick;
@@ -78,7 +73,13 @@ public final class Overseer {
 				for (String datumName : inputNode.datumNames) {
 					for (Node outputNode : link.getOutputNodes()) {
 						// only input datums and not ending datums are keys in this map
-						depNodesOfDatum.putOne(datumName, outputNode);
+						if (depNodesOfDatum.containsKey(datumName)) {
+							depNodesOfDatum.get(datumName).add(outputNode);
+						} else {
+							Set<Node> nodes = ConcurrentHashMap.newKeySet(); // very impt! todo also could be race condition cause
+							nodes.add(outputNode);
+							depNodesOfDatum.put(datumName, nodes);
+						}
 					}
 				}
 			}
