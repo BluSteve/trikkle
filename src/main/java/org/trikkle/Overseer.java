@@ -56,6 +56,7 @@ public final class Overseer {
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
 	private boolean garbageCollect = true;
+	private final Set<String> gcBlacklist = new HashSet<>();
 	private Map<String, Object> resultCache;
 
 	/**
@@ -155,7 +156,7 @@ public final class Overseer {
 			for (Node inputNode : link.getInputNodes()) {
 				for (String datumName : inputNode.datumNames) {
 					depNodesOfDatum.get(datumName).remove(node);
-					if (depNodesOfDatum.get(datumName).isEmpty()) {
+					if (depNodesOfDatum.get(datumName).isEmpty() && !gcBlacklist.contains(datumName)) {
 						cache.remove(datumName); // garbage collect intermediate values
 					}
 				}
@@ -511,6 +512,15 @@ public final class Overseer {
 	 */
 	public void setGarbageCollect(boolean garbageCollect) {
 		this.garbageCollect = garbageCollect;
+	}
+
+	/**
+	 * Get the garbage collection blacklist. A datum in the blacklist will not be garbage collected even if it is no longer needed.
+	 *
+	 * @return the garbage collection blacklist
+	 */
+	public Set<String> getGcBlacklist() {
+		return gcBlacklist;
 	}
 
 	/**
