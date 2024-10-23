@@ -55,7 +55,7 @@ public final class Overseer {
 	private Observer observer = null;
 	private boolean parallel = true;
 	private int parallelThreshold = 2;
-	private boolean garbageCollect = true;
+	private boolean garbageCollect = false;
 	private final Set<String> gcBlacklist = new HashSet<>();
 	private Map<String, Object> resultCache;
 
@@ -109,12 +109,11 @@ public final class Overseer {
 
 	/**
 	 * Starts the overseer by running some checks and then ticking until the graph has all ending nodes at progress 1
-	 * ({@link Node#getProgress()}) and all arcs are {@link ArcStatus#FINISHED}. Blocks the current thread until the
+	 * ({@link Node#getProgress()}). Acs need not be {@link ArcStatus#FINISHED}. Blocks the current thread until the
 	 * graph has ended.
 	 *
-	 * @throws IllegalStateException if the overseer has already started
-	 * @throws IllegalStateException if the starting nodes are not fully populated
-	 * @throws IllegalStateException if the overseer construction and start() are called in different threads
+	 * @throws IllegalStateException if the overseer has already started, OR starting nodes are not fully populated,
+	 *                               OR if the overseer construction and start() are called in different threads
 	 */
 	public void start() {
 		if (started) {
@@ -131,8 +130,7 @@ public final class Overseer {
 		// check that overseer and .start() are called in the same thread
 		for (Primable primable : g.primables) {
 			if (!primable.getLock().isHeldByCurrentThread()) {
-				throw new IllegalStateException(
-						"Overseer construction and start() must be called in the same thread!");
+				throw new IllegalStateException("Overseer construction and start() must be called in the same thread!");
 			}
 		}
 
@@ -502,7 +500,7 @@ public final class Overseer {
 	}
 
 	/**
-	 * Default: {@code true}
+	 * Default: {@code false}
 	 *
 	 * @param garbageCollect whether to garbage collect intermediate values
 	 */

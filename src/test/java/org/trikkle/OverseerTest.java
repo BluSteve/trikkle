@@ -128,6 +128,7 @@ class OverseerTest {
 		Graph graph = new Graph(links);
 
 		Overseer overseer = new Overseer(graph);
+		overseer.setGarbageCollect(true);
 		overseer.addStartingDatum("a", 1.0);
 		overseer.addStartingDatum("b", 5.0);
 		overseer.addStartingDatum("c", 6.0);

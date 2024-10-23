@@ -20,6 +20,7 @@ public abstract class Arc implements Primable {
 	private ArcStatus status = ArcStatus.IDLE;
 	private Overseer overseer;
 	private Link link;
+	private Set<String> reifiedInputDatumNames = new HashSet<>();
 	private Set<Node> outputNodesRemaining; // could be stale
 
 	/**
@@ -66,49 +67,46 @@ public abstract class Arc implements Primable {
 	 *
 	 * @param datumName the name of the datum
 	 * @return the datum with the given name
-	 * @throws NullPointerException if there is no datum with the given name in the cache
+	 * @throws NullPointerException     if there is no datum with the given name in the cache
+	 * @throws IllegalArgumentException if the datum is not an input of this arc and garbage collection is enabled; this
+	 *                                  is regardless of whether the datum is in the cache
 	 */
 	protected <T> T getDatum(String datumName) {
-		boolean in = false;
-		for (Node n : link.getInputNodes()) {
-			if (n.datumNames.contains(datumName)) {
-				in = true;
-				break;
-			}
-		}
-		if (!in && overseer.getCache().containsKey(datumName)) {
-			System.err.println("Warning: datum " + datumName + " is not an input of link " + link.getOutputNodes() + "!");
-		}
+		boolean inInputNode = reifiedInputDatumNames.contains(datumName);
+		boolean inCache = overseer.getCache().containsKey(datumName);
 
-		if (!overseer.getCache().containsKey(datumName)) {
+		if (this.overseer.isGarbageCollect() && !inInputNode) {
+			throw new IllegalArgumentException("Datum " + datumName + " is not an input of this arc!");
+		}
+		if (!inCache) {
 			throw new NullPointerException("No datum with name " + datumName + " is in the cache!");
 		}
+
 		//noinspection unchecked
 		return (T) overseer.getCache().get(datumName);
 	}
 
 	/**
 	 * Gets the datum with the given name from the overseer's cache. If the datum is not in the cache, the default value
-	 * is returned.
+	 * is returned. NOTE: If the datum is not in the cache but is an input of this arc, the default value will be
+	 * returned and no exception will be thrown.
 	 *
 	 * @param datumName the name of the datum
 	 * @return the datum with the given name, or the default value if the datum is not in the cache
+	 * @throws IllegalArgumentException if the datum is not an input of this arc and garbage collection is enabled
+	 *                                  and the datum is in the cache
 	 */
 	protected <T> T getDatum(String datumName, T defaultValue) {
-		boolean in = false;
-		for (Node n : link.getInputNodes()) {
-			if (n.datumNames.contains(datumName)) {
-				in = true;
-				break;
-			}
-		}
-		if (!in && overseer.getCache().containsKey(datumName)) {
-			System.err.println("Warning: datum " + datumName + " is not an input of link " + link.getOutputNodes() + "!");
-		}
+		boolean inInputNode = reifiedInputDatumNames.contains(datumName);
+		boolean inCache = overseer.getCache().containsKey(datumName);
 
-		if (!overseer.getCache().containsKey(datumName)) {
+		if (!inCache) {
 			return defaultValue;
 		}
+		if (this.overseer.isGarbageCollect() && !inInputNode) {
+			throw new IllegalArgumentException("Datum " + datumName + " is not an input of this arc!");
+		}
+
 		//noinspection unchecked
 		return (T) overseer.getCache().get(datumName);
 	}
@@ -254,6 +252,10 @@ public abstract class Arc implements Primable {
 		this.overseer = overseer;
 		link = overseer.g.arcMap.get(this);
 		outputNodesRemaining = new HashSet<>(link.getOutputNodes());
+		reifiedInputDatumNames.clear();
+		for (Node node : link.getInputNodes()) {
+			reifiedInputDatumNames.addAll(node.datumNames);
+		}
 	}
 
 	public Set<String> getInputDatumNames() { // returns object itself, not a copy
@@ -363,5 +365,13 @@ public abstract class Arc implements Primable {
 		} else {
 			return name;
 		}
+	}
+
+	public Set<String> getReifiedInputDatumNames() {
+		return reifiedInputDatumNames;
+	}
+
+	public void setReifiedInputDatumNames(Set<String> reifiedInputDatumNames) {
+		this.reifiedInputDatumNames = reifiedInputDatumNames;
 	}
 }
