@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 // Imagine that arithmetic takes a lot of time.
 class QuadraticExample {
 	static Graph verbose() {
@@ -92,7 +94,7 @@ class QuadraticExample {
 	static Graph simple() {
 		List<Link> links = new ArrayList<>();
 		Nodespace ns = new Nodespace();
-		Node nodeA =ns.discreteOf("a");
+		Node nodeA = ns.discreteOf("a");
 
 		String a$in, b$in, c$in, a2$in, bsq$in, fourac$in, detsqrtpos$in, detsqrtneg$in;
 		String a2$out, bsq$out, fourac$out, detsqrtpos$out, detsqrtneg$out, pos$out, neg$out;
@@ -160,6 +162,7 @@ class QuadraticExample {
 
 			@Override
 			protected void run() {
+				assertThrows(IllegalArgumentException.class, () -> getDatum("a"));
 				pos = (-b + detsqrtpos) / a2;
 				neg = (-b + detsqrtneg) / a2;
 			}
@@ -173,9 +176,9 @@ class QuadraticExample {
 		return graph;
 	}
 
-	private static void testGraph(Graph graph) {
+	private static void testGraph(Graph graph, boolean gc) {
 		Overseer overseer = new Overseer(graph);
-		overseer.setGarbageCollect(false);
+		overseer.setGarbageCollect(gc);
 		overseer.setLogging(true);
 		overseer.addStartingDatum("a", 1.0);
 		overseer.addStartingDatum("b", 5.0);
@@ -202,8 +205,8 @@ class QuadraticExample {
 	void test() {
 		Graph annotationGraph = simple();
 		Graph verboseGraph = verbose();
-		testGraph(annotationGraph);
-		testGraph(verboseGraph);
+		testGraph(annotationGraph, true);
+		testGraph(verboseGraph, false);
 		annotationGraph.optimizeDependencies();
 		Assertions.assertTrue(annotationGraph.congruentTo(verboseGraph));
 	}
